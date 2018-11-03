@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const SECRET = process.env.SECRET_KEY || 'test';
 const BWF = process.env.BWF || 10;
+const DEFAULT_PHOTO = `https://moonvillageassociation.org/wp-content/uploads/2018/06/default-profile-picture1.jpg`;
 
 const PORT = +process.env.PORT || 3000;
 
@@ -25,5 +26,6 @@ module.exports = {
   SECRET,
   PORT,
   DB_URI,
-  BWF
+  BWF,
+  DEFAULT_PHOTO
 };
