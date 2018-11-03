@@ -5,10 +5,24 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+//import routes
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
+const surveyRoutes = require('./routes/surveys');
+const questionRoutes = require('./routes/questions');
+const choicesRoutes = require('./routes/choices');
+
 // add logging system
 
 const morgan = require('morgan');
 app.use(morgan('tiny'));
+
+// add routes here
+app.use(authRoutes);
+app.use('/users', userRoutes);
+app.use('/surveys', surveyRoutes);
+app.use('/questions', questionRoutes);
+app.use('/choices', choicesRoutes);
 
 /** 404 handler */
 
