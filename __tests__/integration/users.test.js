@@ -153,7 +153,7 @@ describe('DELETE /users/:username', () => {
   });
 });
 
-//Delete users and companies tables after each tets
+//Delete tables after each tets
 afterEach(async function () {
   await dropTables();
 });
