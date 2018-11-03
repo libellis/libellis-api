@@ -82,18 +82,18 @@ describe('POST /users', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty('token');
 
-    // // TEST FOR JSON SCHEMA
-    // const invalidResponse = await request(app)
-    //   .post('/users')
-    //   .send({
-    //     username: 'bobcat',
-    //     password: 'bob',
-    //     first_name: 'bob',
-    //     last_name: 'johnson',
-    //     email: 'bob.com'
-    //   });
+    // TEST FOR JSON SCHEMA
+    const invalidResponse = await request(app)
+      .post('/users')
+      .send({
+        username: 'bobcat',
+        password: 'bob',
+        first_name: 'bob',
+        last_name: 'johnson',
+        email: 'bob.com'
+      });
 
-    // expect(invalidResponse.statusCode).toBe(400);
+    expect(invalidResponse.statusCode).toBe(400);
   });
 });
 
@@ -128,15 +128,15 @@ describe('PATCH /users/:username', () => {
     expect(response.body.user._username).toBe(user3.username);
     expect(response.body.user.first_name).toBe('Josephina');
 
-    // //TEST FOR JSON SCHEMA
-    // const invalidResponse = await request(app)
-    //   .patch(`/users/${user3.username}`)
-    //   .send({
-    //     first_name: 20,
-    //     last_name: null,
-    //     _token: userToken
-    //   });
-    // expect(invalidResponse.statusCode).toBe(400);
+    //TEST FOR JSON SCHEMA
+    const invalidResponse = await request(app)
+      .patch(`/users/${user3.username}`)
+      .send({
+        first_name: 20,
+        last_name: null,
+        _token: userToken
+      });
+    expect(invalidResponse.statusCode).toBe(400);
   });
 });
 
