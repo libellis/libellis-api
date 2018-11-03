@@ -1,8 +1,8 @@
 const express = require('express');
 const router = new express.Router();
 const User = require('../models/user');
-const Survey = require('../models/application');
-const Question = require('../models/job');
+// const Survey = require('../models/survey');
+// const Question = require('../models/question');
 const { classPartialUpdate } = require('../helpers/partialUpdate');
 const { ensureLoggedIn, ensureCorrectUser } = require('../middleware/auth');
 
