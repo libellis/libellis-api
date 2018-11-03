@@ -14,6 +14,7 @@
     "jest": "^23.6.0",
     "jsonschema": "^1.2.4",
     "jsonwebtoken": "^8.3.0",
+    "morgan": "^1.9.1",
     "pg": "^7.6.0",
     "supertest": "^3.3.0"
   }
