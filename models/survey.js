@@ -6,7 +6,7 @@ const {
 
 
 class Survey {
-  constructor({id, author, title, description, date_posted, anonymous = true }) {
+  constructor({ id, author, title, description, date_posted, anonymous = true }) {
     this.id = id;
     this.author = author;
     this.title = title;
@@ -37,19 +37,19 @@ class Survey {
 
     if (id === undefined) throw new Error('Missing id parameter')
 
-    let surveys = await db.query(
+    let result = await db.query(
       `SELECT id, author, title, description, date_posted, anonymous
             FROM surveys
             WHERE id=$1`, [id]
     )
 
-    if (surveys.rows.length < 1) {
+    if (result.rows.length < 1) {
       const err = Error('Not Found');
       err.status = 404;
       throw err;
     }
 
-    return new Survey(surveys.rows[0]);
+    return new Survey(result.rows[0]);
   }
 
   /**
@@ -58,16 +58,16 @@ class Survey {
    * @param {{field: value, ...}} search
    */
   static async getAll(search) {
-    let surveys;
+    let result;
     if (search === undefined) {
-      surveys = await db.query(
+      result = await db.query(
         `SELECT id, author, title, description, date_posted, anonymous
                 FROM surveys`
       );
     } else {
       console.log('RUN SEARCH QUERY HERE')
     }
-    return surveys.rows.map(s => new Survey(s));
+    return result.rows.map(s => new Survey(s));
   }
 
   /**
@@ -81,14 +81,14 @@ class Survey {
 
     if (!author || !title) throw new Error('Missing author or title parameter');
 
-    let survey = await db.query(
+    let result = await db.query(
       `INSERT INTO surveys (author, title, description)
             VALUES ($1, $2, $3)
             RETURNING id, author, title, description, date_posted, anonymous`,
       [author, title, description]
     )
 
-    return new Survey(survey.rows[0]);
+    return new Survey(result.rows[0]);
   }
 
   updateFromValues(vals) {
