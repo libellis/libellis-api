@@ -41,11 +41,12 @@ describe('getSurvey(id)', () => {
     it('should get a survey by id', async function () {
         const survey = await Survey.getOne(survey1.id);
         expect(survey).toEqual({
-            "anonymous": true,
-            "author": "joerocket",
-            "date_posted": expect.any(Date),
-            "description": "hot fiya",
-            "title": "best albums of 2009",
+            _id: expect.any(Number),
+            anonymous: true,
+            author: "joerocket",
+            date_posted: expect.any(Date),
+            description: "hot fiya",
+            title: "best albums of 2009",
         });
     });
 });
@@ -57,6 +58,7 @@ describe('getSurveys()', () => {
 
         expect(surveys.length).toEqual(2);
         expect(surveys[0]).toEqual({
+            "_id": 1,
             "anonymous": true,
             "author": survey1.author,
             "date_posted": expect.any(Date),
@@ -64,6 +66,7 @@ describe('getSurveys()', () => {
             "title": survey1.title
         });
         expect(surveys[1]).toEqual({
+            "_id": expect.any(Number),
             "anonymous": true,
             "author": survey2.author,
             "date_posted": expect.any(Date),
@@ -74,18 +77,19 @@ describe('getSurveys()', () => {
 });
 
 
+
 describe('createSurvey(author, title, description)', () => {
-    it('should create a new survey with author, title, and description', async function() {
+    it('should create a new survey with author, title, and description', async function () {
         const newSurvey = {
             author: user1.username,
             title: "How do you like your drink mixed?",
-            description:  "Shaken or Stirred. Which will it be?"
+            description: "Shaken or Stirred. Which will it be?"
         }
 
         const survey = await Survey.create(newSurvey.author, newSurvey.title, newSurvey.description)
 
         expect(survey).toEqual({
-            id: expect.any(Number),
+            _id: expect.any(Number),
             author: newSurvey.author,
             title: newSurvey.title,
             description: newSurvey.description,
@@ -94,7 +98,7 @@ describe('createSurvey(author, title, description)', () => {
         })
     });
 
-    it('should create a new survey with a null description', async function() {
+    it('should create a new survey with a null description', async function () {
         const newSurvey = {
             author: user1.username,
             title: "How do you like your drink mixed?",
@@ -103,7 +107,7 @@ describe('createSurvey(author, title, description)', () => {
         const survey = await Survey.create(newSurvey.author, newSurvey.title)
 
         expect(survey).toEqual({
-            id: expect.any(Number),
+            _id: expect.any(Number),
             author: newSurvey.author,
             title: newSurvey.title,
             description: null,
@@ -112,7 +116,7 @@ describe('createSurvey(author, title, description)', () => {
         })
     });
 
-    it('should return throw error if fields missing', async function() {
+    it('should return throw error if fields missing', async function () {
         const newSurvey = {
             author: user1.username,
         }
@@ -124,26 +128,79 @@ describe('createSurvey(author, title, description)', () => {
     });
 });
 
-describe('updateSurvey(id, title, description, anonymous)', async function() {
-    it('should update a survey with all fields', async function() {
 
+
+
+
+describe('updateSurvey(id, title, description, anonymous)', async function () {
+    it('should update a survey with all fields', async function () {
+        let survey = await Survey.getOne(survey1.id);
+
+        survey.description = 'new description';
+        survey.title = 'New Title';
+        survey.anonymous = false;
+
+        await survey.save();
+
+        survey = await Survey.getOne(survey1.id);
+
+        expect(survey).toEqual({
+            _id: survey1.id,
+            author: survey1.author,
+            title: 'New Title',
+            description: 'new description',
+            date_posted: survey1.date_posted,
+            anonymous: false
+        })
     });
 
-    it('should update a survey with one field', async function() {
+    it('should update a survey with one field', async function () {
+        let survey = await Survey.getOne(survey1.id);
 
+        survey.description = 'new description';
+
+        await survey.save();
+
+        survey = await Survey.getOne(survey1.id);
+
+        expect(survey).toEqual({
+            _id: survey1.id,
+            author: survey1.author,
+            title: survey1.title,
+            description: 'new description',
+            date_posted: survey1.date_posted,
+            anonymous: survey1.anonymous
+        });
     });
 
-    it('should throw error if id missing', async function() {
+    it('should throw not change an restricted field', async function() {
+        let survey = await Survey.getOne(survey1.id);
+        
+        survey.author = "NewAuthor";
+        survey.date_posted = Date.now();
 
-    });
+        await survey.save();
+
+        survey = await Survey.getOne(survey1.id);
+
+        expect(survey).toEqual({
+            _id: survey1.id,
+            author: survey1.author,
+            title: survey1.title,
+            description: survey1.description,
+            date_posted: survey1.date_posted,
+            anonymous: survey1.anonymous
+        });
+    })
 });
 
+
 describe('deleteSurvey(id)', () => {
-    it('should delete a survey by id', async function() {
+    it('should delete a survey by id', async function () {
 
     });
 
-    it('should return error if id is not given', async function() {
+    it('should return error if id is not given', async function () {
 
     });
 });
