@@ -28,6 +28,7 @@ let survey1,
 
 //Insert 2 users before each test
 beforeEach(async function () {
+  await dropTables();
   await createTables();
 
   ({
@@ -51,7 +52,7 @@ beforeEach(async function () {
 
 
 
-//Test get surveys route
+// Test get surveys route
 describe('GET /surveys', () => {
   it('should correctly return a list of surveys', async function () {
     const response = await request(app).get('/surveys');
@@ -80,58 +81,25 @@ describe('GET /surveys', () => {
   });
 });
 
-describe('GET /surveys/:id', () => {
-  it('should return details for a survey by by', async function() {
-    const response = await request(app).get(`/surveys/${survey1}`);
-    expect(response.statusCode).toBe(200);
-    expect(response.body.survey).toEqual({
-      _id: expect.any(Number),
-      author: 'joerocket',
-      title: 'best albums of 2009',
-      description: 'hot fiya',
-      date_posted: expect.any(String),
-      anonymous: true
-    })
-  });
-
-  // it('should return a 404 Not Found when id not found', async function() {
-  //   const response = await request(app).get('/surveys/33797');
-  //   expect(response.statuCode).toBe(404);
-  // })
-})
-
-
-// //Test create user route
-// describe('POST /users', () => {
-//   it('should correctly create a new user and return it', async function () {
-//     const response = await request(app)
-//       .post('/users')
-//       .send({
-//         username: 'bobcat',
-//         password: 'bob',
-//         first_name: 'bob',
-//         last_name: 'johnson',
-//         email: 'bob@gmail.com'
-//       });
+// describe('GET /surveys/:id', () => {
+//   it('should return details for a survey by by', async function() {
+//     const response = await request(app).get(`/surveys/${survey1}`);
 //     expect(response.statusCode).toBe(200);
-//     expect(response.body).toHaveProperty('token');
-
-//     // TEST FOR JSON SCHEMA
-//     const invalidResponse = await request(app)
-//       .post('/users')
-//       .send({
-//         username: 'bobcat',
-//         password: 'bob',
-//         first_name: 'bob',
-//         last_name: 'johnson',
-//         email: 'bob.com'
-//       });
-
-//     expect(invalidResponse.statusCode).toBe(400);
+//     expect(response.body.survey).toEqual({
+//       _id: expect.any(Number),
+//       author: 'joerocket',
+//       title: 'best albums of 2009',
+//       description: 'hot fiya',
+//       date_posted: expect.any(String),
+//       anonymous: true
+//     })
 //   });
 
-
-
+//   // it('should return a 404 Not Found when id not found', async function() {
+//   //   const response = await request(app).get('/surveys/33797');
+//   //   expect(response.statuCode).toBe(404);
+//   // })
+// })
 
 
 

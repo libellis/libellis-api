@@ -27,7 +27,7 @@ router.get('/:id', async function (req, res, next) {
     return res.json(survey)
 
   } catch (err) {
-    return next(error);
+    return next(err);
   }
 });
 
