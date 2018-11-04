@@ -34,10 +34,9 @@ router.get('/:id', async function (req, res, next) {
 //Create a new user
 router.post('/', async function (req, res, next) {
   try {
-    await User.createUser(req.body);
-    const token = await User.authenticate(req.body);
+    const survey = await Survey.create(req.body);
     return res.json({
-      token
+      survey
     });
   } catch (error) {
     return next(error);

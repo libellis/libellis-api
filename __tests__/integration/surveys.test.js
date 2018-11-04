@@ -58,8 +58,7 @@ describe('GET /surveys', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.surveys.length).toBe(2);
     expect(response.body.surveys).toEqual(
-      [
-        {
+      [{
           _id: expect.any(Number),
           author: 'joerocket',
           title: 'best albums of 2009',
@@ -81,7 +80,7 @@ describe('GET /surveys', () => {
 });
 
 describe('GET /surveys/:id', () => {
-  it('should return details for a survey by by', async function() {
+  it('should return details for a survey by by', async function () {
     const response = await request(app).get(`/surveys/${survey1.id}`);
     expect(response.statusCode).toBe(200);
     expect(response.body.survey).toEqual({
@@ -98,6 +97,36 @@ describe('GET /surveys/:id', () => {
   //   const response = await request(app).get('/surveys/33797');
   //   expect(response.statuCode).toBe(404);
   // })
+})
+
+describe('POST /surveys', () => {
+  it('should create a new survey', async function () {
+    const newSurvey = await request(app)
+      .post('/surveys')
+      .send({
+        author: user1.username,
+        title: 'xxSuperCoolTestSurveyxx',
+        description: '9999ThisIsDescriptive9999'
+      });
+    expect(newSurvey.body).toEqual({
+      survey: {
+        _id: 3,
+        author: 'joerocket',
+        title: 'xxSuperCoolTestSurveyxx',
+        description: '9999ThisIsDescriptive9999',
+        date_posted: expect.any(String),
+        anonymous: true
+      }
+    });
+
+    const surveys = await request(app).get('/surveys');
+    expect(surveys.body.length).toBe(3);
+  })
+
+  it('should return an error for bad data', async function() {
+    
+  })
+
 })
 
 
