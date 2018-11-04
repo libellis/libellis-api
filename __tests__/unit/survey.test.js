@@ -28,7 +28,7 @@ beforeEach(async function () {
 // Test get filtered users
 describe('getSurvey(id)', () => {
   it('should get a survey by id', async function () {
-    const survey = await Survey.getOne(survey1.id);
+    const survey = await Survey.get(survey1.id);
     expect(survey).toEqual({
       _id: expect.any(Number),
       anonymous: true,
@@ -42,7 +42,7 @@ describe('getSurvey(id)', () => {
   it('should throw error if use not found', async function () {
 
     try {
-      const response = await Survey.getOne(3456);
+      const response = await Survey.get(3456);
     } catch (err) {
       expect(err.status).toBe(404);
       expect(err.message).toEqual('Not Found');
@@ -129,7 +129,7 @@ describe('createSurvey(author, title, description)', () => {
 
 describe('updateSurvey(id, title, description, anonymous)', async function () {
   it('should update a survey with all fields', async function () {
-    let survey = await Survey.getOne(survey1.id);
+    let survey = await Survey.get(survey1.id);
 
     survey.description = 'new description';
     survey.title = 'New Title';
@@ -137,7 +137,7 @@ describe('updateSurvey(id, title, description, anonymous)', async function () {
 
     await survey.save();
 
-    survey = await Survey.getOne(survey1.id);
+    survey = await Survey.get(survey1.id);
 
     expect(survey).toEqual({
       _id: survey1.id,
@@ -150,13 +150,13 @@ describe('updateSurvey(id, title, description, anonymous)', async function () {
   });
 
   it('should update a survey with one field', async function () {
-    let survey = await Survey.getOne(survey1.id);
+    let survey = await Survey.get(survey1.id);
 
     survey.description = 'new description';
 
     await survey.save();
 
-    survey = await Survey.getOne(survey1.id);
+    survey = await Survey.get(survey1.id);
 
     expect(survey).toEqual({
       _id: survey1.id,
@@ -169,14 +169,14 @@ describe('updateSurvey(id, title, description, anonymous)', async function () {
   });
 
   it('should throw not change an restricted field', async function () {
-    let survey = await Survey.getOne(survey1.id);
+    let survey = await Survey.get(survey1.id);
 
     survey.author = "NewAuthor";
     survey.date_posted = Date.now();
 
     await survey.save();
 
-    survey = await Survey.getOne(survey1.id);
+    survey = await Survey.get(survey1.id);
 
     expect(survey).toEqual({
       _id: survey1.id,
@@ -192,10 +192,10 @@ describe('updateSurvey(id, title, description, anonymous)', async function () {
 
 describe('deleteSurvey(id)', () => {
   it('should delete a survey by id', async function () {
-    let survey = await Survey.getOne(survey1.id);
+    let survey = await Survey.get(survey1.id);
     survey.delete();
     try {
-      survey = await Survey.getOne(survey1.id);
+      survey = await Survey.get(survey1.id);
     } catch (err) {
       expect(err.status).toBe(404);
       expect(err.message).toEqual('Not Found');
