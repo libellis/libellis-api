@@ -84,7 +84,7 @@ describe('createSurvey(author, title, description)', () => {
       description: "Shaken or Stirred. Which will it be?"
     }
 
-    const survey = await Survey.create(newSurvey.author, newSurvey.title, newSurvey.description)
+    const survey = await Survey.create(newSurvey)
 
     expect(survey).toEqual({
       _id: expect.any(Number),
@@ -102,7 +102,7 @@ describe('createSurvey(author, title, description)', () => {
       title: "How do you like your drink mixed?",
     }
 
-    const survey = await Survey.create(newSurvey.author, newSurvey.title)
+    const survey = await Survey.create(newSurvey)
 
     expect(survey).toEqual({
       _id: expect.any(Number),
@@ -119,7 +119,7 @@ describe('createSurvey(author, title, description)', () => {
       author: user1.username,
     }
     try {
-      const response = await Survey.create(newSurvey.author)
+      const response = await Survey.create(newSurvey)
     } catch (err) {
       expect(err.message).toEqual('Missing author or title parameter')
     }

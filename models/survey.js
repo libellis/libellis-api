@@ -73,11 +73,9 @@ class Survey {
   /**
    * createSurvey(author, title, description) <- returns created survey details
    * 
-   * @param {String} author 
-   * @param {String} title 
-   * @param {String} description 
+   * @param {Object}
    */
-  static async create(author, title, description) {
+  static async create({ author, title, description }) {
 
     if (!author || !title) throw new Error('Missing author or title parameter');
 
