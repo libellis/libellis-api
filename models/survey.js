@@ -43,6 +43,12 @@ class Survey {
             WHERE id=$1`, [id]
         )
 
+        if (surveys.rows.length < 1) {
+            const err = Error('Not Found');
+            err.status = 404;
+            throw err;
+        }
+
         return new Survey(surveys.rows[0]);
     }
 
@@ -85,30 +91,6 @@ class Survey {
         return new Survey(survey.rows[0]);
     }
 
-
-    // async update(id, data) {
-    //     if (id === undefined) throw new Error('Missing id parameter');
-
-    //     let currentData = await this.getOne(id);
-    //     for (let field in currentData) {
-    //         if (data[field] === undefined) data[field] = currentData[field];
-    //     }
-
-    //     let {title, description, anonymous} = data;
-
-    //     let survey = await db.query(
-    //         `UPDATE surveys
-    //         SET title=$2, description=$3, anonymous=$4
-    //         WHERE id=$1
-    //         RETURNING id, author, title, description, date_posted, anonymous`,
-    //         [id, title, description, anonymous]
-    //     )
-    //     return survey.rows[0]
-    // }
-
-
-
-
     updateFromValues(vals) {
         classPartialUpdate(this, vals);
     }
@@ -149,7 +131,7 @@ class Survey {
         if (result.rows.length === 0) {
             throw new Error(`Could not delete survey: ${this.id}`);
         }
-        return 'User Deleted';
+        return `Deleted`;
     }
 }
 

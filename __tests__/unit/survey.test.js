@@ -8,19 +8,8 @@ const {
 } = require('../../test_helpers/setup');
 
 
-
-// INSERT INTO surveys (author, title, description)
-// VALUES ('joerocket', 'best albums of 2009', 'hot fiya')
-// RETURNING id, author, title, description, anonymous, date_posted
-// 
-// INSERT INTO surveys (author, title, description)
-// VALUES ('spongebob','top ceos','top ceos of all time')
-// RETURNING id, author, title, description, anonymous, date_posted
-// `);
-
-
-
 let survey1, survey2, question1, question2, user1, user2;
+
 // Insert 2 users before each test
 beforeEach(async function () {
     // Build up our test tables and return inserted test questions, surveys and users
@@ -49,6 +38,16 @@ describe('getSurvey(id)', () => {
             title: "best albums of 2009",
         });
     });
+
+    it('should throw error if use not found', async function() {
+
+        try {
+            const response = await Survey.getOne(3456);
+        } catch (err) {
+            expect(err.status).toBe(404);
+            expect(err.message).toEqual('Not Found');
+        }
+    });
 });
 
 
@@ -75,7 +74,6 @@ describe('getSurveys()', () => {
         });
     });
 });
-
 
 
 describe('createSurvey(author, title, description)', () => {
@@ -127,9 +125,6 @@ describe('createSurvey(author, title, description)', () => {
         }
     });
 });
-
-
-
 
 
 describe('updateSurvey(id, title, description, anonymous)', async function () {
@@ -197,11 +192,14 @@ describe('updateSurvey(id, title, description, anonymous)', async function () {
 
 describe('deleteSurvey(id)', () => {
     it('should delete a survey by id', async function () {
-
-    });
-
-    it('should return error if id is not given', async function () {
-
+        let survey = await Survey.getOne(survey1.id);
+        survey.delete();
+        try {
+            survey = await Survey.getOne(survey1.id);
+        } catch (err) {
+            expect(err.status).toBe(404);
+            expect(err.message).toEqual('Not Found');
+        }
     });
 });
 
