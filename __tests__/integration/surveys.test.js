@@ -28,7 +28,6 @@ let survey1,
 
 //Insert 2 users before each test
 beforeEach(async function () {
-  await dropTables();
   await createTables();
 
   ({
@@ -81,25 +80,25 @@ describe('GET /surveys', () => {
   });
 });
 
-// describe('GET /surveys/:id', () => {
-//   it('should return details for a survey by by', async function() {
-//     const response = await request(app).get(`/surveys/${survey1}`);
-//     expect(response.statusCode).toBe(200);
-//     expect(response.body.survey).toEqual({
-//       _id: expect.any(Number),
-//       author: 'joerocket',
-//       title: 'best albums of 2009',
-//       description: 'hot fiya',
-//       date_posted: expect.any(String),
-//       anonymous: true
-//     })
-//   });
+describe('GET /surveys/:id', () => {
+  it('should return details for a survey by by', async function() {
+    const response = await request(app).get(`/surveys/${survey1.id}`);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.survey).toEqual({
+      _id: expect.any(Number),
+      author: 'joerocket',
+      title: 'best albums of 2009',
+      description: 'hot fiya',
+      date_posted: expect.any(String),
+      anonymous: true
+    })
+  });
 
-//   // it('should return a 404 Not Found when id not found', async function() {
-//   //   const response = await request(app).get('/surveys/33797');
-//   //   expect(response.statuCode).toBe(404);
-//   // })
-// })
+  // it('should return a 404 Not Found when id not found', async function() {
+  //   const response = await request(app).get('/surveys/33797');
+  //   expect(response.statuCode).toBe(404);
+  // })
+})
 
 
 
