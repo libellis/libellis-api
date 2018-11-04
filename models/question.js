@@ -27,7 +27,7 @@ class Question {
 
   set survey_id(val) {
     if (this._survey_id) {
-      throw new Error(`Can't change survey_id!`);
+      throw new Error(`Can't change survey id!`);
     }
     this._survey_id = val;
   }
@@ -40,11 +40,9 @@ class Question {
    * getAll() -> return an array of question instances 
    *             whose title match search criteria, or whose
    *             survey_id or type match.  
-   * Example: can look up all multiple choice questions
-   *          from survey with survey_id of 5.
    * 
    */
-  static async getAll({ search, type, survey_id }) {
+  static async getAll({ search, type }) {
 
     //If search, type or survey_id are undefined then they will be %%
     //helps fix bug if passed in object does not have all 3, or search
@@ -52,12 +50,11 @@ class Question {
     let result = await db.query(`
       SELECT id, survey_id, title, type
       FROM questions 
-      WHERE (title ILIKE $1 and type ILIKE $2 and survey_id ILIKE $3) 
+      WHERE (title ILIKE $1 and type ILIKE $2) 
       `,
       [
         `%${search === undefined ? '' : search}%`,
-        `%${type === undefined ? '' : type}%`,
-        `%${survey_id === undefined ? '' : survey_id}%`,
+        `%${type === undefined ? '' : type}%`
       ]
     );
 
@@ -79,22 +76,19 @@ class Question {
       `, [id]
     );
 
-    if (questions.rows.length === 0) {
+    if (result.rows.length === 0) {
       const err = Error(`Cannot find question by id: ${id}`);
       err.status = 404;
       throw err;
     }
 
-    return new Question(questions.rows[0]);
+    return new Question(result.rows[0]);
   }
 
   /**
    * create(survey_id, title, type) -> creates a new question for the
    * given survey and returns it as a new instance of Question class.
    * 
-   * @param {Integer} survey_id 
-   * @param {String} title 
-   * @param {String} type
    */
   static async create({ survey_id, title, type }) {
     const result = await db.query(
