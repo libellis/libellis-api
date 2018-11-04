@@ -15,10 +15,10 @@ beforeEach(async function () {
   ({ question1, question2, survey1, survey2, user1, user2 } = await insertTestData());
 });
 
-// Test getting all questions without filtering
+// Test getting all questions by a survey_id
 describe('get()', () => {
   it('should correctly return a list of questions', async function () {
-    const questions = await Question.getAll({});
+    const questions = await Question.getAll({ survey_id: survey1.id });
 
     // Check that returned structure matches this exactly
     expect(questions).toEqual([
@@ -27,12 +27,6 @@ describe('get()', () => {
         title: question1.title,
         type: question1.type,
         _survey_id: question1.survey_id
-      },
-      {
-        _id: question2.id,
-        title: question2.title,
-        type: question2.type,
-        _survey_id: question2.survey_id
       }
     ]);
   });
@@ -47,8 +41,8 @@ describe('create()', () => {
       survey_id: survey2.id,
     });
 
-    const questions = await Question.getAll({});
-    expect(questions.length).toEqual(3);
+    const questions = await Question.getAll({ survey_id: survey2.id });
+    expect(questions.length).toEqual(2);
   });
 });
 
@@ -79,8 +73,8 @@ describe('updateQuestion()', () => {
     question = await Question.get(question1.id);
     expect(question.title).toEqual('Favorite Trance Artist');
 
-    const questions = await Question.getAll({});
-    expect(questions.length).toEqual(2);
+    const questions = await Question.getAll({ survey_id: survey1.id });
+    expect(questions.length).toEqual(1);
 
     expect(() => {
       question.id = 'THISSHOULDFAIL';

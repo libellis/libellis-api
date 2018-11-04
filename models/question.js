@@ -37,12 +37,11 @@ class Question {
   }
 
   /**
-   * getAll() -> return an array of question instances 
-   *             whose title match search criteria, or whose
-   *             survey_id or type match.  
+   * getAll() -> only use case is to return all questions by a survey_id
+   * so that's what this does
    * 
    */
-  static async getAll({ search, type }) {
+  static async getAll({ survey_id }) {
 
     //If search, type or survey_id are undefined then they will be %%
     //helps fix bug if passed in object does not have all 3, or search
@@ -50,12 +49,9 @@ class Question {
     let result = await db.query(`
       SELECT id, survey_id, title, type
       FROM questions 
-      WHERE (title ILIKE $1 and type ILIKE $2) 
+      WHERE survey_id=$1
       `,
-      [
-        `%${search === undefined ? '' : search}%`,
-        `%${type === undefined ? '' : type}%`
-      ]
+      [survey_id]
     );
 
     return result.rows.map(q => new Question(q));
