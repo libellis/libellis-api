@@ -1,4 +1,4 @@
-db = require('../db');
+const db = require('../db');
 
 async function createTables() {
   //adding surveys and related users for those surveys to test
