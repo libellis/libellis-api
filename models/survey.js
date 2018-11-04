@@ -33,7 +33,7 @@ class Survey {
    * 
    * @param {int} id
    */
-  static async getOne(id) {
+  static async get(id) {
 
     if (id === undefined) throw new Error('Missing id parameter')
 
