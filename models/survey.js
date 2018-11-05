@@ -75,15 +75,15 @@ class Survey {
    * 
    * @param {Object}
    */
-  static async create({ author, title, description }) {
+  static async create({ username, title, description }) {
 
-    if (!author || !title) throw new Error('Missing author or title parameter');
+    if (!username || !title) throw new Error('Missing username or title parameter');
 
     let result = await db.query(
       `INSERT INTO surveys (author, title, description)
             VALUES ($1, $2, $3)
             RETURNING id, author, title, description, date_posted, anonymous`,
-      [author, title, description]
+      [username, title, description]
     )
 
     return new Survey(result.rows[0]);

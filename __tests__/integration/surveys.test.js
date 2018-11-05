@@ -26,10 +26,19 @@ let survey1,
   choice8,
   userToken;
 
+let testUser = {
+  "username": "kevin",
+  "password": "kevin",
+  "first_name": "kevin",
+  "last_name": "kevin",
+  "email": "kevin@kevin.com"
+};
+
 //Insert 2 users before each test
 beforeEach(async function () {
   await createTables();
 
+  // insert test data and store it in variables
   ({
     question1,
     question2,
@@ -46,6 +55,17 @@ beforeEach(async function () {
     choice7,
     choice8
   } = await insertTestData());
+
+  let response = await request(app)
+    .post('/users')
+    .send({
+      "username": testUser.username,
+      "password": testUser.password,
+      "first_name": testUser.first_name,
+      "last_name": testUser.last_name,
+      "email": testUser.email
+   });
+   userToken = response.body.token;
 });
 
 
@@ -101,17 +121,18 @@ describe('GET /surveys/:id', () => {
 
 describe('POST /surveys', () => {
   it('should create a new survey', async function () {
-    const newSurvey = await request(app)
+    let response = await request(app)
       .post('/surveys')
       .send({
-        author: user1.username,
+        _token: userToken,
         title: 'xxSuperCoolTestSurveyxx',
         description: '9999ThisIsDescriptive9999'
       });
-    expect(newSurvey.body).toEqual({
+
+    expect(response.body).toEqual({
       survey: {
         _id: 3,
-        author: 'joerocket',
+        author: testUser.username,
         title: 'xxSuperCoolTestSurveyxx',
         description: '9999ThisIsDescriptive9999',
         date_posted: expect.any(String),
@@ -119,13 +140,36 @@ describe('POST /surveys', () => {
       }
     });
 
-    const surveys = await request(app).get('/surveys');
-    expect(surveys.body.length).toBe(3);
+    response = await request(app).get('/surveys');
+    expect(response.body.surveys.length).toBe(3);
   })
 
-  it('should return an error for bad data', async function() {
-    
-  })
+  it('should return an 400 error for missing title', async function() {
+    const response = await request(app)
+      .post('/surveys')
+      .send({
+        _token: userToken,
+        description: '9999ThisIsDescriptive9999'
+      });
+
+    expect(response.status).toEqual(400);
+    console.log(response.error.message);
+    // expect(response.error.message).toEqual("instance requires property \"title\"");
+  });
+
+  it('should return an 401 unauthorized if not logged in or bad token', async function() {
+    const response = await request(app)
+      .post('/surveys')
+      .send({
+        _token: userToken.concat("3s8sd3"),
+        title: 'xxSuperCoolTestSurveyxx',
+        description: '9999ThisIsDescriptive9999'
+      });
+
+    expect(response.status).toEqual(401);
+    console.log(response.error.message);
+    // expect(response.error).toEqual("Not authorized");
+  });
 
 })
 
