@@ -58,7 +58,6 @@ function ensureAdminUser(req, res, next) {
 }
 
 /** requires login */
-// does not work right now
 async function ensureAuthor(req, res, next) {
   try {
     let survey = await Survey.get(req.params.id);
@@ -72,10 +71,6 @@ async function ensureAuthor(req, res, next) {
 
     return next();
   } catch (err) {
-    /** 
-     * I had a seriously hard to find bug here because
-     * I put throw new Error() instead of next()
-     */
     return next({ status: 401, message: "Unauthorized" });
   }
 }
