@@ -14,9 +14,11 @@ router.get('/', async function (req, res, next) {
     const surveys = await Survey.getAll();
     const questionPromises = surveys.map(survey => Question.getAll({survey_id: survey.id}));
     const questions = await Promise.all(questionPromises);
+
     for (let i=0; i<surveys.length; i++)
       surveys[i].questions = questions[i];
-    return res.json({
+    
+      return res.json({
       surveys
     });
   } catch (error) {
@@ -29,6 +31,7 @@ router.get('/:id', async function (req, res, next) {
   try {
     const survey = await Survey.get(req.params.id);
     survey.questions = await Question.getAll({ survey_id: survey.id });
+
     return res.json({survey})
   } catch (err) {
     return next(err);
@@ -40,6 +43,7 @@ router.post('/', ensureLoggedIn, validateInput(createSurveySchema), async functi
   try {
     let { title, description } = req.body
     const survey = await Survey.create({author: req.username, title, description });
+
     return res.json({
       survey
     });
@@ -48,9 +52,50 @@ router.post('/', ensureLoggedIn, validateInput(createSurveySchema), async functi
   }
 });
 
-/** update a survey */
-router.patch('/:id', ensureCorrectUser, async function(req, res, next) {
 
+/** update a survey */
+router.patch('/:id', ensureLoggedIn, async function(req, res, next) {
+  try {
+    let { title, description } = req.body;
+    if (!title && !description) return "Nothing to update";
+    
+    const survey = await Survey.get(req.params.id);
+
+    // if user is not author of survey, throw 401
+    if (survey.author !== req.username) {
+      let err = new Error('Not Authorized to edit');
+      err.status = 401;
+      throw err;
+    }
+
+    survey.title = title || survey.title;
+    survey.description = description || survey.description;
+    await survey.save();
+
+    return res.json({survey})
+  } catch (err) {
+    return next(err);
+  }
+});
+
+router.delete('/:id', ensureLoggedIn, async function(req, res, next) {
+  try {
+
+    const survey = await Survey.get(req.params.id);
+
+    // if user is not author of survey, throw 401
+    if (survey.author !== req.username) {
+      let err = new Error('Not Authorized to delete');
+      err.status = 401;
+      throw err;
+    }
+
+    await survey.delete();
+
+    return res.json('Deleted');
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = router;
