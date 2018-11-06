@@ -2,6 +2,7 @@
 
 const jwt = require("jsonwebtoken");
 const { SECRET } = require("../config.js");
+const Survey = require("../models/survey");
 
 /** Middleware: Requires user is logged in. */
 
@@ -56,8 +57,32 @@ function ensureAdminUser(req, res, next) {
   }
 }
 
+/** requires login */
+// does not work right now
+async function ensureAuthor(req, res, next) {
+  try {
+    let survey = await Survey.get(req.params.id);
+
+    // put survey object onto req for route function to use
+    req.survey = survey;
+
+    // if user is not author of survey, throw 401
+    if (req.survey.author !== req.username) 
+      throw new Error();
+
+    return next();
+  } catch (err) {
+    /** 
+     * I had a seriously hard to find bug here because
+     * I put throw new Error() instead of next()
+     */
+    return next({ status: 401, message: "Unauthorized" });
+  }
+}
+
 module.exports = {
   ensureLoggedIn,
   ensureCorrectUser,
-  ensureAdminUser
+  ensureAdminUser,
+  ensureAuthor
 };

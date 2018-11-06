@@ -5,7 +5,7 @@ const Question = require('../models/question');
 
 const createSurveySchema = require('../schema/createSurvey.json')
 const validateInput = require('../middleware/validation');
-const { ensureLoggedIn, ensureCorrectUser } = require('../middleware/auth');
+const { ensureLoggedIn, ensureAuthor } = require('../middleware/auth');
 
 
 /** get a list of surveys */
@@ -54,20 +54,12 @@ router.post('/', ensureLoggedIn, validateInput(createSurveySchema), async functi
 
 
 /** update a survey */
-router.patch('/:id', ensureLoggedIn, async function(req, res, next) {
+router.patch('/:id', ensureLoggedIn, ensureAuthor, async function(req, res, next) {
   try {
     let { title, description } = req.body;
     if (!title && !description) return "Nothing to update";
     
-    const survey = await Survey.get(req.params.id);
-
-    // if user is not author of survey, throw 401
-    if (survey.author !== req.username) {
-      let err = new Error('Not Authorized to edit');
-      err.status = 401;
-      throw err;
-    }
-
+    let survey = req.survey;
     survey.title = title || survey.title;
     survey.description = description || survey.description;
     await survey.save();
@@ -78,17 +70,10 @@ router.patch('/:id', ensureLoggedIn, async function(req, res, next) {
   }
 });
 
-router.delete('/:id', ensureLoggedIn, async function(req, res, next) {
+/** delete a survey */
+router.delete('/:id', ensureLoggedIn, ensureAuthor, async function(req, res, next) {
   try {
-
-    const survey = await Survey.get(req.params.id);
-
-    // if user is not author of survey, throw 401
-    if (survey.author !== req.username) {
-      let err = new Error('Not Authorized to delete');
-      err.status = 401;
-      throw err;
-    }
+    let survey = req.survey;
 
     await survey.delete();
 

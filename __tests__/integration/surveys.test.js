@@ -298,7 +298,7 @@ describe('PATCH /surveys/:id', () => {
     expect(patchResponse.body.survey.title).toEqual('__bettertitle__');
   });
 
-  it('Should not authorize if survey owned by other user', async function() {
+  it('Should not authorize to update if survey owned by other user', async function() {
     // first create a new survey by testUser
     const postReponse = await request(app)
       .post('/surveys')
@@ -321,7 +321,7 @@ describe('PATCH /surveys/:id', () => {
       });
     
     expect(patchResponse.status).toEqual(401);
-    expect(patchResponse.body.message).toEqual("Not Authorized to edit");
+    expect(patchResponse.body.message).toEqual("Unauthorized");
   });
 })
 
@@ -354,7 +354,7 @@ describe('DELETE /surveys/:id', () => {
   });
 
 
-  it('Should not authorize if survey owned by other user', async function() {
+  it('Should not authorize to delete if survey owned by other user', async function() {
     // first create a new survey by testUser
     const postReponse = await request(app)
       .post('/surveys')
@@ -370,11 +370,11 @@ describe('DELETE /surveys/:id', () => {
     const deleteResponse = await request(app)
       .delete(`/surveys/${postReponse.body.survey._id}`)
       .send({
-        _token: hackerToken 
+        _token: hackerToken
       });
     
-    expect(deleteResponse.error.status).toEqual(401);
-    expect(deleteResponse.body.message).toEqual("Not Authorized to delete");
+    expect(deleteResponse.status).toEqual(401);
+    expect(deleteResponse.body.message).toEqual("Unauthorized");
   });
 })
 
