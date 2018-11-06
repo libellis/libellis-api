@@ -10,12 +10,9 @@ const {
 } = require('../../test_helpers/setup');
 
 let survey1,
-  survey2,
   question1,
   question2,
   user1,
-  user2,
-  user3,
   choice1,
   choice2,
   choice3,
@@ -43,9 +40,7 @@ beforeEach(async function () {
     question1,
     question2,
     survey1,
-    survey2,
     user1,
-    user2,
     choice1,
     choice2,
     choice3,
@@ -64,8 +59,8 @@ beforeEach(async function () {
       "first_name": testUser.first_name,
       "last_name": testUser.last_name,
       "email": testUser.email
-   });
-   userToken = response.body.token;
+    });
+  userToken = response.body.token;
 });
 
 
@@ -73,34 +68,44 @@ beforeEach(async function () {
 
 // Test get surveys route
 describe('GET /surveys', () => {
-  it('should correctly return a list of surveys', async function () {
+  it('should correctly return a list of surveys including it\'s questions', async function () {
     const response = await request(app).get('/surveys');
     expect(response.statusCode).toBe(200);
     expect(response.body.surveys.length).toBe(2);
     expect(response.body.surveys).toEqual(
       [{
-          _id: expect.any(Number),
-          author: 'joerocket',
-          title: 'best albums of 2009',
-          description: 'hot fiya',
-          date_posted: expect.any(String),
-          anonymous: true
-        },
-        {
-          _id: expect.any(Number),
-          author: 'spongebob',
-          title: 'top ceos',
-          description: 'top ceos of all time',
-          date_posted: expect.any(String),
-          anonymous: true
-        }
-      ]
+        "_id": 1,
+        "anonymous": true,
+        "author": "joerocket",
+        "date_posted": expect.any(String),
+        "description": "hot fiya",
+        "title": "best albums of 2009",
+        "questions": [{
+          "_id": 1,
+          "_survey_id": 1,
+          "title": "Favorite EDM Artist",
+          "type": "multiple choice"
+        }]
+      }, {
+        "_id": 2,
+        "anonymous": true,
+        "author": "spongebob",
+        "date_posted": expect.any(String),
+        "description": "top ceos of all time",
+        "title": "top ceos",
+        "questions": [{
+          "_id": 2,
+          "_survey_id": 2,
+          "title": "Favorite Bootcamp CEO",
+          "type": "multiple choice"
+        }]
+      }]
     );
   });
 });
 
 describe('GET /surveys/:id', () => {
-  it('should return details for a survey by by', async function () {
+  it('should return details for a survey', async function () {
     const response = await request(app).get(`/surveys/${survey1.id}`);
     expect(response.statusCode).toBe(200);
     expect(response.body.survey).toEqual({
@@ -109,14 +114,20 @@ describe('GET /surveys/:id', () => {
       title: 'best albums of 2009',
       description: 'hot fiya',
       date_posted: expect.any(String),
-      anonymous: true
+      anonymous: true,
+      questions: [{
+        "_id": 1,
+        "_survey_id": 1,
+        "title": "Favorite EDM Artist",
+        "type": "multiple choice"
+      }]
     })
   });
 
-  // it('should return a 404 Not Found when id not found', async function() {
-  //   const response = await request(app).get('/surveys/33797');
-  //   expect(response.statuCode).toBe(404);
-  // })
+  it('should return a 404 Not Found if id not found', async function () {
+    const response = await request(app).get('/surveys/33797');
+    expect(response.statusCode).toBe(404);
+  })
 })
 
 describe('POST /surveys', () => {
@@ -144,7 +155,7 @@ describe('POST /surveys', () => {
     expect(response.body.surveys.length).toBe(3);
   })
 
-  it('should return an 400 error for missing title', async function() {
+  it('should return an 400 error for missing title', async function () {
     const response = await request(app)
       .post('/surveys')
       .send({
@@ -157,7 +168,7 @@ describe('POST /surveys', () => {
     // expect(response.error.message).toEqual("instance requires property \"title\"");
   });
 
-  it('should return an 401 unauthorized if not logged in or bad token', async function() {
+  it('should return an 401 unauthorized if not logged in or bad token', async function () {
     const response = await request(app)
       .post('/surveys')
       .send({
@@ -168,9 +179,7 @@ describe('POST /surveys', () => {
 
     expect(response.status).toEqual(401);
     console.log(response.error.message);
-    // expect(response.error).toEqual("Not authorized");
   });
-
 })
 
 

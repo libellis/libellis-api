@@ -1,7 +1,7 @@
 const express = require('express');
 const router = new express.Router();
 const Survey = require('../models/survey');
-const User = require('../models/user');
+const Question = require('../models/question');
 
 const createSurveySchema = require('../schema/createSurvey.json')
 const validateInput = require('../middleware/validation');
@@ -12,6 +12,10 @@ const { ensureLoggedIn, ensureCorrectUser } = require('../middleware/auth');
 router.get('/', async function (req, res, next) {
   try {
     const surveys = await Survey.getAll();
+    const questionPromises = surveys.map(survey => Question.getAll({survey_id: survey.id}));
+    const questions = await Promise.all(questionPromises);
+    for (let i=0; i<surveys.length; i++)
+      surveys[i].questions = questions[i];
     return res.json({
       surveys
     });
@@ -24,6 +28,7 @@ router.get('/', async function (req, res, next) {
 router.get('/:id', async function (req, res, next) {
   try {
     const survey = await Survey.get(req.params.id);
+    survey.questions = await Question.getAll({ survey_id: survey.id });
     return res.json({survey})
   } catch (err) {
     return next(err);
@@ -34,7 +39,7 @@ router.get('/:id', async function (req, res, next) {
 router.post('/', ensureLoggedIn, validateInput(createSurveySchema), async function (req, res, next) {
   try {
     let { title, description } = req.body
-    const survey = await Survey.create({username: req.username, title, description });
+    const survey = await Survey.create({author: req.username, title, description });
     return res.json({
       survey
     });

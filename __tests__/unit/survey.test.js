@@ -26,7 +26,7 @@ beforeEach(async function () {
 });
 
 // Test get filtered users
-describe('getSurvey(id)', () => {
+describe('get(id)', () => {
   it('should get a survey by id', async function () {
     const survey = await Survey.get(survey1.id);
     expect(survey).toEqual({
@@ -51,7 +51,7 @@ describe('getSurvey(id)', () => {
 });
 
 
-describe('getSurveys()', () => {
+describe('getAll()', () => {
   it('should get a list of surveys with no filter queries', async function () {
     const surveys = await Survey.getAll();
 
@@ -76,7 +76,7 @@ describe('getSurveys()', () => {
 });
 
 
-describe('createSurvey(author, title, description)', () => {
+describe('create(author, title, description)', () => {
   it('should create a new survey with author, title, and description', async function () {
     const newSurvey = {
       author: user1.username,
@@ -127,7 +127,7 @@ describe('createSurvey(author, title, description)', () => {
 });
 
 
-describe('updateSurvey(id, title, description, anonymous)', async function () {
+describe('save(id, title, description, anonymous)', async function () {
   it('should update a survey with all fields', async function () {
     let survey = await Survey.get(survey1.id);
 
@@ -190,7 +190,7 @@ describe('updateSurvey(id, title, description, anonymous)', async function () {
 });
 
 
-describe('deleteSurvey(id)', () => {
+describe('delete(id)', () => {
   it('should delete a survey by id', async function () {
     let survey = await Survey.get(survey1.id);
     survey.delete();
