@@ -62,10 +62,15 @@ class Survey {
     if (search === undefined) {
       result = await db.query(
         `SELECT id, author, title, description, date_posted, anonymous
-                FROM surveys`
+                FROM surveys` 
       );
     } else {
       console.log('RUN SEARCH QUERY HERE')
+    }
+    if (result.rows.length < 1) {
+      let err = new Error('Not Found');
+      err.status = 404;
+      throw err;
     }
     return result.rows.map(s => new Survey(s));
   }
@@ -73,12 +78,9 @@ class Survey {
   /**
    * createSurvey(author, title, description) <- returns created survey details
    * 
-   * @param {String} author 
-   * @param {String} title 
-   * @param {String} description 
+   * @param {Object}
    */
-  static async create(author, title, description) {
-
+  static async create({ author, username, title, description }) {
     if (!author || !title) throw new Error('Missing author or title parameter');
 
     let result = await db.query(

@@ -1,18 +1,24 @@
 const express = require('express');
 const router = new express.Router();
 const Survey = require('../models/survey');
-const User = require('../models/user');
-const {
-  ensureLoggedIn,
-  ensureCorrectUser
-} = require('../middleware/auth');
+const Question = require('../models/question');
+
+const createSurveySchema = require('../schema/createSurvey.json')
+const validateInput = require('../middleware/validation');
+const { ensureLoggedIn, ensureCorrectUser } = require('../middleware/auth');
 
 
-// Get a list of surveys
+/** get a list of surveys */
 router.get('/', async function (req, res, next) {
   try {
     const surveys = await Survey.getAll();
-    return res.json({
+    const questionPromises = surveys.map(survey => Question.getAll({survey_id: survey.id}));
+    const questions = await Promise.all(questionPromises);
+
+    for (let i=0; i<surveys.length; i++)
+      surveys[i].questions = questions[i];
+    
+      return res.json({
       surveys
     });
   } catch (error) {
@@ -20,28 +26,76 @@ router.get('/', async function (req, res, next) {
   }
 });
 
+/** get a survey by id */
 router.get('/:id', async function (req, res, next) {
   try {
-    console.log(req.params.id)
     const survey = await Survey.get(req.params.id);
-    return res.json(survey)
+    survey.questions = await Question.getAll({ survey_id: survey.id });
 
+    return res.json({survey})
   } catch (err) {
     return next(err);
   }
 });
 
-//Create a new user
-// router.post('/', validateInput(newUserSchema), async function (req, res, next) {
-//   try {
-//     await User.createUser(req.body);
-//     const token = await User.authenticate(req.body);
-//     return res.json({
-//       token
-//     });
-//   } catch (error) {
-//     return next(error);
-//   }
-// });
+/**  create a new survey */
+router.post('/', ensureLoggedIn, validateInput(createSurveySchema), async function (req, res, next) {
+  try {
+    let { title, description } = req.body
+    const survey = await Survey.create({author: req.username, title, description });
+
+    return res.json({
+      survey
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+
+/** update a survey */
+router.patch('/:id', ensureLoggedIn, async function(req, res, next) {
+  try {
+    let { title, description } = req.body;
+    if (!title && !description) return "Nothing to update";
+    
+    const survey = await Survey.get(req.params.id);
+
+    // if user is not author of survey, throw 401
+    if (survey.author !== req.username) {
+      let err = new Error('Not Authorized to edit');
+      err.status = 401;
+      throw err;
+    }
+
+    survey.title = title || survey.title;
+    survey.description = description || survey.description;
+    await survey.save();
+
+    return res.json({survey})
+  } catch (err) {
+    return next(err);
+  }
+});
+
+router.delete('/:id', ensureLoggedIn, async function(req, res, next) {
+  try {
+
+    const survey = await Survey.get(req.params.id);
+
+    // if user is not author of survey, throw 401
+    if (survey.author !== req.username) {
+      let err = new Error('Not Authorized to delete');
+      err.status = 401;
+      throw err;
+    }
+
+    await survey.delete();
+
+    return res.json('Deleted');
+  } catch (err) {
+    next(err);
+  }
+});
 
 module.exports = router;
