@@ -97,7 +97,9 @@ class Question {
     );
 
     if (result.rows.length === 0) {
-      throw new Error(`Can't create question`);
+      const err = new Error(`Can't create question`);
+      err.status = 400;
+      throw err;
     }
 
     return new Question(result.rows[0]);

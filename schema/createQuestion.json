@@ -1,0 +1,43 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/root.json",
+  "type": "object",
+  "title": "The Root Schema",
+  "required": [
+    "survey_id",
+    "title",
+    "type"
+  ],
+  "properties": {
+    "survey_id": {
+      "$id": "#/properties/survey_id",
+      "type": "integer",
+      "title": "The Survey_id Schema",
+      "default": 0,
+      "examples": [
+        2378
+      ]
+    },
+    "title": {
+      "$id": "#/properties/title",
+      "type": "string",
+      "title": "The Title Schema",
+      "default": "",
+      "examples": [
+        "Best Hip Hop Artist of 2019"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "type": {
+      "$id": "#/properties/type",
+      "type": "string",
+      "title": "The Type Schema",
+      "default": "",
+      "examples": [
+        "ranked"
+      ],
+      "pattern": "^(.*)$"
+    }
+  }
+}
