@@ -209,12 +209,12 @@ describe('PATCH /surveys/:id', () => {
       .patch(`/surveys/${postReponse.body.survey._id}`)
       .send({
         _token: userToken,
-        title: '__muchbetter__'
+        title: '__muchbetter__',
       });
 
-    expect(patchResponse.body.survey.author).toEqual(testUser.username);
-    expect(patchResponse.body.survey.title).toEqual('__muchbetter__');
+    expect(patchResponse.status).toEqual(200);
     expect(patchResponse.body.survey.description).toEqual('9999ThisIsDescriptive9999');
+    expect(patchResponse.body.survey.title).toEqual('__muchbetter__');
   });
 
 
@@ -292,10 +292,7 @@ describe('PATCH /surveys/:id', () => {
         title: '__bettertitle__'
       });
 
-    expect(patchResponse.status).toBe(200);
-    expect(patchResponse.body.survey.author).toEqual(testUser.username);
-    expect(patchResponse.body.survey.description).toEqual('9999ThisIsDescriptive9999');
-    expect(patchResponse.body.survey.title).toEqual('__bettertitle__');
+    expect(patchResponse.status).toBe(400);
   });
 
   it('Should not authorize to update if survey owned by other user', async function() {

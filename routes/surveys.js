@@ -4,6 +4,7 @@ const Survey = require('../models/survey');
 const Question = require('../models/question');
 
 const createSurveySchema = require('../schema/createSurvey.json')
+const patchSurveySchema = require('../schema/patchSurvey.json')
 const validateInput = require('../middleware/validation');
 const { ensureLoggedIn, ensureAuthor } = require('../middleware/auth');
 
@@ -31,7 +32,6 @@ router.get('/:id', async function (req, res, next) {
   try {
     const survey = await Survey.get(req.params.id);
     survey.questions = await Question.getAll({ survey_id: survey.id });
-
     return res.json({survey})
   } catch (err) {
     return next(err);
@@ -43,7 +43,6 @@ router.post('/', ensureLoggedIn, validateInput(createSurveySchema), async functi
   try {
     let { title, description } = req.body
     const survey = await Survey.create({author: req.username, title, description });
-
     return res.json({
       survey
     });
@@ -54,16 +53,11 @@ router.post('/', ensureLoggedIn, validateInput(createSurveySchema), async functi
 
 
 /** update a survey */
-router.patch('/:id', ensureLoggedIn, ensureAuthor, async function(req, res, next) {
+router.patch('/:id', ensureLoggedIn, ensureAuthor, validateInput(patchSurveySchema), async function(req, res, next) {
   try {
-    let { title, description } = req.body;
-    if (!title && !description) return "Nothing to update";
-    
     let survey = req.survey;
-    survey.title = title || survey.title;
-    survey.description = description || survey.description;
+    survey.updateFromValues(req.body);
     await survey.save();
-
     return res.json({survey})
   } catch (err) {
     return next(err);
