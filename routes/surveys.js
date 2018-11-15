@@ -9,19 +9,16 @@ const validateInput = require('../middleware/validation');
 const { ensureLoggedIn, ensureAuthor } = require('../middleware/auth');
 
 
-/** get a list of surveys */
+/** get a list of surveys
+ * accepts a query param of "search" to filter results
+ * 
+ * responds with a an array of surveys with top level data
+ */
 router.get('/', async function (req, res, next) {
   try {
-    console.log(req.query);
     let { search } = req.query;
-    const surveys = await Survey.getAll({search});
-    const questionPromises = surveys.map(survey => Question.getAll({survey_id: survey.id}));
-    const questions = await Promise.all(questionPromises);
-
-    for (let i=0; i<surveys.length; i++)
-      surveys[i].questions = questions[i];
-    
-      return res.json({
+    const surveys = await Survey.getAll(search);
+    return res.json({
       surveys
     });
   } catch (error) {
@@ -29,7 +26,11 @@ router.get('/', async function (req, res, next) {
   }
 });
 
-/** get a survey by id */
+/** get a survey by id 
+ * 
+ * responds with a survey object with top level data
+ * with an array of questions with top level data
+*/
 router.get('/:id', async function (req, res, next) {
   try {
     const survey = await Survey.get(req.params.id);
@@ -40,7 +41,11 @@ router.get('/:id', async function (req, res, next) {
   }
 });
 
-/**  create a new survey */
+/** create a new survey 
+ * accepts a title and description as JSON
+ * 
+ * responds with a survey objject with top level data
+*/
 router.post('/', ensureLoggedIn, validateInput(createSurveySchema), async function (req, res, next) {
   try {
     let { title, description } = req.body
@@ -54,7 +59,10 @@ router.post('/', ensureLoggedIn, validateInput(createSurveySchema), async functi
 });
 
 
-/** update a survey */
+/** update a survey 
+ * 
+ * responds with a survey object with top level data
+*/
 router.patch('/:id', ensureLoggedIn, ensureAuthor, validateInput(patchSurveySchema), async function(req, res, next) {
   try {
     let survey = req.survey;
@@ -66,13 +74,14 @@ router.patch('/:id', ensureLoggedIn, ensureAuthor, validateInput(patchSurveySche
   }
 });
 
-/** delete a survey */
+/** delete a survey 
+ * 
+ * responds with message
+*/
 router.delete('/:id', ensureLoggedIn, ensureAuthor, async function(req, res, next) {
   try {
     let survey = req.survey;
-
     await survey.delete();
-
     return res.json('Deleted');
   } catch (err) {
     next(err);

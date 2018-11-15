@@ -57,9 +57,8 @@ class Survey {
    * 
    * @param {{field: value, ...}} search
    */
-  static async getAll({ search }) {
+  static async getAll(search) {
     let result;
-    console.log('search', search)
     if (search === undefined || search === '') {
       result = await db.query(
         `SELECT id, author, title, description, date_posted, anonymous

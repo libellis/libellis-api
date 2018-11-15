@@ -91,26 +91,14 @@ describe('GET /surveys', () => {
         "author": "joerocket",
         "date_posted": expect.any(String),
         "description": "hot fiya",
-        "title": "best albums of 2009",
-        "questions": [{
-          "_id": 1,
-          "_survey_id": 1,
-          "title": "Favorite EDM Artist",
-          "type": "multiple choice"
-        }]
+        "title": "best albums of 2009"
       }, {
         "_id": 2,
         "anonymous": true,
         "author": "spongebob",
         "date_posted": expect.any(String),
         "description": "top ceos of all time",
-        "title": "top ceos",
-        "questions": [{
-          "_id": 2,
-          "_survey_id": 2,
-          "title": "Favorite Bootcamp CEO",
-          "type": "multiple choice"
-        }]
+        "title": "top ceos"
       }]
     );
   });
@@ -126,13 +114,7 @@ describe('GET /surveys', () => {
         "author": "spongebob",
         "date_posted": expect.any(String),
         "description": "top ceos of all time",
-        "title": "top ceos",
-        "questions": [{
-          "_id": 2,
-          "_survey_id": 2,
-          "title": "Favorite Bootcamp CEO",
-          "type": "multiple choice"
-        }]
+        "title": "top ceos"
       }]
     );
   });
@@ -148,13 +130,7 @@ describe('GET /surveys', () => {
         "author": "joerocket",
         "date_posted": expect.any(String),
         "description": "hot fiya",
-        "title": "best albums of 2009",
-        "questions": [{
-          "_id": 1,
-          "_survey_id": 1,
-          "title": "Favorite EDM Artist",
-          "type": "multiple choice"
-        }]
+        "title": "best albums of 2009"
       }]
     );
   });
@@ -170,13 +146,7 @@ describe('GET /surveys', () => {
         "author": "spongebob",
         "date_posted": expect.any(String),
         "description": "top ceos of all time",
-        "title": "top ceos",
-        "questions": [{
-          "_id": 2,
-          "_survey_id": 2,
-          "title": "Favorite Bootcamp CEO",
-          "type": "multiple choice"
-        }]
+        "title": "top ceos"
       }]
     );
   });
