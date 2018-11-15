@@ -57,15 +57,22 @@ class Survey {
    * 
    * @param {{field: value, ...}} search
    */
-  static async getAll(search) {
+  static async getAll({ search }) {
     let result;
-    if (search === undefined) {
+    console.log('search', search)
+    if (search === undefined || search === '') {
       result = await db.query(
         `SELECT id, author, title, description, date_posted, anonymous
                 FROM surveys` 
       );
     } else {
-      console.log('RUN SEARCH QUERY HERE')
+      result = await db.query(
+        `SELECT id, author, title, description, date_posted, anonymous
+                FROM surveys WHERE 
+                author ILIKE $1 OR
+                title ILIKE $1 OR
+                description ILIKE $1`, [`%${search}%`] 
+      );
     }
     if (result.rows.length < 1) {
       let err = new Error('Not Found');

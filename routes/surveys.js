@@ -12,7 +12,9 @@ const { ensureLoggedIn, ensureAuthor } = require('../middleware/auth');
 /** get a list of surveys */
 router.get('/', async function (req, res, next) {
   try {
-    const surveys = await Survey.getAll();
+    console.log(req.query);
+    let { search } = req.query;
+    const surveys = await Survey.getAll({search});
     const questionPromises = surveys.map(survey => Question.getAll({survey_id: survey.id}));
     const questions = await Promise.all(questionPromises);
 
