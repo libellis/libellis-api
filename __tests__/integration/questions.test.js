@@ -7,11 +7,12 @@ const Question = require('../../models/question');
 const {
   createTables,
   insertTestData,
-  dropTables
+  dropTables,
 } = require('../../test_helpers/setup');
 
 let survey1,
   survey2,
+  survey3,
   question1,
   question2,
   user1,
@@ -27,15 +28,15 @@ let survey1,
   hackerToken;
 
 let testUser = {
-  "username": "kevin",
-  "password": "kevin",
-  "first_name": "kevin",
-  "last_name": "kevin",
-  "email": "kevin@kevin.com"
+  username: 'kevin',
+  password: 'kevin',
+  first_name: 'kevin',
+  last_name: 'kevin',
+  email: 'kevin@kevin.com',
 };
 
 //Insert 2 users before each test
-beforeEach(async function () {
+beforeEach(async function() {
   await createTables();
 
   // insert test data and store it in variables
@@ -52,336 +53,273 @@ beforeEach(async function () {
     choice5,
     choice6,
     choice7,
-    choice8
+    choice8,
   } = await insertTestData());
 
   let response = await request(app)
     .post('/users')
     .send({
-      "username": testUser.username,
-      "password": testUser.password,
-      "first_name": testUser.first_name,
-      "last_name": testUser.last_name,
-      "email": testUser.email
+      username: testUser.username,
+      password: testUser.password,
+      first_name: testUser.first_name,
+      last_name: testUser.last_name,
+      email: testUser.email,
     });
   userToken = response.body.token;
 
   let responseForHacker = await request(app)
     .post('/users')
     .send({
-      "username": "hackerman",
-      "password": "hackerman",
-      "first_name": "hackerman",
-      "last_name": "hackerman",
-      "email": "hackerman@hacker.com",
+      username: 'hackerman',
+      password: 'hackerman',
+      first_name: 'hackerman',
+      last_name: 'hackerman',
+      email: 'hackerman@hacker.com',
     });
   hackerToken = responseForHacker.body.token;
+
+  
+  let surveyResponse = await request(app)
+    .post('/surveys')
+    .send({
+      _token: userToken,
+      title: 'xxSuperCoolTestSurveyxx',
+      description: '9999ThisIsDescriptive9999'
+    });
+  survey3 = surveyResponse.body.survey;
 });
-
-
-
 
 // Test get questions route
-describe('GET /questions', () => {
-  it('should correctly return a list of questions by a survey id', async function () {
+describe('GET /surveys/:survey_id/questions', () => {
+  it('should correctly return a list of questions by a survey id', async function() {
     let response = await request(app)
-      .get('/questions')
-      .query({ survey_id: survey1.id });
+      .get(`/surveys/${survey1.id}/questions`);
     expect(response.statusCode).toBe(200);
     expect(response.body.questions.length).toBe(1);
-    expect(response.body.questions).toEqual(
-      [
-        {
-          "_id": question1.id,
-          "_survey_id": survey1.id,
-          "title": question1.title,
-          "type": question1.type
-        }
-      ]
-    );
+    expect(response.body.questions).toEqual([
+      {
+        _id: question1.id,
+        _survey_id: survey1.id,
+        title: question1.title,
+        type: question1.type,
+      },
+    ]);
 
     response = await request(app)
-      .get('/questions')
-      .query({ survey_id: survey2.id });
+      .get(`/surveys/${survey2.id}/questions`);
     expect(response.statusCode).toBe(200);
     expect(response.body.questions.length).toBe(1);
-    expect(response.body.questions).toEqual(
-      [
-        {
-          "_id": question2.id,
-          "_survey_id": survey2.id,
-          "title": question2.title,
-          "type": question2.type
-        }
-      ]
-    );
+    expect(response.body.questions).toEqual([
+      {
+        _id: question2.id,
+        _survey_id: survey2.id,
+        title: question2.title,
+        type: question2.type,
+      },
+    ]);
   });
 });
 
-describe('GET /questions/:id', () => {
-  it('should return details for a question', async function () {
-    const response = await request(app).get(`/questions/${question1.id}`);
+describe('GET /surveys/:survey_id/questions/:question_id', () => {
+  it('should return details for a question', async function() {
+    const response = await request(app).get(`/surveys/${survey1.id}/questions/${question1.id}`);
     expect(response.statusCode).toBe(200);
     expect(response.body.question).toEqual({
-      "_id": question1.id,
-      "_survey_id": survey1.id,
-      "title": question1.title,
-      "type": question1.type
-    })
+      _id: question1.id,
+      _survey_id: survey1.id,
+      title: question1.title,
+      type: question1.type,
+    });
   });
 
-  it('should return a 404 if id not found', async function () {
-    const response = await request(app).get('/questions/33797');
+  it('should return a 404 if id not found', async function() {
+    const response = await request(app).get(`/surveys/${survey1.id}/questions/33797`);
     expect(response.statusCode).toBe(404);
-  })
-})
+  });
+});
 
-describe('POST /questions', () => {
-  it('should create a new question', async function () {
+describe('POST /surveys/:survey_id/questions', () => {
+  it('should create a new question', async function() {
     let response = await request(app)
-      .post('/questions')
+      .post(`/surveys/${survey3._id}/questions`)
       .send({
         _token: userToken,
-        survey_id: survey1.id,
         title: 'TestQuestion1',
-        type: 'ranked'
+        type: 'ranked',
       });
 
     expect(response.body).toEqual({
       question: {
         _id: 3,
-        _survey_id: survey1.id,
+        _survey_id: survey3._id,
         title: 'TestQuestion1',
-        type: 'ranked'
-      }
+        type: 'ranked',
+      },
     });
 
     response = await request(app)
-      .get('/questions')
-      .query({ survey_id: survey1.id });
-    expect(response.body.questions.length).toBe(2);
-  })
+      .get(`/surveys/${survey3._id}/questions`)
+    expect(response.body.questions.length).toBe(1);
+  });
 
-  it('should give 400 error for missing "not null" data', async function () {
+  it('should give 400 error for missing "not null" data', async function() {
     const response = await request(app)
-      .post('/questions')
+      .post(`/surveys/${survey3._id}/questions`)
       .send({
         _token: userToken,
-        survey_id: survey1.id,
-        title: "amazzzzinggg"
+        title: 'amazzzzinggg',
       });
 
     expect(response.status).toEqual(400);
   });
 
-  it('should not authorize if not logged in or bad token', async function () {
+  it('should not authorize if not logged in or bad token', async function() {
     const response = await request(app)
-      .post('/questions')
+      .post(`/surveys/${survey3._id}/questions`)
       .send({
-        _token: userToken.concat("3s8sd3"),
-        survey_id: survey1.id,
+        _token: userToken.concat('3s8sd3'),
         title: 'TestQuestionBadUser',
-        type: 'ranked'
+        type: 'ranked',
       });
 
     expect(response.status).toEqual(401);
   });
-})
+});
 
+describe('PATCH /surveys/:survey_id/questions/:question_id', () => {
+  it('Should update the title of a question only', async function() {
+    // first create a new question by testUser
+    let response = await request(app)
+      .post(`/surveys/${survey3._id}/questions`)
+      .send({
+        _token: userToken,
+        title: 'TestQuestion1',
+        type: 'ranked',
+      });
 
-// describe('PATCH /surveys/:id', () => {
-//   it('Should update the title of a survey only', async function() {
-//     // first create a new survey by testUser
-//     const postReponse = await request(app)
-//       .post('/surveys')
-//       .send({
-//         _token: userToken,
-//         title: 'xxSuperCoolTestSurveyxx',
-//         description: '9999ThisIsDescriptive9999'
-//       });
+    expect(response.body).toEqual({
+      question: {
+        _id: 3,
+        _survey_id: survey3._id,
+        title: 'TestQuestion1',
+        type: 'ranked',
+      },
+    });
 
-//     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
+    let patchResponse = await request(app)
+      .patch(`/surveys/${survey3._id}/questions/${response.body.question._id}`)
+      .send({
+        _token: userToken,
+        title: '__muchbetter__',
+      });
 
-//     const patchResponse = await request(app)
-//       .patch(`/surveys/${postReponse.body.survey._id}`)
-//       .send({
-//         _token: userToken,
-//         title: '__muchbetter__'
-//       });
+    expect(patchResponse.body.question.title).toEqual('__muchbetter__');
+    expect(patchResponse.body.question.type).toEqual('ranked');
+  });
 
-//     expect(patchResponse.body.survey.author).toEqual(testUser.username);
-//     expect(patchResponse.body.survey.title).toEqual('__muchbetter__');
-//     expect(patchResponse.body.survey.description).toEqual('9999ThisIsDescriptive9999');
-//   });
+  it('Should refuse to update the survey_id for a question', async function() {
+    let response = await request(app)
+      .post(`/surveys/${survey3._id}/questions`)
+      .send({
+        _token: userToken,
+        title: 'TestQuestion1',
+        type: 'ranked',
+      });
 
+    expect(response.body).toEqual({
+      question: {
+        _id: 3,
+        _survey_id: survey3._id,
+        title: 'TestQuestion1',
+        type: 'ranked',
+      },
+    });
 
-//   it('Should update the description of a survey only', async function() {
-//     // first create a new survey by testUser
-//     const postReponse = await request(app)
-//       .post('/surveys')
-//       .send({
-//         _token: userToken,
-//         title: 'xxSuperCoolTestSurveyxx',
-//         description: '9999ThisIsDescriptive9999'
-//       });
+    const patchResponse = await request(app)
+      .patch(`/surveys/${survey3._id}/questions/${response.body.question._id}`)
+      .send({
+        _token: userToken,
+        title: '__bettertitle__',
+        survey_id: 5000,
+      });
 
-//     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
+    expect(patchResponse.status).toEqual(400);
+  });
+});
 
-//     const patchResponse = await request(app)
-//       .patch(`/surveys/${postReponse.body.survey._id}`)
-//       .send({
-//         _token: userToken,
-//         description: '__muchbetter__'
-//       });
+describe('DELETE /surveys/:survey_id/questions/:question_id', () => {
+  it('Should delete a question', async function() {
+    // first create a new question by testUser
+    let response = await request(app)
+      .post(`/surveys/${survey3._id}/questions`)
+      .send({
+        _token: userToken,
+        title: 'TestQuestion1',
+        type: 'ranked',
+      });
 
-//     expect(patchResponse.body.survey.author).toEqual(testUser.username);
-//     expect(patchResponse.body.survey.description).toEqual('__muchbetter__');
-//     expect(patchResponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
-//   });
+    expect(response.body).toEqual({
+      question: {
+        _id: 3,
+        _survey_id: survey3._id,
+        title: 'TestQuestion1',
+        type: 'ranked',
+      },
+    });
 
+    const deleteResponse = await request(app)
+      .delete(`/surveys/${survey3._id}/questions/3`)
+      .send({
+        _token: userToken,
+      });
 
+    expect(deleteResponse.status).toEqual(200);
+    expect(deleteResponse.body).toEqual('Question Deleted');
 
-//   it('Should update the title and description of a survey only', async function() {
-//     // first create a new survey by testUser
-//     const postReponse = await request(app)
-//       .post('/surveys')
-//       .send({
-//         _token: userToken,
-//         title: 'xxSuperCoolTestSurveyxx',
-//         description: '9999ThisIsDescriptive9999'
-//       });
+    const getResponse = await request(app).get(
+      `/surveys/${survey3._id}/questions/${response.body.question._id}`,
+    );
 
-//     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
+    expect(getResponse.status).toBe(404);
+  });
 
-//     const patchResponse = await request(app)
-//       .patch(`/surveys/${postReponse.body.survey._id}`)
-//       .send({
-//         _token: userToken,
-//         description: '__muchbetter__',
-//         title: '__bettertitle__'
-//       });
+  it('Should not authorize to delete if survey for question is owned by other user', async function() {
+    // first create a new question by testUser
+    let response = await request(app)
+      .post(`/surveys/${survey3._id}/questions`)
+      .send({
+        _token: userToken,
+        title: 'TestQuestion1',
+        type: 'ranked',
+      });
 
-//     expect(patchResponse.body.survey.author).toEqual(testUser.username);
-//     expect(patchResponse.body.survey.description).toEqual('__muchbetter__');
-//     expect(patchResponse.body.survey.title).toEqual('__bettertitle__');
-//   });
+    expect(response.body).toEqual({
+      question: {
+        _id: 3,
+        _survey_id: survey3._id,
+        title: 'TestQuestion1',
+        type: 'ranked',
+      },
+    });
 
+    // Try to delete a question whose author is "kevin" with the token for "hackerman"
+    const deleteResponse = await request(app)
+      .delete(`/surveys/${survey3.id}/questions/3`)
+      .send({
+        _token: hackerToken,
+      });
 
-
-//   it('Should ignore all invalid or immutable fields', async function() {
-//     // first create a new survey by testUser
-//     const postReponse = await request(app)
-//       .post('/surveys')
-//       .send({
-//         _token: userToken,
-//         title: 'xxSuperCoolTestSurveyxx',
-//         description: '9999ThisIsDescriptive9999'
-//       });
-
-//     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
-
-//     const patchResponse = await request(app)
-//       .patch(`/surveys/${postReponse.body.survey._id}`)
-//       .send({
-//         _token: userToken,
-//         author: 'hackerman',
-//         notdescription: '__muchbetter__',
-//         title: '__bettertitle__'
-//       });
-
-//     expect(patchResponse.status).toBe(200);
-//     expect(patchResponse.body.survey.author).toEqual(testUser.username);
-//     expect(patchResponse.body.survey.description).toEqual('9999ThisIsDescriptive9999');
-//     expect(patchResponse.body.survey.title).toEqual('__bettertitle__');
-//   });
-
-//   it('Should not authorize to update if survey owned by other user', async function() {
-//     // first create a new survey by testUser
-//     const postReponse = await request(app)
-//       .post('/surveys')
-//       .send({
-//         _token: userToken,
-//         title: 'xxSuperCoolTestSurveyxx',
-//         description: '9999ThisIsDescriptive9999'
-//       });
-
-//     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
-
-//     /** Try to edit a survey whose author is "kevin" with the token for "hackerman" */
-//     const patchResponse = await request(app)
-//       .patch(`/surveys/${postReponse.body.survey._id}`)
-//       .send({
-//         _token: hackerToken,
-//         author: 'hackerman',
-//         notdescription: '__muchbetter__',
-//         title: '__bettertitle__'
-//       });
-
-//     expect(patchResponse.status).toEqual(401);
-//     expect(patchResponse.body.message).toEqual("Unauthorized");
-//   });
-// })
-
-// describe('DELETE /surveys/:id', () => {
-//   it('Should delete a survey', async function() {
-//     // first create a new survey by testUser
-//     const postReponse = await request(app)
-//       .post('/surveys')
-//       .send({
-//         _token: userToken,
-//         title: 'xxSuperCoolTestSurveyxx',
-//         description: '9999ThisIsDescriptive9999'
-//       });
-
-//     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
-
-//     const deleteResponse = await request(app)
-//       .delete(`/surveys/${postReponse.body.survey._id}`)
-//       .send({
-//         _token: userToken
-//       });
-
-//     expect(deleteResponse.status).toEqual(200);
-//     expect(deleteResponse.body).toEqual("Deleted");
-
-//     const getResponse = await request(app)
-//       .get(`/surveys/${postReponse.body.survey._id}`)
-
-//       expect(getResponse.status).toBe(404);
-//   });
-
-
-//   it('Should not authorize to delete if survey owned by other user', async function() {
-//     // first create a new survey by testUser
-//     const postReponse = await request(app)
-//       .post('/surveys')
-//       .send({
-//         _token: userToken,
-//         title: 'xxSuperCoolTestSurveyxx',
-//         description: '9999ThisIsDescriptive9999'
-//       });
-
-//     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
-
-//     /** Try to delete a survey whose author is "kevin" with the token for "hackerman" */
-//     const deleteResponse = await request(app)
-//       .delete(`/surveys/${postReponse.body.survey._id}`)
-//       .send({
-//         _token: hackerToken
-//       });
-
-//     expect(deleteResponse.status).toEqual(401);
-//     expect(deleteResponse.body.message).toEqual("Unauthorized");
-//   });
-// })
-
+    expect(deleteResponse.status).toEqual(401);
+    expect(deleteResponse.body.message).toEqual('Unauthorized');
+  });
+});
 
 //Delete tables after each tets
-afterEach(async function () {
+afterEach(async function() {
   await dropTables();
 });
 
 //Close db connection
-afterAll(async function () {
+afterAll(async function() {
   await db.end();
 });

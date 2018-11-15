@@ -6,23 +6,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //import routes
-const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/users');
-const surveyRoutes = require('./routes/surveys');
-const questionRoutes = require('./routes/questions');
-// const choicesRoutes = require('./routes/choices');
+const authRouter = require('./routes/auth');
+const userRouter = require('./routes/users');
+const surveyRouter = require('./routes/surveys');
+const questionRouter = require('./routes/questions');
+// const choicesRouter = require('./routes/choices');
 
 // add logging system
 
 const morgan = require('morgan');
 app.use(morgan('tiny'));
 
+surveyRouter.use('/:id/questions', questionRouter);
+
 // add routes here
-app.use(authRoutes);
-app.use('/users', userRoutes);
-app.use('/surveys', surveyRoutes);
-app.use('/questions', questionRoutes);
-// app.use('/choices', choicesRoutes);
+app.use(authRouter);
+app.use('/users', userRouter);
+app.use('/surveys', surveyRouter);
+// app.use('/choices', choicesRouter);
 
 /** 404 handler */
 

@@ -5,11 +5,8 @@
   "type": "object",
   "title": "The Root Schema",
   "required": [
-    "title",
-    "type",
     "_token"
   ],
-  "additionalProperties": false,
   "properties": {
     "title": {
       "$id": "#/properties/title",
@@ -41,5 +38,6 @@
       ],
       "pattern": "^(.*)$"
     }
-  }
+  },
+  "additionalProperties": false
 }
