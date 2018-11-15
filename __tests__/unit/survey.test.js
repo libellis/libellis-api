@@ -73,6 +73,20 @@ describe('getAll()', () => {
       "title": survey2.title
     });
   });
+
+  it('should be able to search for a survey', async function () {
+    const surveys = await Survey.getAll(survey1.author);
+
+    expect(surveys.length).toEqual(1);
+    expect(surveys[0]).toEqual({
+      "_id": 1,
+      "anonymous": true,
+      "author": survey1.author,
+      "date_posted": expect.any(Date),
+      "description": survey1.description,
+      "title": survey1.title
+    });
+  });
 });
 
 

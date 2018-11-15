@@ -5,9 +5,6 @@
   "type": "object",
   "title": "The Root Schema",
   "additionalProperties": false,
-  "required": [
-    "title"
-  ],
   "properties": {
     "_token": {
       "$id": "#/properties/_token",

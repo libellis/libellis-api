@@ -91,26 +91,62 @@ describe('GET /surveys', () => {
         "author": "joerocket",
         "date_posted": expect.any(String),
         "description": "hot fiya",
-        "title": "best albums of 2009",
-        "questions": [{
-          "_id": 1,
-          "_survey_id": 1,
-          "title": "Favorite EDM Artist",
-          "type": "multiple choice"
-        }]
+        "title": "best albums of 2009"
       }, {
         "_id": 2,
         "anonymous": true,
         "author": "spongebob",
         "date_posted": expect.any(String),
         "description": "top ceos of all time",
-        "title": "top ceos",
-        "questions": [{
-          "_id": 2,
-          "_survey_id": 2,
-          "title": "Favorite Bootcamp CEO",
-          "type": "multiple choice"
-        }]
+        "title": "top ceos"
+      }]
+    );
+  });
+
+  it('should be able to search for a survey by author', async function () {
+    const response = await request(app).get('/surveys?search=sponge');
+    expect(response.statusCode).toBe(200);
+    expect(response.body.surveys.length).toBe(1);
+    expect(response.body.surveys).toEqual(
+      [{
+        "_id": 2,
+        "anonymous": true,
+        "author": "spongebob",
+        "date_posted": expect.any(String),
+        "description": "top ceos of all time",
+        "title": "top ceos"
+      }]
+    );
+  });
+
+  it('should be able to search for a survey by title', async function () {
+    const response = await request(app).get('/surveys?search=albums');
+    expect(response.statusCode).toBe(200);
+    expect(response.body.surveys.length).toBe(1);
+    expect(response.body.surveys).toEqual(
+      [{
+        "_id": 1,
+        "anonymous": true,
+        "author": "joerocket",
+        "date_posted": expect.any(String),
+        "description": "hot fiya",
+        "title": "best albums of 2009"
+      }]
+    );
+  });
+
+  it('should be able to search for a survey by description', async function () {
+    const response = await request(app).get('/surveys?search=ceos+of+all');
+    expect(response.statusCode).toBe(200);
+    expect(response.body.surveys.length).toBe(1);
+    expect(response.body.surveys).toEqual(
+      [{
+        "_id": 2,
+        "anonymous": true,
+        "author": "spongebob",
+        "date_posted": expect.any(String),
+        "description": "top ceos of all time",
+        "title": "top ceos"
       }]
     );
   });
@@ -209,12 +245,12 @@ describe('PATCH /surveys/:id', () => {
       .patch(`/surveys/${postReponse.body.survey._id}`)
       .send({
         _token: userToken,
-        title: '__muchbetter__'
+        title: '__muchbetter__',
       });
 
-    expect(patchResponse.body.survey.author).toEqual(testUser.username);
-    expect(patchResponse.body.survey.title).toEqual('__muchbetter__');
+    expect(patchResponse.status).toEqual(200);
     expect(patchResponse.body.survey.description).toEqual('9999ThisIsDescriptive9999');
+    expect(patchResponse.body.survey.title).toEqual('__muchbetter__');
   });
 
 
@@ -292,10 +328,7 @@ describe('PATCH /surveys/:id', () => {
         title: '__bettertitle__'
       });
 
-    expect(patchResponse.status).toBe(200);
-    expect(patchResponse.body.survey.author).toEqual(testUser.username);
-    expect(patchResponse.body.survey.description).toEqual('9999ThisIsDescriptive9999');
-    expect(patchResponse.body.survey.title).toEqual('__bettertitle__');
+    expect(patchResponse.status).toBe(400);
   });
 
   it('Should not authorize to update if survey owned by other user', async function() {
