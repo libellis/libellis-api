@@ -1,6 +1,7 @@
 const express = require('express');
 const router = new express.Router({mergeParams: true});
 const Question = require('../models/question');
+const Choice = require('../models/choice');
 const createQuestionSchema = require('../schema/createQuestion.json');
 const updateQuestionSchema = require('../schema/updateQuestion.json');
 const validateInput = require('../middleware/validation');
@@ -21,10 +22,15 @@ router.get('/', async function(req, res, next) {
   }
 });
 
-/** get a question by id */
+/** get a question by id
+  * and return it with array of choices on it
+  *
+ */ 
 router.get('/:question_id', async function(req, res, next) {
   try {
     const question = await Question.get(req.params.question_id);
+    const choices = await Choice.getAll({ question_id: req.params.question_id });
+    question.choices = choices;
     return res.json({question});
   } catch (err) {
     return next(err);
