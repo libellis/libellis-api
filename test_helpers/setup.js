@@ -103,39 +103,35 @@ async function insertTestData() {
 
   // 4 choices for favorite EDM artists
 
-  let result7 = await db.query(
-    `
-  INSERT INTO choices (question_id, content, title)
-  VALUES ($1, 'Bassnectar-Test-Youtube-Link.html', 'Bassnectar')
-  RETURNING id, question_id, content, title
-  `,
+  let result7 = await db.query(`
+    INSERT INTO choices (question_id, content, title)
+    VALUES ($1, 'Bassnectar-Test-Youtube-Link.html', 'Bassnectar')
+    RETURNING id, question_id, content, title
+    `,
     [question1.id,]
   );
 
-  let result8 = await db.query(
-    `
-  INSERT INTO choices (question_id, content, title)
-  VALUES ($1, 'Tiesto-Youtube-Link.html', 'Tiesto')
-  RETURNING id, question_id, content, title
-  `,
+  let result8 = await db.query(`
+    INSERT INTO choices (question_id, content, title)
+    VALUES ($1, 'Tiesto-Youtube-Link.html', 'Tiesto')
+    RETURNING id, question_id, content, title
+    `,
     [question1.id,]
   );
 
-  let result9 = await db.query(
-    `
-  INSERT INTO choices (question_id, content, title)
-  VALUES ($1, 'Beats-Antique-Youtube-Link.html', 'Beats Antique')
-  RETURNING id, question_id, content, title
-  `,
+  let result9 = await db.query(`
+    INSERT INTO choices (question_id, content, title)
+    VALUES ($1, 'Beats-Antique-Youtube-Link.html', 'Beats Antique')
+    RETURNING id, question_id, content, title
+    `,
     [question1.id,]
   );
 
-  let result10 = await db.query(
-    `
-  INSERT INTO choices (question_id, content, title)
-  VALUES ($1, 'Slugabed-Youtube-Link.html', 'Slugabed')
-  RETURNING id, question_id, content, title
-  `,
+  let result10 = await db.query(`
+    INSERT INTO choices (question_id, content, title)
+    VALUES ($1, 'Slugabed-Youtube-Link.html', 'Slugabed')
+    RETURNING id, question_id, content, title
+    `,
     [question1.id,]
   );
 

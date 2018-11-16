@@ -4,11 +4,11 @@ const {
   classPartialUpdate
 } = require('../helpers/partialUpdate');
 
-class Question {
-  constructor({ id, survey_id, type, title }) {
+class Choice {
+  constructor({ id, question_id, content, title }) {
     this.id = id;
-    this.survey_id = survey_id;
-    this.type = type;
+    this.question_id = question_id;
+    this.content = content;
     this.title = title;
   }
 
@@ -25,100 +25,96 @@ class Question {
     return this._id;
   }
 
-  set survey_id(val) {
-    if (this._survey_id) {
-      throw new Error(`Can't change survey id!`);
+  set question_id(val) {
+    if (this._question_id) {
+      throw new Error(`Can't change question id!`);
     }
-    this._survey_id = val;
+    this._question_id = val;
   }
 
-  get survey_id() {
-    return this._survey_id;
+  get question_id() {
+    return this._question_id;
   }
 
   /**
-   * getAll() -> only use case is to return all questions by a survey_id
+   * getAll() -> only use case is to return all choices by a question_id
    * so that's what this does
    * 
    */
-  static async getAll({ survey_id }) {
+  static async getAll({ question_id }) {
 
-    //If search, type or survey_id are undefined then they will be %%
-    //helps fix bug if passed in object does not have all 3, or search
-    //is intentionally empty to get all
     let result = await db.query(`
-      SELECT id, survey_id, title, type
-      FROM questions 
-      WHERE survey_id=$1
+      SELECT id, question_id, title, content
+      FROM choices 
+      WHERE question_id=$1
       `,
-      [survey_id]
+      [question_id]
     );
 
-    return result.rows.map(q => new Question(q));
+    return result.rows.map(q => new Choice(q));
   }
 
   /**
-   * get(id) -> return a question by id
+   * get(id) -> return a choice by id
    * 
    */
   static async get(id) {
 
-    if (id === undefined) throw new Error('Missing id parameter');
+    if (id === undefined) throw new Error(`Missing id parameter`);
 
     const result = await db.query(`
-      SELECT id, survey_id, title, type
-      FROM questions
+      SELECT id, question_id, title, content
+      FROM choices
       WHERE id=$1
       `, [id]
     );
 
     if (result.rows.length === 0) {
-      const err = Error(`Cannot find question by id: ${id}`);
+      const err = Error(`Cannot find choice by id: ${id}`);
       err.status = 404;
       throw err;
     }
 
-    return new Question(result.rows[0]);
+    return new Choice(result.rows[0]);
   }
 
   /**
-   * create(survey_id, title, type) -> creates a new question for the
-   * given survey and returns it as a new instance of Question class.
+   * create(question_id, title, content) -> creates a new choice for the
+   * given question and returns it as a new instance of Choice class.
    * 
    */
-  static async create({ survey_id, title, type }) {
-    const result = await db.query(
-      `
-    INSERT INTO questions (survey_id, title, type)
-    VALUES ($1,$2,$3)
-    RETURNING id, survey_id, title, type
+  static async create({ question_id, title, content }) {
+    const result = await db.query(`
+      INSERT INTO choices (question_id, title, content)
+      VALUES ($1,$2,$3)
+      RETURNING id, question_id, title, content
     `,
-      [survey_id, title, type]
+      [question_id, title, content]
     );
 
     if (result.rows.length === 0) {
-      const err = new Error(`Can't create question`);
+      const err = new Error(`Can't create choice`);
       err.status = 400;
       throw err;
     }
 
-    return new Question(result.rows[0]);
+    return new Choice(result.rows[0]);
   }
 
   updateFromValues(vals) {
     classPartialUpdate(this, vals);
   }
 
-  //Update a question instance
+  //Update a choice instance
   async save() {
     const {
       query,
       values
     } = sqlForPartialUpdate(
-      'questions', {
-        survey_id: this.survey_id,
+      'choices', {
+        question_id: this.question_id,
         title: this.title,
-        type: this.type
+        content: this.content
       },
       'id',
       this.id
@@ -127,27 +123,27 @@ class Question {
     const result = await db.query(query, values);
 
     if (result.rows.length === 0) {
-      const err = new Error(`Cannot find question to update`);
+      const err = new Error(`Cannot find choice to update`);
       err.status = 400;
       throw err;
     }
   }
 
-  //Delete question and return a message
+  //Delete choice and return a message
   async delete() {
-    const result = await db.query(
-      `
-        DELETE FROM questions 
-        WHERE id=$1
-        RETURNING id`,
+    const result = await db.query(`
+      DELETE FROM choices 
+      WHERE id=$1
+      RETURNING id
+    `,
       [this.id]
     );
 
     if (result.rows.length === 0) {
-      throw new Error(`Could not delete question: ${this.id}`);
+      throw new Error(`Could not delete choice: ${this.id}`);
     }
-    return `Question Deleted`;
+    return `Choice Deleted`;
   }
 }
 
-module.exports = Question;
+module.exports = Choice;
