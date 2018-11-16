@@ -210,6 +210,18 @@ describe('POST /surveys/:survey_id/questions', () => {
 
     expect(response.status).toEqual(401);
   });
+
+  it('should only allow type multiple or ranked', async function() {
+    let response = await request(app)
+      .post(`/surveys/${survey3._id}/questions`)
+      .send({
+        _token: userToken,
+        title: 'TestQuestion2',
+        type: 'nonvalidtype',
+      });
+
+    expect(response.status).toEqual(400);
+  });
 });
 
 describe('PATCH /surveys/:survey_id/questions/:question_id', () => {
