@@ -129,6 +129,32 @@ describe('GET /surveys/:survey_id/questions/:question_id', () => {
       _survey_id: survey1.id,
       title: question1.title,
       type: question1.type,
+      choices: [
+        {
+          _id: choice1.id,
+          _question_id: question1.id,
+          content: choice1.content,
+          title: choice1.title,
+        },
+        {
+          _id: choice2.id,
+          _question_id: question1.id,
+          content: choice2.content,
+          title: choice2.title,
+        },
+        {
+          _id: choice3.id,
+          _question_id: question1.id,
+          content: choice3.content,
+          title: choice3.title,
+        },
+        {
+          _id: choice4.id,
+          _question_id: question1.id,
+          content: choice4.content,
+          title: choice4.title,
+        },
+      ]
     });
   });
 
