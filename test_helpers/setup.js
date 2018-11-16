@@ -86,13 +86,13 @@ async function insertTestData() {
 
   let result5 = await db.query(`
   INSERT INTO questions (title, type, survey_id)
-  VALUES ('Favorite EDM Artist','multiple choice', $1)
+  VALUES ('Favorite EDM Artist','multiple', $1)
   RETURNING id, title, type, survey_id
   `, [survey1.id]);
 
   let result6 = await db.query(`
   INSERT INTO questions (title, type, survey_id)
-  VALUES ('Favorite Bootcamp CEO','multiple choice', $1)
+  VALUES ('Favorite Bootcamp CEO','multiple', $1)
   RETURNING id, title, type, survey_id
   `, [survey2.id]);
 

@@ -29,7 +29,7 @@
       "examples": [
         "ranked"
       ],
-      "pattern": "^(.*)$"
+      "pattern": "^(ranked|multiple)$"
     },
     "_token": {
       "$id": "#/properties/_token",
