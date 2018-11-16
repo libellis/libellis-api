@@ -127,7 +127,7 @@ class Question {
     const result = await db.query(query, values);
 
     if (result.rows.length === 0) {
-      const err = new Error('Cannot find question to update');
+      const err = new Error(`Cannot find question to update`);
       err.status = 400;
       throw err;
     }
