@@ -1,26 +1,18 @@
 {
   "definitions": {},
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "",
   "$id": "http://example.com/root.json",
   "type": "object",
   "title": "The Root Schema",
+  "description": "Schema for Creating Question",
+  "default": null,
+  "additionalProperties": false,
   "required": [
-    "title",
     "type",
+    "title",
     "_token"
   ],
-  "additionalProperties": false,
   "properties": {
-    "title": {
-      "$id": "#/properties/title",
-      "type": "string",
-      "title": "The Title Schema",
-      "default": "",
-      "examples": [
-        "Best Hip Hop Artist of 2019"
-      ],
-      "pattern": "^(.*)$"
-    },
     "type": {
       "$id": "#/properties/type",
       "type": "string",
@@ -31,15 +23,76 @@
       ],
       "pattern": "^(ranked|multiple)$"
     },
-    "_token": {
+    "title": {
+      "$id": "#/properties/title",
+      "type": "string",
+      "title": "The Title Schema",
+      "default": "",
+      "examples": [
+        "Best Beat Albums of All Time"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "title": {
       "$id": "#/properties/_token",
       "type": "string",
       "title": "The Token Schema",
       "default": "",
       "examples": [
-        "23BFfdfldskjkei@#$#kjsdffksld"
+        "238sdfkjlj2398qfklajsdffkl209r8aksjldf"
       ],
       "pattern": "^(.*)$"
+    },
+    "choices": {
+      "$id": "#/properties/choices",
+      "type": "array",
+      "title": "The Choices Schema",
+      "default": null,
+      "additionalItems": false,
+      "items": {
+        "$id": "#/properties/choices/items",
+        "type": "object",
+        "title": "The Items Schema",
+        "default": null,
+        "additionalProperties": false,
+        "required": [
+          "title",
+          "type"
+        ],
+        "properties": {
+          "title": {
+            "$id": "#/properties/choices/items/properties/title",
+            "type": "string",
+            "title": "The Title Schema",
+            "default": "",
+            "examples": [
+              "Flying Lotus - 1983"
+            ],
+            "pattern": "^(.*)$"
+          },
+          "content": {
+            "$id": "#/properties/choices/items/properties/content",
+            "type": "string",
+            "title": "The Content Schema",
+            "default": "",
+            "examples": [
+              "flyinglotusspotifylink.com"
+            ],
+            "pattern": "^(.*)$",
+            "format": "uri-reference"
+          },
+          "type": {
+            "$id": "#/properties/choices/items/properties/type",
+            "type": "string",
+            "title": "The Type Schema",
+            "default": "",
+            "examples": [
+              "spotify"
+            ],
+            "pattern": "^(text|image|spotify|soundcloud|youtube)$"
+          }
+        }
+      }
     }
   }
 }
