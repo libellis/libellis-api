@@ -135,24 +135,28 @@ describe('GET /surveys/:survey_id/questions/:question_id', () => {
           _question_id: question1.id,
           content: choice1.content,
           title: choice1.title,
+          type: choice1.type
         },
         {
           _id: choice2.id,
           _question_id: question1.id,
           content: choice2.content,
           title: choice2.title,
+          type: choice2.type
         },
         {
           _id: choice3.id,
           _question_id: question1.id,
           content: choice3.content,
           title: choice3.title,
+          type: choice3.type
         },
         {
           _id: choice4.id,
           _question_id: question1.id,
           content: choice4.content,
           title: choice4.title,
+          type: choice4.type
         },
       ]
     });
@@ -165,7 +169,7 @@ describe('GET /surveys/:survey_id/questions/:question_id', () => {
 });
 
 describe('POST /surveys/:survey_id/questions', () => {
-  it('should create a new question', async function() {
+  it('should create a new question if no choices', async function() {
     let response = await request(app)
       .post(`/surveys/${survey3._id}/questions`)
       .send({
@@ -180,6 +184,7 @@ describe('POST /surveys/:survey_id/questions', () => {
         _survey_id: survey3._id,
         title: 'TestQuestion1',
         type: 'ranked',
+        choices: []
       },
     });
 
@@ -188,6 +193,76 @@ describe('POST /surveys/:survey_id/questions', () => {
     expect(response.body.questions.length).toBe(1);
   });
 
+  it('should create a new question with supplied choices', async function() {
+    let response = await request(app)
+      .post(`/surveys/${survey3._id}/questions`)
+      .send({
+        _token: userToken,
+        title: 'Favorite President',
+        type: 'ranked',
+        choices: [
+          {
+            type: 'text',
+            title: 'FDR'
+          },
+          {
+            type: 'text',
+            title: 'Barack Obama'
+          },
+          {
+            type: 'text',
+            title: 'George Bush'
+          },
+          {
+            type: 'text',
+            title: 'George Washington'
+          },
+        ]
+      });
+
+    expect(response.body).toEqual({
+      question: {
+        _id: 3,
+        _survey_id: survey3._id,
+        title: 'Favorite President',
+        type: 'ranked',
+        choices: [
+          {
+            _id: 9,
+            type: 'text',
+            title: 'FDR',
+            content: null,
+            _question_id: 3
+          },
+          {
+            _id: 10,
+            type: 'text',
+            title: 'Barack Obama',
+            content: null,
+            _question_id: 3
+          },
+          {
+            _id: 11,
+            type: 'text',
+            title: 'George Bush',
+            content: null,
+            _question_id: 3
+          },
+          {
+            _id: 12,
+            type: 'text',
+            title: 'George Washington',
+            content: null,
+            _question_id: 3
+          },
+        ]
+      },
+    });
+
+    response = await request(app)
+      .get(`/surveys/${survey3._id}/questions`)
+    expect(response.body.questions.length).toBe(1);
+  });
   it('should give 400 error for missing "not null" data', async function() {
     const response = await request(app)
       .post(`/surveys/${survey3._id}/questions`)
@@ -241,6 +316,7 @@ describe('PATCH /surveys/:survey_id/questions/:question_id', () => {
         _survey_id: survey3._id,
         title: 'TestQuestion1',
         type: 'ranked',
+        choices: []
       },
     });
 
@@ -270,6 +346,7 @@ describe('PATCH /surveys/:survey_id/questions/:question_id', () => {
         _survey_id: survey3._id,
         title: 'TestQuestion1',
         type: 'ranked',
+        choices: []
       },
     });
 
@@ -302,6 +379,7 @@ describe('DELETE /surveys/:survey_id/questions/:question_id', () => {
         _survey_id: survey3._id,
         title: 'TestQuestion1',
         type: 'ranked',
+        choices: []
       },
     });
 
@@ -337,6 +415,7 @@ describe('DELETE /surveys/:survey_id/questions/:question_id', () => {
         _survey_id: survey3._id,
         title: 'TestQuestion1',
         type: 'ranked',
+        choices: []
       },
     });
 

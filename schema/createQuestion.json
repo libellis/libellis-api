@@ -33,7 +33,7 @@
       ],
       "pattern": "^(.*)$"
     },
-    "title": {
+    "_token": {
       "$id": "#/properties/_token",
       "type": "string",
       "title": "The Token Schema",

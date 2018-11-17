@@ -86,7 +86,7 @@ class Choice {
    */
   static async create({ question_id, title, content, type }) {
     if (type === undefined || question_id === undefined ||
-        content === undefined || type === undefined) {
+        title === undefined) {
       const err = new Error(`Must supply title, type and question_id`);
       err.status = 400;
       throw err;

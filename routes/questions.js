@@ -48,6 +48,21 @@ router.post(
       const newQuestion = req.body;
       newQuestion.survey_id = req.params.id;
       const question = await Question.create(newQuestion);
+      // now that we've created the question, let's create
+      // the choices if they were submitted with question
+      if (newQuestion.choices) {
+        for (const choice of newQuestion.choices) {
+          const newChoice = {...choice, question_id: question._id}
+          console.log('New Choice:', newChoice);
+          await Choice.create(newChoice);
+        }
+      }
+       
+      // now that we have created all choices, let's retrieve them and attach
+      // to question that was returned  
+      const choices = await Choice.getAll({ question_id: question._id });
+      question.choices = choices;
+
       return res.json({question});
     } catch (error) {
       return next(error);
