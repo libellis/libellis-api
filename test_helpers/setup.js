@@ -41,6 +41,7 @@ async function createTables() {
       id SERIAL PRIMARY KEY,
       question_id integer REFERENCES questions ON DELETE cascade,
       content text,
+      type text NOT NULL,
       title text NOT NULL
     )
   `)
@@ -104,33 +105,33 @@ async function insertTestData() {
   // 4 choices for favorite EDM artists
 
   let result7 = await db.query(`
-    INSERT INTO choices (question_id, content, title)
-    VALUES ($1, 'Bassnectar-Test-Youtube-Link.html', 'Bassnectar')
-    RETURNING id, question_id, content, title
+    INSERT INTO choices (question_id, content, title, type)
+    VALUES ($1, 'Bassnectar-Test-Youtube-Link.html', 'Bassnectar', 'youtube')
+    RETURNING id, question_id, content, title, type
     `,
     [question1.id,]
   );
 
   let result8 = await db.query(`
-    INSERT INTO choices (question_id, content, title)
-    VALUES ($1, 'Tiesto-Youtube-Link.html', 'Tiesto')
-    RETURNING id, question_id, content, title
+    INSERT INTO choices (question_id, content, title, type)
+    VALUES ($1, 'Tiesto-Youtube-Link.html', 'Tiesto', 'youtube')
+    RETURNING id, question_id, content, title, type
     `,
     [question1.id,]
   );
 
   let result9 = await db.query(`
-    INSERT INTO choices (question_id, content, title)
-    VALUES ($1, 'Beats-Antique-Youtube-Link.html', 'Beats Antique')
-    RETURNING id, question_id, content, title
+    INSERT INTO choices (question_id, content, title, type)
+    VALUES ($1, 'Beats-Antique-Youtube-Link.html', 'Beats Antique', 'youtube')
+    RETURNING id, question_id, content, title, type
     `,
     [question1.id,]
   );
 
   let result10 = await db.query(`
-    INSERT INTO choices (question_id, content, title)
-    VALUES ($1, 'Slugabed-Youtube-Link.html', 'Slugabed')
-    RETURNING id, question_id, content, title
+    INSERT INTO choices (question_id, content, title, type)
+    VALUES ($1, 'Slugabed-Youtube-Link.html', 'Slugabed', 'youtube')
+    RETURNING id, question_id, content, title, type
     `,
     [question1.id,]
   );
@@ -142,39 +143,35 @@ async function insertTestData() {
 
   // 4 choices for top bootcamp school ceo
 
-  let result11 = await db.query(
-    `
-  INSERT INTO choices (question_id, content, title)
-  VALUES ($1, 'Elie-CEO.html', 'Elie Schoppik')
-  RETURNING id, question_id, content, title
-  `,
+  let result11 = await db.query(`
+    INSERT INTO choices (question_id, content, title, type)
+    VALUES ($1, 'Elie-CEO.html', 'Elie Schoppik', 'text')
+    RETURNING id, question_id, content, title, type
+    `,
     [question2.id,]
   );
 
-  let result12 = await db.query(
-    `
-  INSERT INTO choices (question_id, content, title)
-  VALUES ($1, 'Matt-CEO.html', 'Matthew Lane')
-  RETURNING id, question_id, content, title
-  `,
+  let result12 = await db.query(`
+    INSERT INTO choices (question_id, content, title, type)
+    VALUES ($1, 'Matt-CEO.html', 'Matthew Lane', 'text')
+    RETURNING id, question_id, content, title, type
+    `,
     [question2.id,]
   );
 
-  let result13 = await db.query(
-    `
-  INSERT INTO choices (question_id, content, title)
-  VALUES ($1, 'Steve-Jerbs-CEO.html', 'Steve Jerbs')
-  RETURNING id, question_id, content, title
-  `,
+  let result13 = await db.query(`
+    INSERT INTO choices (question_id, content, title, type)
+    VALUES ($1, 'Steve-Jerbs-CEO.html', 'Steve Jerbs', 'text')
+    RETURNING id, question_id, content, title, type
+    `,
     [question2.id,]
   );
 
-  let result14 = await db.query(
-    `
-  INSERT INTO choices (question_id, content, title)
-  VALUES ($1, 'Chill-Gates-CEO.html', 'Chill Gates')
-  RETURNING id, question_id, content, title
-  `,
+  let result14 = await db.query(`
+    INSERT INTO choices (question_id, content, title, type)
+    VALUES ($1, 'Chill-Gates-CEO.html', 'Chill Gates', 'text')
+    RETURNING id, question_id, content, title, type
+    `,
     [question2.id,]
   );
 
