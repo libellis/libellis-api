@@ -5,11 +5,12 @@ const {
 } = require('../helpers/partialUpdate');
 
 class Choice {
-  constructor({ id, question_id, content, title }) {
+  constructor({ id, question_id, content, title, type }) {
     this.id = id;
     this.question_id = question_id;
     this.content = content;
     this.title = title;
+    this.type = type;
   }
 
   // make setter/getter that makes it so you can't change primary key
@@ -44,7 +45,7 @@ class Choice {
   static async getAll({ question_id }) {
 
     let result = await db.query(`
-      SELECT id, question_id, title, content
+      SELECT id, question_id, title, content, type
       FROM choices 
       WHERE question_id=$1
       `,
@@ -63,7 +64,7 @@ class Choice {
     if (id === undefined) throw new Error(`Missing id parameter`);
 
     const result = await db.query(`
-      SELECT id, question_id, title, content
+      SELECT id, question_id, title, content, type
       FROM choices
       WHERE id=$1
       `, [id]
@@ -83,13 +84,19 @@ class Choice {
    * given question and returns it as a new instance of Choice class.
    * 
    */
-  static async create({ question_id, title, content }) {
+  static async create({ question_id, title, content, type }) {
+    if (type === undefined || question_id === undefined ||
+        content === undefined || type === undefined) {
+      const err = new Error(`Must supply title, type and question_id`);
+      err.status = 400;
+      throw err;
+    }
     const result = await db.query(`
-      INSERT INTO choices (question_id, title, content)
-      VALUES ($1,$2,$3)
-      RETURNING id, question_id, title, content
+      INSERT INTO choices (question_id, title, content, type)
+      VALUES ($1,$2,$3,$4)
+      RETURNING id, question_id, title, content, type
     `,
-      [question_id, title, content]
+      [question_id, title, content, type]
     );
 
     if (result.rows.length === 0) {
@@ -114,7 +121,8 @@ class Choice {
       'choices', {
         question_id: this.question_id,
         title: this.title,
-        content: this.content
+        content: this.content,
+        type: this.type
       },
       'id',
       this.id
