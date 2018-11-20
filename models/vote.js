@@ -126,7 +126,7 @@ class Vote {
     // put all desctructured params into an array. if any are empty string or
     // falsy value, throw error
     const voteData = [survey_id, username, question_id, choice_id, score];
-    if (voteData.some(data => data === '' || !data)) {
+    if (voteData.some(data => !data)) {
       const err = new Error(
         'Must supply survey_id, username, question_id, choice_id, and score',
       );

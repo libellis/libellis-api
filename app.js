@@ -10,6 +10,7 @@ const authRouter = require('./routes/auth');
 const userRouter = require('./routes/users');
 const surveyRouter = require('./routes/surveys');
 const questionRouter = require('./routes/questions');
+const voteRouter = require('./routes/votes');
 // const choicesRouter = require('./routes/choices');
 
 // add logging system
@@ -18,6 +19,7 @@ const morgan = require('morgan');
 app.use(morgan('tiny'));
 
 surveyRouter.use('/:id/questions', questionRouter);
+surveyRouter.use('/:id/votes', voteRouter);
 
 // add routes here
 app.use(authRouter);
