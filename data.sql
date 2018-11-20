@@ -42,7 +42,7 @@ CREATE TABLE votes
   choice_id integer NOT NULL REFERENCES choices ON DELETE cascade,
   question_id integer NOT NULL REFERENCES questions ON DELETE cascade,
   survey_id integer NOT NULL REFERENCES surveys ON DELETE cascade,
-  user_id text NOT NULL REFERENCES users ON DELETE cascade,
+  username text NOT NULL REFERENCES users ON DELETE cascade,
   PRIMARY KEY (choice_id, question_id, survey_id, user_id),
   score integer NOT NULL
 );
