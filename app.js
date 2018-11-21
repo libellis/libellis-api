@@ -2,6 +2,7 @@
 
 const express = require('express');
 const app = express();
+const cors = require('cors');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -17,6 +18,7 @@ const voteRouter = require('./routes/votes');
 
 const morgan = require('morgan');
 app.use(morgan('tiny'));
+app.use(cors());
 
 surveyRouter.use('/:id/questions', questionRouter);
 surveyRouter.use('/:id/votes', voteRouter);
