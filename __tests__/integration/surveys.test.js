@@ -87,6 +87,7 @@ describe('GET /surveys', () => {
     expect(response.body.surveys).toEqual(
       [{
         "_id": 1,
+        "published": false,
         "anonymous": true,
         "author": "joerocket",
         "date_posted": expect.any(String),
@@ -94,6 +95,7 @@ describe('GET /surveys', () => {
         "title": "best albums of 2009"
       }, {
         "_id": 2,
+        "published": false,
         "anonymous": true,
         "author": "spongebob",
         "date_posted": expect.any(String),
@@ -110,6 +112,7 @@ describe('GET /surveys', () => {
     expect(response.body.surveys).toEqual(
       [{
         "_id": 2,
+        "published": false,
         "anonymous": true,
         "author": "spongebob",
         "date_posted": expect.any(String),
@@ -126,6 +129,7 @@ describe('GET /surveys', () => {
     expect(response.body.surveys).toEqual(
       [{
         "_id": 1,
+        "published": false,
         "anonymous": true,
         "author": "joerocket",
         "date_posted": expect.any(String),
@@ -142,6 +146,7 @@ describe('GET /surveys', () => {
     expect(response.body.surveys).toEqual(
       [{
         "_id": 2,
+        "published": false,
         "anonymous": true,
         "author": "spongebob",
         "date_posted": expect.any(String),
@@ -158,6 +163,7 @@ describe('GET /surveys/:id', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.survey).toEqual({
       _id: expect.any(Number),
+      published: false,
       author: 'joerocket',
       title: 'best albums of 2009',
       description: 'hot fiya',
@@ -191,6 +197,7 @@ describe('POST /surveys', () => {
     expect(response.body).toEqual({
       survey: {
         _id: 3,
+        published: false,
         author: testUser.username,
         title: 'xxSuperCoolTestSurveyxx',
         description: '9999ThisIsDescriptive9999',
