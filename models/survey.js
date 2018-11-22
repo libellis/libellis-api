@@ -6,13 +6,14 @@ const {
 
 
 class Survey {
-  constructor({ id, author, title, description, date_posted, anonymous = true }) {
+  constructor({ id, author, title, description, date_posted, anonymous, published}) {
     this.id = id;
     this.author = author;
     this.title = title;
     this.description = description;
     this.date_posted = date_posted
     this.anonymous = anonymous;
+    this.published = published;
   }
 
   // make setter/getter that makes it so you can't change primary key
@@ -38,7 +39,7 @@ class Survey {
     if (id === undefined) throw new Error('Missing id parameter')
 
     let result = await db.query(
-      `SELECT id, author, title, description, date_posted, anonymous
+      `SELECT id, author, title, description, date_posted, anonymous, published
             FROM surveys
             WHERE id=$1`, [id]
     )
@@ -61,12 +62,12 @@ class Survey {
     let result;
     if (search === undefined || search === '') {
       result = await db.query(
-        `SELECT id, author, title, description, date_posted, anonymous
+        `SELECT id, author, title, description, date_posted, anonymous, published
                 FROM surveys` 
       );
     } else {
       result = await db.query(
-        `SELECT id, author, title, description, date_posted, anonymous
+        `SELECT id, author, title, description, date_posted, anonymous, published
                 FROM surveys WHERE 
                 author ILIKE $1 OR
                 title ILIKE $1 OR
@@ -92,7 +93,7 @@ class Survey {
     let result = await db.query(
       `INSERT INTO surveys (author, title, description)
             VALUES ($1, $2, $3)
-            RETURNING id, author, title, description, date_posted, anonymous`,
+            RETURNING id, author, title, description, date_posted, anonymous, published`,
       [author, title, description]
     )
 
@@ -112,7 +113,8 @@ class Survey {
       'surveys', {
         description: this.description,
         title: this.title,
-        anonymous: this.anonymous
+        anonymous: this.anonymous,
+        published: this.published
       },
       'id',
       this.id

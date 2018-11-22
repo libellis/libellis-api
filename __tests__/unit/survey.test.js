@@ -31,6 +31,7 @@ describe('get(id)', () => {
     const survey = await Survey.get(survey1.id);
     expect(survey).toEqual({
       _id: expect.any(Number),
+      published: false,
       anonymous: true,
       author: "joerocket",
       date_posted: expect.any(Date),
@@ -58,6 +59,7 @@ describe('getAll()', () => {
     expect(surveys.length).toEqual(2);
     expect(surveys[0]).toEqual({
       "_id": 1,
+      published: false,
       "anonymous": true,
       "author": survey1.author,
       "date_posted": expect.any(Date),
@@ -66,6 +68,7 @@ describe('getAll()', () => {
     });
     expect(surveys[1]).toEqual({
       "_id": expect.any(Number),
+      published: false,
       "anonymous": true,
       "author": survey2.author,
       "date_posted": expect.any(Date),
@@ -80,6 +83,7 @@ describe('getAll()', () => {
     expect(surveys.length).toEqual(1);
     expect(surveys[0]).toEqual({
       "_id": 1,
+      published: false,
       "anonymous": true,
       "author": survey1.author,
       "date_posted": expect.any(Date),
@@ -102,6 +106,7 @@ describe('create(author, title, description)', () => {
 
     expect(survey).toEqual({
       _id: expect.any(Number),
+      published: false,
       author: newSurvey.author,
       title: newSurvey.title,
       description: newSurvey.description,
@@ -120,6 +125,7 @@ describe('create(author, title, description)', () => {
 
     expect(survey).toEqual({
       _id: expect.any(Number),
+      published: false,
       author: newSurvey.author,
       title: newSurvey.title,
       description: null,
@@ -155,6 +161,7 @@ describe('save(id, title, description, anonymous)', async function () {
 
     expect(survey).toEqual({
       _id: survey1.id,
+      published: false,
       author: survey1.author,
       title: 'New Title',
       description: 'new description',
@@ -174,6 +181,7 @@ describe('save(id, title, description, anonymous)', async function () {
 
     expect(survey).toEqual({
       _id: survey1.id,
+      published: false,
       author: survey1.author,
       title: survey1.title,
       description: 'new description',
@@ -194,6 +202,7 @@ describe('save(id, title, description, anonymous)', async function () {
 
     expect(survey).toEqual({
       _id: survey1.id,
+      published: false,
       author: survey1.author,
       title: survey1.title,
       description: survey1.description,
