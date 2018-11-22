@@ -12,7 +12,14 @@ let survey1, survey2, question1, question2, user1, user2;
 beforeEach(async function () {
   // Build up our test tables and return inserted test questions, surveys and users
   await createTables();
-  ({ question1, question2, survey1, survey2, user1, user2 } = await insertTestData());
+  ({
+    question1,
+    question2,
+    survey1,
+    survey2,
+    user1,
+    user2
+  } = await insertTestData());
 });
 
 // Test get filtered users
@@ -21,8 +28,7 @@ describe('getUsers()', () => {
     const users = await User.getUsers();
 
     // Check that returned structure matches this exactly
-    expect(users).toEqual([
-      {
+    expect(users).toEqual([{
         _username: user1.username,
         first_name: user1.first_name,
         last_name: user1.last_name,
@@ -80,6 +86,24 @@ describe('getUser()', () => {
     }
   });
 });
+
+
+/** Get Surveys authored by user */
+describe('getSurveys()', () => {
+  it('should return a list of surveys authored by a user', async function () {
+    const surveys = await User.getSurveys(user1.username);
+    expect(surveys).toEqual([{
+      "_id": 1,
+      "anonymous": true,
+      "author": "joerocket",
+      "date_posted": expect.any(Date),
+      "description": "hot fiya",
+      "published": false,
+      "title": "best albums of 2009"
+    }]);
+  });
+});
+
 
 // Authenticate one user
 describe('authenticate()', () => {

@@ -115,6 +115,26 @@ describe('GET /users/:username', () => {
   });
 });
 
+
+// test get surveys created by user
+describe('GET /users/:username/surveys', () => {
+  it('should get an empty array of surveys for existing user with no created surveys', async function () {
+    const response = await request(app)
+      .get(`/users/${user3.username}/surveys`)
+      .query({ _token: userToken });
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({surveys: []});
+  });
+
+  it('should get an empty array of surveys for existing user with no created surveys', async function () {
+    const response = await request(app)
+      .get(`/users/${user3.username}/surveys`)
+      .query({ _token: userToken });
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({surveys: []});
+  });
+});
+
 //Test updating a user route
 describe('PATCH /users/:username', () => {
   it('should correctly update a user and return it', async function () {

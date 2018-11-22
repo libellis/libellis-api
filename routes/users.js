@@ -1,7 +1,6 @@
 const express = require('express');
 const router = new express.Router();
 const User = require('../models/user');
-// const Survey = require('../models/survey');
 // const Question = require('../models/question');
 const { classPartialUpdate } = require('../helpers/partialUpdate');
 const validateInput = require('../middleware/validation');
@@ -35,6 +34,16 @@ router.get('/:username', ensureCorrectUser, async function (req, res, next) {
   try {
     const user = await User.getUser(req.params.username);
     return res.json({ user });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// Get a list of surveys created by this user
+router.get('/:username/surveys', ensureCorrectUser, async function (req, res, next) {
+  try {
+    const surveys = await User.getSurveys(req.params.username);
+    return res.json({ surveys });
   } catch (error) {
     return next(error);
   }

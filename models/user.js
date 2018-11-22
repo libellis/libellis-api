@@ -6,6 +6,8 @@ const {
 const bcrypt = require('bcrypt');
 const { BWF, SECRET, DEFAULT_PHOTO } = require('../config');
 const jwt = require('jsonwebtoken');
+const Survey = require('../models/survey');
+
 
 class User /* extends Model */ {
   constructor({ username, first_name, last_name, email, photo_url, is_admin }) {
@@ -91,7 +93,7 @@ class User /* extends Model */ {
     throw new Error('Invalid username/password')
   }
 
-  //Get user and return an instance
+  /** get User details */
   static async getUser(username) {
     let result = await db.query(
       `
@@ -108,6 +110,18 @@ class User /* extends Model */ {
     }
 
     return new User(result.rows[0]);
+  }
+
+  /** get Surveys created by given user */
+  static async getSurveys(username) {
+    let result = await db.query(
+      `SELECT id, author, title, description, date_posted, anonymous, published
+      FROM surveys WHERE author=$1`, [username]
+    );
+
+    if (result.rows.length === 0) return [];
+
+    return result.rows.map(s => new Survey(s));
   }
 
   updateFromValues(vals) {
