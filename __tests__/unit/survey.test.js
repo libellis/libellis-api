@@ -190,6 +190,27 @@ describe('save(id, title, description, anonymous)', async function () {
     });
   });
 
+  it('should update a survey to published state', async function () {
+    let survey = await Survey.get(survey1.id);
+
+    // should update all save checks to use this!
+    survey.updateFromValues({published: true});
+
+    await survey.save();
+
+    survey = await Survey.get(survey1.id);
+
+    expect(survey).toEqual({
+      _id: survey1.id,
+      published: true,
+      author: survey1.author,
+      title: survey1.title,
+      description: survey1.description,
+      date_posted: survey1.date_posted,
+      anonymous: survey1.anonymous
+    });
+  });
+
   it('should throw not change an restricted field', async function () {
     let survey = await Survey.get(survey1.id);
 

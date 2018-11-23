@@ -26,6 +26,15 @@
       ],
       "pattern": "^(.*)$"
     },
+    "published": {
+      "$id": "#/properties/published",
+      "type": "boolean",
+      "title": "Published Boolean Schema",
+      "default": false,
+      "examples": [
+        false
+      ]
+    },
     "description": {
       "$id": "#/properties/description",
       "type": "string",
