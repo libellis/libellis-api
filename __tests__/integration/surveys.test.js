@@ -260,6 +260,28 @@ describe('PATCH /surveys/:id', () => {
     expect(patchResponse.body.survey.title).toEqual('__muchbetter__');
   });
 
+  it('Should allow a user to publish a survey via patch', async function() {
+    // first create a new survey by testUser
+    const postReponse = await request(app)
+      .post('/surveys')
+      .send({
+        _token: userToken,
+        title: 'xxSuperCoolTestSurveyxx',
+        description: '9999ThisIsDescriptive9999'
+      });
+    
+    expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
+
+    const patchResponse = await request(app)
+      .patch(`/surveys/${postReponse.body.survey._id}`)
+      .send({
+        _token: userToken,
+        published: true
+      });
+
+    expect(patchResponse.status).toEqual(200);
+    expect(patchResponse.body.survey.published).toEqual(true);
+  });
 
   it('Should update the description of a survey only', async function() {
     // first create a new survey by testUser

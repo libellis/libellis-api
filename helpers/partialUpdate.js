@@ -40,10 +40,12 @@ function sqlForPartialUpdate(table, items, key, id) {
   return { query, values };
 }
 
+//updated to hasOwnProperty - previous method failed on keys whose properties
+//were falsey values
 function classPartialUpdate(classInstance, updateObj) {
   // Intentional: mutates in place
   for (let [key, value] of Object.entries(updateObj)) {
-    if (classInstance[key]) classInstance[key] = value;
+    if (classInstance.hasOwnProperty(key)) classInstance[key] = value;
   }
 }
 
