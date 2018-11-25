@@ -16,6 +16,10 @@ router.get('/', async function(req, res, next) {
   try {
     const survey_id = req.params.id;
     const questions = await Question.getAll({survey_id});
+    for (const question of questions) {
+      const choices = await Choice.getAll({ question_id: question._id });
+      question.choices = choices;
+    }
     return res.json({questions});
   } catch (error) {
     return next(error);
