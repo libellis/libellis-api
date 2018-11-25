@@ -78,13 +78,12 @@ beforeEach(async function() {
     });
   hackerToken = responseForHacker.body.token;
 
-  
   let surveyResponse = await request(app)
     .post('/surveys')
     .send({
       _token: userToken,
       title: 'xxSuperCoolTestSurveyxx',
-      description: '9999ThisIsDescriptive9999'
+      description: '9999ThisIsDescriptive9999',
     });
   survey3 = surveyResponse.body.survey;
 });
@@ -92,8 +91,7 @@ beforeEach(async function() {
 // Test get questions route
 describe('GET /surveys/:survey_id/questions', () => {
   it('should correctly return a list of questions by a survey id', async function() {
-    let response = await request(app)
-      .get(`/surveys/${survey1.id}/questions`);
+    let response = await request(app).get(`/surveys/${survey1.id}/questions`);
     expect(response.statusCode).toBe(200);
     expect(response.body.questions.length).toBe(1);
     expect(response.body.questions).toEqual([
@@ -102,19 +100,36 @@ describe('GET /surveys/:survey_id/questions', () => {
         _survey_id: survey1.id,
         title: question1.title,
         type: question1.type,
-      },
-    ]);
-
-    response = await request(app)
-      .get(`/surveys/${survey2.id}/questions`);
-    expect(response.statusCode).toBe(200);
-    expect(response.body.questions.length).toBe(1);
-    expect(response.body.questions).toEqual([
-      {
-        _id: question2.id,
-        _survey_id: survey2.id,
-        title: question2.title,
-        type: question2.type,
+        choices: [
+          {
+            _id: choice1.id,
+            _question_id: question1.id,
+            content: choice1.content,
+            title: choice1.title,
+            type: choice1.type,
+          },
+          {
+            _id: choice2.id,
+            _question_id: question1.id,
+            content: choice2.content,
+            title: choice2.title,
+            type: choice2.type,
+          },
+          {
+            _id: choice3.id,
+            _question_id: question1.id,
+            content: choice3.content,
+            title: choice3.title,
+            type: choice3.type,
+          },
+          {
+            _id: choice4.id,
+            _question_id: question1.id,
+            content: choice4.content,
+            title: choice4.title,
+            type: choice4.type,
+          },
+        ],
       },
     ]);
   });
@@ -122,7 +137,9 @@ describe('GET /surveys/:survey_id/questions', () => {
 
 describe('GET /surveys/:survey_id/questions/:question_id', () => {
   it('should return details for a question', async function() {
-    const response = await request(app).get(`/surveys/${survey1.id}/questions/${question1.id}`);
+    const response = await request(app).get(
+      `/surveys/${survey1.id}/questions/${question1.id}`,
+    );
     expect(response.statusCode).toBe(200);
     expect(response.body.question).toEqual({
       _id: question1.id,
@@ -135,35 +152,37 @@ describe('GET /surveys/:survey_id/questions/:question_id', () => {
           _question_id: question1.id,
           content: choice1.content,
           title: choice1.title,
-          type: choice1.type
+          type: choice1.type,
         },
         {
           _id: choice2.id,
           _question_id: question1.id,
           content: choice2.content,
           title: choice2.title,
-          type: choice2.type
+          type: choice2.type,
         },
         {
           _id: choice3.id,
           _question_id: question1.id,
           content: choice3.content,
           title: choice3.title,
-          type: choice3.type
+          type: choice3.type,
         },
         {
           _id: choice4.id,
           _question_id: question1.id,
           content: choice4.content,
           title: choice4.title,
-          type: choice4.type
+          type: choice4.type,
         },
-      ]
+      ],
     });
   });
 
   it('should return a 404 if id not found', async function() {
-    const response = await request(app).get(`/surveys/${survey1.id}/questions/33797`);
+    const response = await request(app).get(
+      `/surveys/${survey1.id}/questions/33797`,
+    );
     expect(response.statusCode).toBe(404);
   });
 });
@@ -184,12 +203,11 @@ describe('POST /surveys/:survey_id/questions', () => {
         _survey_id: survey3._id,
         title: 'TestQuestion1',
         type: 'ranked',
-        choices: []
+        choices: [],
       },
     });
 
-    response = await request(app)
-      .get(`/surveys/${survey3._id}/questions`)
+    response = await request(app).get(`/surveys/${survey3._id}/questions`);
     expect(response.body.questions.length).toBe(1);
   });
 
@@ -203,21 +221,21 @@ describe('POST /surveys/:survey_id/questions', () => {
         choices: [
           {
             type: 'text',
-            title: 'FDR'
+            title: 'FDR',
           },
           {
             type: 'text',
-            title: 'Barack Obama'
+            title: 'Barack Obama',
           },
           {
             type: 'text',
-            title: 'George Bush'
+            title: 'George Bush',
           },
           {
             type: 'text',
-            title: 'George Washington'
+            title: 'George Washington',
           },
-        ]
+        ],
       });
 
     expect(response.body).toEqual({
@@ -232,35 +250,34 @@ describe('POST /surveys/:survey_id/questions', () => {
             type: 'text',
             title: 'FDR',
             content: null,
-            _question_id: 3
+            _question_id: 3,
           },
           {
             _id: 10,
             type: 'text',
             title: 'Barack Obama',
             content: null,
-            _question_id: 3
+            _question_id: 3,
           },
           {
             _id: 11,
             type: 'text',
             title: 'George Bush',
             content: null,
-            _question_id: 3
+            _question_id: 3,
           },
           {
             _id: 12,
             type: 'text',
             title: 'George Washington',
             content: null,
-            _question_id: 3
+            _question_id: 3,
           },
-        ]
+        ],
       },
     });
 
-    response = await request(app)
-      .get(`/surveys/${survey3._id}/questions`)
+    response = await request(app).get(`/surveys/${survey3._id}/questions`);
     expect(response.body.questions.length).toBe(1);
   });
   it('should give 400 error for missing "not null" data', async function() {
@@ -316,7 +333,7 @@ describe('PATCH /surveys/:survey_id/questions/:question_id', () => {
         _survey_id: survey3._id,
         title: 'TestQuestion1',
         type: 'ranked',
-        choices: []
+        choices: [],
       },
     });
 
@@ -346,7 +363,7 @@ describe('PATCH /surveys/:survey_id/questions/:question_id', () => {
         _survey_id: survey3._id,
         title: 'TestQuestion1',
         type: 'ranked',
-        choices: []
+        choices: [],
       },
     });
 
@@ -379,7 +396,7 @@ describe('DELETE /surveys/:survey_id/questions/:question_id', () => {
         _survey_id: survey3._id,
         title: 'TestQuestion1',
         type: 'ranked',
-        choices: []
+        choices: [],
       },
     });
 
@@ -415,7 +432,7 @@ describe('DELETE /surveys/:survey_id/questions/:question_id', () => {
         _survey_id: survey3._id,
         title: 'TestQuestion1',
         type: 'ranked',
-        choices: []
+        choices: [],
       },
     });
 
