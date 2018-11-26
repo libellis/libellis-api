@@ -63,9 +63,11 @@ class Survey {
     if (search === undefined || search === '') {
       result = await db.query(
         `SELECT id, author, title, description, date_posted, anonymous, published
-                FROM surveys` 
+        FROM surveys` 
       );
+      console.log('search is empty', result.rows);
     } else {
+      console.log('search is not empty');
       result = await db.query(
         `SELECT id, author, title, description, date_posted, anonymous, published
                 FROM surveys WHERE 
@@ -74,11 +76,7 @@ class Survey {
                 description ILIKE $1`, [`%${search}%`] 
       );
     }
-    if (result.rows.length < 1) {
-      let err = new Error('Not Found');
-      err.status = 404;
-      throw err;
-    }
+    
     return result.rows.map(s => new Survey(s));
   }
 
