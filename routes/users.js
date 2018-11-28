@@ -1,6 +1,7 @@
 const express = require('express');
 const router = new express.Router();
 const User = require('../models/user');
+const Survey = require('../models/survey');
 // const Question = require('../models/question');
 const { classPartialUpdate } = require('../helpers/partialUpdate');
 const validateInput = require('../middleware/validation');
@@ -33,6 +34,7 @@ router.post('/', validateInput(newUserSchema), async function (req, res, next) {
 router.get('/:username', ensureCorrectUser, async function (req, res, next) {
   try {
     const user = await User.getUser(req.params.username);
+    user.surveys = await User.getSurveys(req.params.username);
     return res.json({ user });
   } catch (error) {
     return next(error);
