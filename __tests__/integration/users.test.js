@@ -67,6 +67,7 @@ describe('GET /users', () => {
   });
 });
 
+
 //Test create user route
 describe('POST /users', () => {
   it('should correctly create a new user and return it', async function () {
@@ -97,23 +98,55 @@ describe('POST /users', () => {
   });
 });
 
+
 //Test get one user route
 describe('GET /users/:username', () => {
   it('should correctly return a user by username', async function () {
     const response = await request(app)
       .get(`/users/${user3.username}`)
-      .query({ _token: userToken });
+      .query({
+        _token: userToken
+      });
     expect(response.statusCode).toBe(200);
     expect(response.body.user).toEqual({
-      _username: 'georgetheman',
-      first_name: 'george',
-      last_name: 'johnson',
-      email: 'george@gmail.com',
-      photo_url:
-        'https://moonvillageassociation.org/wp-content/uploads/2018/06/default-profile-picture1.jpg',
+      "_username": "georgetheman",
+      "email": "george@gmail.com",
+      "first_name": "george",
+      "last_name": "johnson",
+      "photo_url": "https://moonvillageassociation.org/wp-content/uploads/2018/06/default-profile-picture1.jpg",
+      "surveys": []
+    })
+  });
+});
+
+
+// test get surveys created by user
+describe('GET /users/:username/surveys', () => {
+  it('should get an empty array of surveys for existing user with no created surveys', async function () {
+    const response = await request(app)
+      .get(`/users/${user3.username}/surveys`)
+      .query({
+        _token: userToken
+      });
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({
+      surveys: []
+    });
+  });
+
+  it('should get an empty array of surveys for existing user with no created surveys', async function () {
+    const response = await request(app)
+      .get(`/users/${user3.username}/surveys`)
+      .query({
+        _token: userToken
+      });
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({
+      surveys: []
     });
   });
 });
+
 
 //Test updating a user route
 describe('PATCH /users/:username', () => {
@@ -123,7 +156,9 @@ describe('PATCH /users/:username', () => {
       .send({
         first_name: 'Josephina'
       })
-      .query({ _token: userToken });
+      .query({
+        _token: userToken
+      });
     expect(response.statusCode).toBe(200);
     expect(response.body.user._username).toBe(user3.username);
     expect(response.body.user.first_name).toBe('Josephina');
@@ -139,6 +174,7 @@ describe('PATCH /users/:username', () => {
     expect(invalidResponse.statusCode).toBe(400);
   });
 });
+
 
 //Test deleting a user route
 describe('DELETE /users/:username', () => {

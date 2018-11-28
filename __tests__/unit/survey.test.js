@@ -94,6 +94,39 @@ describe('getAll()', () => {
 });
 
 
+/** get surveys by user is handled by User model, so this is commented out */
+
+// describe('getForUser()', () => {
+//   it('should return an array of surveys created by given username', async function () {
+//     const surveys = await Survey.getForUser(survey2.author);
+//     expect(surveys[0]).toEqual({
+//       "_id": 2, 
+//       "anonymous": true, 
+//       "author": "spongebob", 
+//       "date_posted": expect.any(Date), 
+//       "description": "top ceos of all time", 
+//       "published": false, 
+//       "title": "top ceos"
+//     });
+//   }); 
+
+//   it('should be able to search for a survey', async function () {
+//     const surveys = await Survey.getAll(survey1.author);
+//     expect(surveys.length).toEqual(1);
+//     expect(surveys[0]).toEqual({
+//       "_id": 1,
+//       published: false,
+//       "anonymous": true,
+//       "author": survey1.author,
+//       "date_posted": expect.any(Date),
+//       "description": survey1.description,
+//       "title": survey1.title
+//     });
+//   });
+// });
+
+
+
 describe('create(author, title, description)', () => {
   it('should create a new survey with author, title, and description', async function () {
     const newSurvey = {

@@ -30,7 +30,7 @@ class Survey {
   }
 
   /**
-   * getSurvey(id) <- return a survey by id
+   * get(id) <- return a survey by id
    * 
    * @param {int} id
    */
@@ -54,7 +54,7 @@ class Survey {
   }
 
   /**
-   * getSurveys() <- return an array of surveys filtered by params
+   * getAll() <- return an array of surveys filtered by params
    * 
    * @param {{field: value, ...}} search
    */
@@ -63,9 +63,11 @@ class Survey {
     if (search === undefined || search === '') {
       result = await db.query(
         `SELECT id, author, title, description, date_posted, anonymous, published
-                FROM surveys` 
+        FROM surveys` 
       );
+      console.log('search is empty', result.rows);
     } else {
+      console.log('search is not empty');
       result = await db.query(
         `SELECT id, author, title, description, date_posted, anonymous, published
                 FROM surveys WHERE 
@@ -74,14 +76,21 @@ class Survey {
                 description ILIKE $1`, [`%${search}%`] 
       );
     }
-    if (result.rows.length < 1) {
-      let err = new Error('Not Found');
-      err.status = 404;
-      throw err;
-    }
+    
     return result.rows.map(s => new Survey(s));
   }
 
+  /** get surveys by user is handled by User model, so this is commented out */
+
+  // static async getForUser(username) {
+  //   let result = await db.query(
+  //     `SELECT id, author, title, description, date_posted, anonymous, published
+  //     FROM surveys WHERE author = $1`, [username]
+  //   );
+  //   return result.rows.map(s => new Survey(s));
+  // }
+
+  
   /**
    * createSurvey(author, title, description) <- returns created survey details
    * 
