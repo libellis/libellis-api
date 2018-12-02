@@ -41,9 +41,18 @@ CREATE TABLE choices
 CREATE TABLE votes
 (
   choice_id integer NOT NULL REFERENCES choices ON DELETE cascade,
-  question_id integer NOT NULL REFERENCES questions ON DELETE cascade,
-  survey_id integer NOT NULL REFERENCES surveys ON DELETE cascade,
   username text NOT NULL REFERENCES users ON DELETE cascade,
-  PRIMARY KEY (choice_id, question_id, survey_id, username),
+  PRIMARY KEY (choice_id, username),
   score integer NOT NULL
 );
+
+CREATE VIEW users_votes AS
+SELECT 
+  username, 
+  questions.survey_id,
+  choices.question_id, 
+  choice_id, 
+  score 
+FROM votes 
+JOIN choices ON votes.choice_id = choices.id 
+JOIN questions ON questions.id = choices.question_id;
