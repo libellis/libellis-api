@@ -241,7 +241,7 @@ describe('POST /surveys/:survey_id/votes', () => {
     });
 
     expect(response.status).toEqual(400);
-    expect(response.body.message).toEqual("Either those quetions or choices do not exist in survey with id: 1");
+    expect(response.body.message).toEqual("Either those questions or choices do not exist in survey with id: 1");
   });
 });
 
