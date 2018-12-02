@@ -105,6 +105,29 @@ describe('getSurveys()', () => {
 });
 
 
+/** Get Surveys taken by user */
+describe('getHistory()', () => {
+  it('should return a list of surveys taken by a user', async function () {
+    const surveys = await User.getHistory(user1.username);
+    expect(surveys).toEqual([{
+      "anonymous": true,
+      "date_posted": expect.any(Date),
+      "description": "hot fiya",
+      "published": false,
+      "survey_id": 1,
+      "title": "best albums of 2009"
+    }, {
+      "anonymous": true,
+      "date_posted": expect.any(Date),
+      "description": "top ceos of all time",
+      "published": false,
+      "survey_id": 2,
+      "title": "top ceos"
+    }]);
+  });
+});
+
+
 // Authenticate one user
 describe('authenticate()', () => {
   it('should correctly return a json web token', async function () {

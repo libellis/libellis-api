@@ -127,8 +127,24 @@ class User /* extends Model */ {
   /** get Surveys user has voted on */
   static async getHistory(username) {
     let result = await db.query(
-      `SELECT survey_id FROM users_votes 
-      WHERE username = $1 GROUP BY survey_id;`, 
+      `SELECT 
+      survey_id, 
+        s.title AS title, 
+        s.description AS description,
+        s.date_posted AS date_posted,
+        s.anonymous AS anonymous,
+        s.published AS published
+      FROM users_votes
+      JOIN surveys AS s 
+      ON users_votes.survey_id = s.id
+      WHERE username = $1
+      GROUP BY 
+        survey_id, 
+        s.title, 
+        s.description, 
+        s.anonymous, 
+        s.published,
+        s.date_posted;`, 
       [username]
     );
 
