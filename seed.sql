@@ -6,11 +6,11 @@ INSERT INTO users (username, password, email, first_name, last_name)
 VALUES ('testuser', 'password', 'test@test.com', 'test', 'user');
 
 -- Insert test surveys
-INSERT INTO surveys (author, title)
-VALUES ('admin', 'Test survey 1');
+INSERT INTO surveys (author, title, published)
+VALUES ('admin', 'Test survey 1', True);
 
-INSERT INTO surveys (author, title, description)
-VALUES ('testuser', 'This survey has a description', 'This is a just a test');
+INSERT INTO surveys (author, title, description, published)
+VALUES ('testuser', 'This survey has a description', 'This is a just a test', True);
 
 -- Insert test questions
 INSERT INTO questions (survey_id, type, title)
