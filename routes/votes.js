@@ -29,7 +29,6 @@ router.get('/',  async function(req, res, next) {
       let vote_results = await Vote.getAll({question_id: question.id});
       survey_votes.push({question_id: question.id, vote_results});
     }
-    console.log('survey routes returns', {results: survey_votes});
     return res.json({results: survey_votes});
   } catch (error) {
     return next(error);
@@ -53,7 +52,7 @@ router.post('/', ensureLoggedIn, async function(req, res, next) {
     // and all choices are part of each question - otherwise get out
 
     if (!(await validateVotes(req.body, survey_id))) {
-      let err = new Error(`Either those quetions or choices do not exist in survey with id: ${survey_id}`);
+      let err = new Error(`Either those questions or choices do not exist in survey with id: ${survey_id}`);
       err.status = 400;
       throw err;
     }
@@ -68,7 +67,6 @@ router.post('/', ensureLoggedIn, async function(req, res, next) {
     }
 
     let results = await Promise.all(votePromises);
-    console.log('vote results:', results)
     if (results.some(voteInstance => !(voteInstance instanceof Vote))) {
       throw Error("Failed to record votes")
     }

@@ -118,8 +118,6 @@ describe('getAll()', () => {
 describe('create()', () => {
   it('should correctly add a vote', async function() {
     const newVote = await Vote.create({
-      question_id: question1.id,
-      survey_id: survey1.id,
       username: user3.username,
       choice_id: choice3.id,
       score: 1,
@@ -132,15 +130,13 @@ describe('create()', () => {
   it('should fail to add a vote with no score', async function() {
     try {
       const badVote = await Vote.create({
-        question_id: question1.id,
-        survey_id: survey1.id,
         username: user3.username,
         choice_id: choice3.id,
       });
       throw new Error();
     } catch (e) {
       expect(e.message).toMatch(
-        `Must supply survey_id, username, question_id, choice_id, and score`,
+        `Missing parameters`,
       );
     }
   });

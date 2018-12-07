@@ -57,7 +57,6 @@ router.post(
       if (newQuestion.choices) {
         for (const choice of newQuestion.choices) {
           const newChoice = {...choice, question_id: question._id}
-          console.log('New Choice:', newChoice);
           await Choice.create(newChoice);
         }
       }
