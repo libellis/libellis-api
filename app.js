@@ -16,8 +16,8 @@ const voteRouter = require('./routes/votes');
 
 // add logging system
 
-const morgan = require('morgan');
-app.use(morgan('tiny'));
+// const morgan = require('morgan');
+// app.use(morgan('tiny'));
 app.use(cors());
 
 surveyRouter.use('/:id/questions', questionRouter);
