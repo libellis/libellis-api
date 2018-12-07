@@ -112,17 +112,11 @@ describe('getHistory()', () => {
     expect(surveys).toEqual([{
       "anonymous": true,
       "date_posted": expect.any(Date),
+      "author": "joerocket",
       "description": "hot fiya",
       "published": false,
       "survey_id": 1,
       "title": "best albums of 2009"
-    }, {
-      "anonymous": true,
-      "date_posted": expect.any(Date),
-      "description": "top ceos of all time",
-      "published": false,
-      "survey_id": 2,
-      "title": "top ceos"
     }]);
   });
 });
