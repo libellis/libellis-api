@@ -161,18 +161,11 @@ describe('GET /users/:username/history', () => {
           "anonymous": true,
           "date_posted": expect.any(String),
           "description": "hot fiya",
+          "author": "joerocket",
           "published": false,
           "survey_id": 1,
           "title": "best albums of 2009",
-        },
-        {
-          "anonymous": true,
-          "date_posted": expect.any(String),
-          "description": "top ceos of all time",
-          "published": false,
-          "survey_id": 2,
-          "title": "top ceos",
-        },
+        }
       ],
     });
   });

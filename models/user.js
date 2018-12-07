@@ -149,7 +149,7 @@ class User /* extends Model */ {
         s.date_posted;`, 
       [username]
     );
-
+    
     if (result.rows.length === 0) return [];
 
     return result.rows;
