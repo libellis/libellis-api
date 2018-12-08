@@ -51,6 +51,16 @@ router.get('/:username/surveys', ensureCorrectUser, async function (req, res, ne
   }
 });
 
+// Get a list of surveys voted on by this user
+router.get('/:username/history', ensureCorrectUser, async function (req, res, next) {
+  try {
+    const surveys = await User.getHistory(req.params.username);
+    return res.json({ surveys });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 //Update a user
 router.patch(
   '/:username',

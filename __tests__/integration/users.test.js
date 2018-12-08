@@ -23,8 +23,8 @@ let survey1,
   choice5,
   choice6,
   choice7,
-  choice8,
-  userToken;
+  choice8;
+
 //Insert 2 users before each test
 beforeEach(async function () {
   await createTables();
@@ -54,7 +54,7 @@ beforeEach(async function () {
       email: 'george@gmail.com'
     });
   user3 = await User.getUser('georgetheman');
-  userToken = response.body.token;
+  user3._token = response.body.token;
 });
 
 //Test get users route
@@ -105,7 +105,7 @@ describe('GET /users/:username', () => {
     const response = await request(app)
       .get(`/users/${user3.username}`)
       .query({
-        _token: userToken
+        _token: user3._token
       });
     expect(response.statusCode).toBe(200);
     expect(response.body.user).toEqual({
@@ -114,7 +114,6 @@ describe('GET /users/:username', () => {
       "first_name": "george",
       "last_name": "johnson",
       "photo_url": "https://moonvillageassociation.org/wp-content/uploads/2018/06/default-profile-picture1.jpg",
-      "surveys": []
     })
   });
 });
@@ -126,7 +125,7 @@ describe('GET /users/:username/surveys', () => {
     const response = await request(app)
       .get(`/users/${user3.username}/surveys`)
       .query({
-        _token: userToken
+        _token: user3._token
       });
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
@@ -138,7 +137,7 @@ describe('GET /users/:username/surveys', () => {
     const response = await request(app)
       .get(`/users/${user3.username}/surveys`)
       .query({
-        _token: userToken
+        _token: user3._token
       });
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
@@ -147,6 +146,42 @@ describe('GET /users/:username/surveys', () => {
   });
 });
 
+
+// test get user's history, list of survey id's that user has voted on
+describe('GET /users/:username/history', () => {
+  it('should return array of the survey ids the user has voted on', async function () {
+    const response = await request(app)
+      .get(`/users/${user1.username}/history`)
+      .query({
+        _token: user1._token
+      });
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({
+      "surveys": [{
+          "anonymous": true,
+          "date_posted": expect.any(String),
+          "description": "hot fiya",
+          "author": "joerocket",
+          "published": false,
+          "survey_id": 1,
+          "title": "best albums of 2009",
+        }
+      ],
+    });
+  });
+
+  it('should get an empty array of survey ids for existing user without voted on surveys', async function () {
+    const response = await request(app)
+      .get(`/users/${user3.username}/history`)
+      .query({
+        _token: user3._token
+      });
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual({
+      surveys: []
+    });
+  });
+});
 
 //Test updating a user route
 describe('PATCH /users/:username', () => {
@@ -157,7 +192,7 @@ describe('PATCH /users/:username', () => {
         first_name: 'Josephina'
       })
       .query({
-        _token: userToken
+        _token: user3._token
       });
     expect(response.statusCode).toBe(200);
     expect(response.body.user._username).toBe(user3.username);
@@ -169,7 +204,7 @@ describe('PATCH /users/:username', () => {
       .send({
         first_name: 20,
         last_name: null,
-        _token: userToken
+        _token: user3._token
       });
     expect(invalidResponse.statusCode).toBe(400);
   });
@@ -182,7 +217,7 @@ describe('DELETE /users/:username', () => {
     const response = await request(app)
       .delete(`/users/${user3.username}`)
       .send({
-        _token: userToken
+        _token: user3._token
       });
     expect(response.statusCode).toBe(200);
     expect(response.body.message).toBe('User Deleted');

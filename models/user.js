@@ -77,7 +77,7 @@ class User /* extends Model */ {
     return new User(result.rows[0]);
   }
 
-  // Authenticate user
+  // Authenticate user - returns JWT
   static async authenticate({ username, password }) {
     const result = await db.query(`
       SELECT password, is_admin FROM users WHERE username=$1
@@ -93,7 +93,7 @@ class User /* extends Model */ {
     throw new Error('Invalid username/password')
   }
 
-  /** get User details */
+  /** get User details - returns shallow user data */
   static async getUser(username) {
     let result = await db.query(
       `
@@ -122,6 +122,37 @@ class User /* extends Model */ {
     if (result.rows.length === 0) return [];
 
     return result.rows.map(s => new Survey(s));
+  }
+
+  /** get Surveys user has voted on */
+  static async getHistory(username) {
+    let result = await db.query(
+      `SELECT 
+        survey_id, 
+        s.author AS author,
+        s.title AS title,
+        s.description AS description,
+        s.date_posted AS date_posted,
+        s.anonymous AS anonymous,
+        s.published AS published
+      FROM users_votes
+      JOIN surveys AS s 
+      ON users_votes.survey_id = s.id
+      WHERE s.author = $1
+      GROUP BY 
+        survey_id,
+        s.author, 
+        s.title, 
+        s.description, 
+        s.anonymous, 
+        s.published,
+        s.date_posted;`, 
+      [username]
+    );
+    
+    if (result.rows.length === 0) return [];
+
+    return result.rows;
   }
 
   updateFromValues(vals) {

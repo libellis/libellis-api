@@ -65,9 +65,7 @@ class Survey {
         `SELECT id, author, title, description, date_posted, anonymous, published
         FROM surveys` 
       );
-      console.log('search is empty', result.rows);
     } else {
-      console.log('search is not empty');
       result = await db.query(
         `SELECT id, author, title, description, date_posted, anonymous, published
                 FROM surveys WHERE 

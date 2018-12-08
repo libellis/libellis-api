@@ -1,5 +1,11 @@
 /** Express app for jobly. */
 
+/***************************************************** */
+/** set NODE_ENV to development, remove when deploying */
+process.env.NODE_ENV = 'development';
+/***************************************************** */
+
+
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -15,9 +21,11 @@ const voteRouter = require('./routes/votes');
 // const choicesRouter = require('./routes/choices');
 
 // add logging system
-
-const morgan = require('morgan');
-app.use(morgan('tiny'));
+console.log('NODE_ENV', process.env.NODE_ENV)
+if (process.env.NODE_ENV === 'development' ) {
+  const morgan = require('morgan');
+  app.use(morgan('tiny'));
+}
 app.use(cors());
 
 surveyRouter.use('/:id/questions', questionRouter);
