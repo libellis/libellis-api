@@ -2,7 +2,7 @@
 
 /***************************************************** */
 /** set NODE_ENV to development, remove when deploying */
-process.env.NODE_ENV = 'development';
+// process.env.NODE_ENV = 'development';
 /***************************************************** */
 
 
@@ -21,7 +21,6 @@ const voteRouter = require('./routes/votes');
 // const choicesRouter = require('./routes/choices');
 
 // add logging system
-console.log('NODE_ENV', process.env.NODE_ENV)
 if (process.env.NODE_ENV === 'development' ) {
   const morgan = require('morgan');
   app.use(morgan('tiny'));
