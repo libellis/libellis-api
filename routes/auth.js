@@ -11,6 +11,7 @@ router.post('/login', async function (req, res, next) {
     const token = await User.authenticate(req.body);
     return res.json({ token });
   } catch (error) {
+    error.status = 400;
     return next(error);
   }
 });
