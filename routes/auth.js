@@ -16,4 +16,13 @@ router.post('/login', async function (req, res, next) {
   }
 });
 
+router.post('/signup', async function (req, res, next) {
+  try {
+    const body = req.body;
+    console.log('signup route received', req.body);
+  } catch (error) {
+    return next(error);
+  }
+})
+
 module.exports = router;
