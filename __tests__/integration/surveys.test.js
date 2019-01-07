@@ -383,7 +383,7 @@ describe('PATCH /surveys/:id', () => {
       });
     
     expect(patchResponse.status).toEqual(401);
-    expect(patchResponse.body.message).toEqual("Unauthorized");
+    expect(patchResponse.body.error).toEqual("Unauthorized");
   });
 })
 
@@ -436,7 +436,7 @@ describe('DELETE /surveys/:id', () => {
       });
     
     expect(deleteResponse.status).toEqual(401);
-    expect(deleteResponse.body.message).toEqual("Unauthorized");
+    expect(deleteResponse.body.error).toEqual("Unauthorized");
   });
 })
 
