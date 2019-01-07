@@ -18,8 +18,10 @@ router.post('/login', async function (req, res, next) {
 
 router.post('/signup', async function (req, res, next) {
   try {
-    const body = req.body;
-    console.log('signup route received', req.body);
+    console.log('received', req.body);
+    await User.createUser(req.body);
+    const token = await User.authenticate(req.body);
+    return res.json({ token });
   } catch (error) {
     return next(error);
   }
