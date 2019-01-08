@@ -94,7 +94,6 @@ class Vote {
   /**
    * create(username, choice_id, score) -> creates a new vote for the
    * given survey and returns it as a new instance of Vote class.
-   *
    */
   static async create({username, choice_id, score}) {
     const voteData = [username, choice_id, score];
