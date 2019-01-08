@@ -2,6 +2,8 @@
 
 A modern voting application that allows users to create and vote on ranked polls.
 
+[Play with our API!](https://libellis.docs.apiary.io)
+
 ## Introduction
 Libellis is a ranked voting application with a simple API for users to create, share, and vote on surveys, where each survey question would effictively be a poll.
 
