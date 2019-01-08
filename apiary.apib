@@ -1,4 +1,4 @@
-FORMAT: 1A
+dFORMAT: 1A
 HOST: http://polls.apiblueprint.org/
 
 # libellis
@@ -262,3 +262,101 @@ object containing a question and an array of choices to pick from
             }
         ]
     }
+    
+
+## Votes Sub-Resource [/surveys/{survey_id}/votes]
+
+### Get Vote Tally for Survey [GET]
+
++ Response 200 (application/json)
+
+    {
+      "results": [
+        {
+          "question_id": 2,
+          "vote_results": [
+            {
+              "votes": 7,
+              "question_title": "Favorite Bootcamp CEO",
+              "choice_title": "Elie Schoppik"
+            },
+            {
+              "votes": 6,
+              "question_title": "Favorite Bootcamp CEO",
+              "choice_title": "Steve Jerbs"
+            },
+            {
+              "votes": 5,
+              "question_title": "Favorite Bootcamp CEO",
+              "choice_title": "Matthew Lane"
+            },
+            {
+              "votes": 2,
+              "question_title": "Favorite Bootcamp CEO",
+              "choice_title": "Chill Gates"
+            }
+          ]
+        }
+      ]
+    }
+    
+### Cast Votes for Survey [POST]
+
++ Request (application/json)
+    {
+      "_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlVycGxlRWVwbGUiLCJpc19hZG1pbiI6ZmFsc2UsImlhdCI6MTU0Mjk1NTYwMn0.CfvAlM6xXS7uK0B5X1JwRj3lb5kGJSJ7qaCdWxyGgCQ",
+      "votes": [
+        {
+          "question_id": 2,
+          "vote_data": [
+            {
+              "choice_id": 5,
+              "score": 4
+            },
+            {
+              "choice_id": 6,
+              "score": 3
+            },
+            {
+              "choice_id": 7,
+              "score": 2
+            },
+            {
+              "choice_id": 8,
+              "score": 1
+            }
+          ]
+        }
+      ]
+    }
+    
++ Response 200 (application/json)
+{
+  "results": [
+    {
+      "question_id": 2,
+      "vote_results": [
+        {
+          "votes": 11,
+          "question_title": "Favorite Bootcamp CEO",
+          "choice_title": "Elie Schoppik"
+        },
+        {
+          "votes": 9,
+          "question_title": "Favorite Bootcamp CEO",
+          "choice_title": "Steve Jerbs"
+        },
+        {
+          "votes": 7,
+          "question_title": "Favorite Bootcamp CEO",
+          "choice_title": "Matthew Lane"
+        },
+        {
+          "votes": 3,
+          "question_title": "Favorite Bootcamp CEO",
+          "choice_title": "Chill Gates"
+        }
+      ]
+    }
+  ]
+}
