@@ -5,6 +5,32 @@ HOST: http://polls.apiblueprint.org/
 
 Libellis is a ranked voting application with a simple API for users to create, share, and vote on surveys, where each survey question would effictively be a poll.
 
+To start please create a user account - you will need a token to use many of our routes.
+
+## User Resource [/users]
+
+### Create a User [POST]
+
++ Request (application/json)
+
+    {
+        "username": "hackerman",
+        "password": "hackerman",
+        "first_name": "hacker",
+        "last_name": "man",
+        "email": "hackerman@hacker.com"
+    }
+
+
++ Response 200 (application/json)
+
+    {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhhY2tlcm1hbiIsImlzX2FkbWluIjpmYWxzZSwiaWF0IjoxNTQ2OTcwNDAzfQ.YfTiu1e1YPy8pa4need1m4rg3VGHzmcKepcUunHI_HA"
+    }
+
+
+
+
 ## Surveys Resource [/surveys]
 
 ### List All Surveys [GET]
@@ -59,7 +85,7 @@ Response then return details about survey created.
                 "description": "Hottest dance hits from 2019 survey",
                 "anonymous": true,
                 "_id": 40,
-                "author": "Michael Jackson",
+                "author": "Michael Jackson"
             }
         ]
     }
@@ -104,72 +130,9 @@ Response then return details about survey created.
 
 ### List All Questions [GET]
 
-+ Response 200 (application/json)
 
-        [
-            {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 2048
-                    }, {
-                        "choice": "Python",
-                        "votes": 1024
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 512
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 256
-                    }
-                ]
-            }
-        ]
 
 ### Create a New Question [POST]
 
 You may create your own question using this action. It takes a JSON
-object containing a question and a collection of answers in the
-form of choices.
-
-+ Request (application/json)
-
-        {
-            "question": "Favourite programming language?",
-            "choices": [
-                "Swift",
-                "Python",
-                "Objective-C",
-                "Ruby"
-            ]
-        }
-
-+ Response 201 (application/json)
-
-    + Headers
-
-            Location: /questions/2
-
-    + Body
-
-            {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 0
-                    }, {
-                        "choice": "Python",
-                        "votes": 0
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 0
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 0
-                    }
-                ]
-            }
+object containing a question and an array of choices to pick from
