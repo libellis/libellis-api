@@ -14,7 +14,7 @@ const {
 beforeEach(async function () {
   await createTables();
   const response = await request(app)
-  .post('/signup')
+  .post('/users')
   .send({
     username: 'testuser',
     password: 'password',
@@ -24,60 +24,6 @@ beforeEach(async function () {
   }); 
 });
 
-
-describe('POST /signup', () => {
-  it('should return a token for a new user', async function() {
-    const response = await request(app)
-      .post('/signup')
-      .send({
-        username: 'georgetheman',
-        password: 'georgeisawesome',
-        first_name: 'george',
-        last_name: 'johnson',
-        email: 'george@gmail.com'
-      }); 
-    expect(response.status).toBe(200);
-    expect(response.body.token).toEqual(expect.any(String))
-  });
-
-  it('should reject sign up if user already exists', async function() {
-    const _ = await request(app)
-      .post('/signup')
-      .send({
-        username: 'georgetheman',
-        password: 'georgeisawesome',
-        first_name: 'george',
-        last_name: 'johnson',
-        email: 'george@gmail.com'
-      });
-
-    const response = await request(app)
-      .post('/signup')
-      .send({
-        username: 'georgetheman',
-        password: 'georgeisawesome',
-        first_name: 'george',
-        last_name: 'johnson',
-        email: 'george@gmail.com'
-      });
-    expect(response.status).toBe(400);
-    expect(response.body.error).toEqual('Username "georgetheman" already exists')
-  });
-
-
-  it('should reject a sign with missing fields', async function() {
-    const response = await request(app)
-      .post('/signup')
-      .send({
-        username: 'georgetheman',
-        password: 'georgeisawesome',
-      }); 
-    expect(response.status).toBe(400);
-    response.body.error.map(e => {
-      expect(e).toContain('instance requires property');
-    });
-  });
-});
 
 describe('POST /login', () => {
   it('should login a user', async function () {
