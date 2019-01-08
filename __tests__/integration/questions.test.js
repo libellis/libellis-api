@@ -444,7 +444,7 @@ describe('DELETE /surveys/:survey_id/questions/:question_id', () => {
       });
 
     expect(deleteResponse.status).toEqual(401);
-    expect(deleteResponse.body.message).toEqual('Unauthorized');
+    expect(deleteResponse.body.error).toEqual('Unauthorized');
   });
 });
 

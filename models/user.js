@@ -54,27 +54,30 @@ class User /* extends Model */ {
     photo_url,
     is_admin
   }) {
-    let result = await db.query(
-      `
-    INSERT INTO users (username, password, first_name, last_name, email, photo_url, is_admin)
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
-    RETURNING username, first_name, last_name, email, photo_url, is_admin`,
-      [
-        username,
-        await bcrypt.hash(password, BWF),
-        first_name,
-        last_name,
-        email,
-        photo_url || DEFAULT_PHOTO,
-        is_admin || false
-      ]
-    );
+    try {
 
-    if (result.rows.length === 0) {
-      throw new Error('Cannot create user');
+      let result = await db.query(
+        `
+      INSERT INTO users (username, password, first_name, last_name, email, photo_url, is_admin)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING username, first_name, last_name, email, photo_url, is_admin`,
+        [
+          username,
+          await bcrypt.hash(password, BWF),
+          first_name,
+          last_name,
+          email,
+          photo_url || DEFAULT_PHOTO,
+          is_admin || false
+        ]
+      );
+
+      return new User(result.rows[0]);  
+    } catch (err) {
+      let error = new Error(`Username "${username}" already exists`);
+      error.status = 400;
+      throw error;
     }
-
-    return new User(result.rows[0]);
   }
 
   // Authenticate user - returns JWT
