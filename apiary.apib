@@ -8,6 +8,7 @@ Libellis is a ranked voting application with a simple API for users to create, s
 To start please create a user account - you will need a token to use many of our routes.
 
 ## User Resource [/users]
+Create a user by supplying a username, password, first name, last name and email address.  Your password will be stored as an encrypted password on our server.  If you lose your password it is **impossible** for us to get it for you.  We also do NOT keep server logs.
 
 ### Create a User [POST]
 
@@ -19,6 +20,26 @@ To start please create a user account - you will need a token to use many of our
         "first_name": "hacker",
         "last_name": "man",
         "email": "hackerman@hacker.com"
+    }
+
+
++ Response 200 (application/json)
+
+    {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhhY2tlcm1hbiIsImlzX2FkbWluIjpmYWxzZSwiaWF0IjoxNTQ2OTcwNDAzfQ.YfTiu1e1YPy8pa4need1m4rg3VGHzmcKepcUunHI_HA"
+    }
+ 
+    
+## Login Path [/login]
+Log in with your username and password if you need a fresh token.
+
+### Login for Token [POST]
+
++ Request (application/json)
+
+    {
+        "username": "hackerman",
+        "password": "hackerman",
     }
 
 
@@ -126,13 +147,118 @@ Response then return details about survey created.
     
 
     
-## Questions Collection [/questions]
+## Questions Sub-Resource [/surveys/{survey_id}/questions]
 
-### List All Questions [GET]
+### List All Questions by a Survey id [GET]
 
++ Response 200 (application/json)
+
+    {
+      "questions": [
+        {
+          "_id": 20,
+          "_survey_id": 40,
+          "type": "ranked",
+          "title": "Favorite Popsicle Flavor",
+          "choices": [
+            {
+              "_id": 68,
+              "_question_id": 20,
+              "content": null,
+              "title": "Strawberry",
+              "type": "text"
+            },
+            {
+              "_id": 69,
+              "_question_id": 20,
+              "content": null,
+              "title": "Vanilla",
+              "type": "text"
+            },
+            {
+              "_id": 70,
+              "_question_id": 20,
+              "content": null,
+              "title": "Cherry",
+              "type": "text"
+            },
+            {
+              "_id": 71,
+              "_question_id": 20,
+              "content": null,
+              "title": "Blueberry",
+              "type": "text"
+            }
+          ]
+        }
+      ]
+    }
 
 
 ### Create a New Question [POST]
 
 You may create your own question using this action. It takes a JSON
 object containing a question and an array of choices to pick from
+
++ Request (application/json)
+    {
+        "_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlVycGxlRWVwbGUiLCJpc19hZG1pbiI6ZmFsc2UsImlhdCI6MTU0Mjk1NTYwMn0.CfvAlM6xXS7uK0B5X1JwRj3lb5kGJSJ7qaCdWxyGgCQ",
+        "title": "Favorite President",
+        "type": "ranked",
+        "choices": [
+            {
+                "type": "text",
+                "title": "FDR"
+            },
+            {
+                "type": "text",
+                "title": "Barack Obama"
+            },
+            {
+                "type": "text",
+                "title": "George Bush"
+            },
+            {
+                "type": "text",
+                "title": "George Washington"
+            }
+        ]
+    }
+    
++ Response 200 (application/json)
+    {
+        "_id": 3,
+        "_survey_id": 20,
+        "title": "Favorite President",
+        "type": "ranked",
+        "choices": [
+            {
+                "_id": 9,
+                "type": "text",
+                "title": "FDR",
+                "content": null,
+                "_question_id": 3
+            },
+            {
+                "_id": 10,
+                "type": "text",
+                "title": "Barack Obama",
+                "content": null,
+                "_question_id": 3
+            },
+            {
+                "_id": 11,
+                "type": "text",
+                "title": "George Bush",
+                "content": null,
+                "_question_id": 3
+            },
+            {
+                "_id": 12,
+                "type": "text",
+                "title": "George Washington",
+                "content": null,
+                "_question_id": 3
+            }
+        ]
+    }
