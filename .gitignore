@@ -2,3 +2,4 @@ coverage
 .env
 node_modules
 drop.sql
+notes.md
