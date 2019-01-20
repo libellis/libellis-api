@@ -59,11 +59,9 @@ beforeEach(async function () {
 
 //Test get users route
 describe('GET /users', () => {
-  it('should correctly return a list of users', async function () {
+  it('should give 401 for any request not made by an Admin User', async function () {
     const response = await request(app).get('/users');
-    expect(response.statusCode).toBe(200);
-    expect(response.body.users.length).toBe(3);
-    expect(response.body.users[0]).toHaveProperty('_username', user1.username);
+    expect(response.statusCode).toBe(401);
   });
 });
 
@@ -82,20 +80,22 @@ describe('POST /users', () => {
       });
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty('token');
+  });
 
+  it('should validate for proper email address format', async function() {
     // TEST FOR JSON SCHEMA
     const invalidResponse = await request(app)
-      .post('/users')
-      .send({
-        username: 'bobcat',
-        password: 'bob',
-        first_name: 'bob',
-        last_name: 'johnson',
-        email: 'bob.com'
-      });
+    .post('/users')
+    .send({
+      username: 'bobcat',
+      password: 'bob',
+      first_name: 'bob',
+      last_name: 'johnson',
+      email: 'bob.com'
+    });
 
     expect(invalidResponse.statusCode).toBe(400);
-  });
+  })
 });
 
 
@@ -115,6 +115,15 @@ describe('GET /users/:username', () => {
       "last_name": "johnson",
       "photo_url": "https://moonvillageassociation.org/wp-content/uploads/2018/06/default-profile-picture1.jpg",
     })
+  });
+
+  it('should reject requests for other users information', async function () {
+    const response = await request(app)
+      .get(`/users/${user2.username}`)
+      .query({
+        _token: user3._token
+      });
+    expect(response.statusCode).toBe(401);
   });
 });
 
@@ -143,6 +152,15 @@ describe('GET /users/:username/surveys', () => {
     expect(response.body).toEqual({
       surveys: []
     });
+  });
+
+  it('should reject requests for other users information', async function () {
+    const response = await request(app)
+      .get(`/users/${user2.username}/surveys`)
+      .query({
+        _token: user3._token
+      });
+    expect(response.statusCode).toBe(401);
   });
 });
 
@@ -180,6 +198,15 @@ describe('GET /users/:username/history', () => {
     expect(response.body).toEqual({
       surveys: []
     });
+  });
+
+  it('should reject requests for other users information', async function () {
+    const response = await request(app)
+      .get(`/users/${user2.username}/history`)
+      .query({
+        _token: user3._token
+      });
+    expect(response.statusCode).toBe(401);
   });
 });
 
