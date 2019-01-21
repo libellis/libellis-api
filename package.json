@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest -i",
-    "coveralls": "jest -i --coverage && cat ./coverage/lcov.info | coveralls",
+    "coveralls-script": "jest -i --coverage && cat ./coverage/lcov.info | coveralls"
   },
   "keywords": [],
   "author": "",
