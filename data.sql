@@ -13,18 +13,18 @@ CREATE TABLE users
 CREATE TABLE surveys
 (
   id SERIAL PRIMARY KEY,
-  author text REFERENCES users ON DELETE cascade,
+  author text NOT NULL REFERENCES users ON DELETE cascade,
   title text NOT NULL UNIQUE,
   description text,
   anonymous boolean NOT NULL default true,
   published boolean NOT NULL default false,
-  date_posted TIMESTAMP default CURRENT_TIMESTAMP
+  date_posted TIMESTAMP NOT NULL default CURRENT_TIMESTAMP
 );
 
 CREATE TABLE questions
 (
   id SERIAL PRIMARY KEY,
-  survey_id integer REFERENCES surveys ON DELETE cascade,
+  survey_id integer NOT NULL REFERENCES surveys ON DELETE cascade,
   type text NOT NULL,
   title text NOT NULL
 );
@@ -32,7 +32,7 @@ CREATE TABLE questions
 CREATE TABLE choices
 (
   id SERIAL PRIMARY KEY,
-  question_id integer REFERENCES questions ON DELETE cascade,
+  question_id integer NOT NULL REFERENCES questions ON DELETE cascade,
   content text,
   type text NOT NULL,
   title text NOT NULL
