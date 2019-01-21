@@ -3,7 +3,7 @@ const {
   sqlForPartialUpdate,
   classPartialUpdate
 } = require('../helpers/partialUpdate');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { BWF, SECRET, DEFAULT_PHOTO } = require('../config');
 const jwt = require('jsonwebtoken');
 const Survey = require('../models/survey');
@@ -56,6 +56,7 @@ class User /* extends Model */ {
   }) {
     try {
 
+      let salt = bcrypt.genSaltSync(BWF);
       let result = await db.query(
         `
       INSERT INTO users (username, password, first_name, last_name, email, photo_url, is_admin)
@@ -63,7 +64,7 @@ class User /* extends Model */ {
       RETURNING username, first_name, last_name, email, photo_url, is_admin`,
         [
           username,
-          await bcrypt.hash(password, BWF),
+          bcrypt.hashSync(password, salt),
           first_name,
           last_name,
           email,
@@ -88,7 +89,7 @@ class User /* extends Model */ {
     );
     const user = result.rows[0];
     if (user) {
-      if (await bcrypt.compare(password, user.password)) {
+      if (bcrypt.compareSync(password, user.password)) {
         const token = jwt.sign({ username, is_admin: user.is_admin }, SECRET);
         return token;
       }
