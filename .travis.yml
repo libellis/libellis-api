@@ -21,4 +21,4 @@ addons:
     - g++-5
 script:
   - npm test
-  - npm run coveralls
+  - npm run coveralls-script
