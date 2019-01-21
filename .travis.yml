@@ -1,5 +1,16 @@
 language: node_js
+env:
+  - CXX=g++-5
 services:
   - postgresql
 before_script:
   - psql -c 'create database libellis-test;' -U postgres
+sudo: required
+before_install:
+  - npm install -g node-gyp
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-5
