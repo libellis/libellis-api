@@ -1,4 +1,7 @@
 # Libellis
+[![Build Status](https://travis-ci.org/libellis/libellis-backend.svg?branch=master)](https://travis-ci.org/libellis/libellis-backend)
+[![Coverage Status](https://coveralls.io/repos/github/libellis/libellis-backend/badge.svg?branch=master)](https://coveralls.io/github/libellis/libellis-backend?branch=master)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 A modern voting application that allows users to create and vote on ranked polls.
 
