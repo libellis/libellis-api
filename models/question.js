@@ -5,10 +5,10 @@ const {
 } = require('../helpers/partialUpdate');
 
 class Question {
-  constructor({ id, survey_id, type, title }) {
+  constructor({ id, survey_id, question_type, title }) {
     this.id = id;
     this.survey_id = survey_id;
-    this.type = type;
+    this.question_type = question_type;
     this.title = title;
   }
 
@@ -47,7 +47,7 @@ class Question {
     //helps fix bug if passed in object does not have all 3, or search
     //is intentionally empty to get all
     let result = await db.query(`
-      SELECT id, survey_id, title, type
+      SELECT id, survey_id, title, question_type
       FROM questions 
       WHERE survey_id=$1
       `,
@@ -66,7 +66,7 @@ class Question {
     if (id === undefined) throw new Error('Missing id parameter');
 
     const result = await db.query(`
-      SELECT id, survey_id, title, type
+      SELECT id, survey_id, title, question_type
       FROM questions
       WHERE id=$1
       `, [id]
@@ -82,18 +82,18 @@ class Question {
   }
 
   /**
-   * create(survey_id, title, type) -> creates a new question for the
+   * create(survey_id, title, question_type) -> creates a new question for the
    * given survey and returns it as a new instance of Question class.
    * 
    */
-  static async create({ survey_id, title, type }) {
+  static async create({ survey_id, title, question_type }) {
     const result = await db.query(
       `
-    INSERT INTO questions (survey_id, title, type)
+    INSERT INTO questions (survey_id, title, question_type)
     VALUES ($1,$2,$3)
-    RETURNING id, survey_id, title, type
+    RETURNING id, survey_id, title, question_type
     `,
-      [survey_id, title, type]
+      [survey_id, title, question_type]
     );
 
     if (result.rows.length === 0) {
@@ -118,7 +118,7 @@ class Question {
       'questions', {
         survey_id: this.survey_id,
         title: this.title,
-        type: this.type
+        question_type: this.question_type
       },
       'id',
       this.id

@@ -173,7 +173,7 @@ describe('GET /surveys/:id', () => {
         "_id": 1,
         "_survey_id": 1,
         "title": "Favorite EDM Artist",
-        "type": "multiple"
+        "question_type": "multiple"
       }]
     })
   });

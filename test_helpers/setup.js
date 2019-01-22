@@ -67,15 +67,15 @@ async function insertTestData() {
   const survey2 = result4.rows[0];
 
   let result5 = await db.query(`
-    INSERT INTO questions (title, type, survey_id)
+    INSERT INTO questions (title, question_type, survey_id)
     VALUES ('Favorite EDM Artist','multiple', $1)
-    RETURNING id, title, type, survey_id
+    RETURNING id, title, question_type, survey_id
   `, [survey1.id]);
 
   let result6 = await db.query(`
-    INSERT INTO questions (title, type, survey_id)
+    INSERT INTO questions (title, question_type, survey_id)
     VALUES ('Favorite Bootcamp CEO','ranked', $1)
-    RETURNING id, title, type, survey_id
+    RETURNING id, title, question_type, survey_id
   `, [survey2.id]);
 
   const question1 = result5.rows[0];
@@ -86,33 +86,33 @@ async function insertTestData() {
   // 4 choices for favorite EDM artists
 
   let result7 = await db.query(`
-    INSERT INTO choices (question_id, content, title, type)
+    INSERT INTO choices (question_id, content, title, content_type)
     VALUES ($1, 'Bassnectar-Test-Youtube-Link.html', 'Bassnectar', 'youtube')
-    RETURNING id, question_id, content, title, type
+    RETURNING id, question_id, content, title, content_type
     `,
     [question1.id]
   );
 
   let result8 = await db.query(`
-    INSERT INTO choices (question_id, content, title, type)
+    INSERT INTO choices (question_id, content, title, content_type)
     VALUES ($1, 'Tiesto-Youtube-Link.html', 'Tiesto', 'youtube')
-    RETURNING id, question_id, content, title, type
+    RETURNING id, question_id, content, title, content_type
     `,
     [question1.id]
   );
 
   let result9 = await db.query(`
-    INSERT INTO choices (question_id, content, title, type)
+    INSERT INTO choices (question_id, content, title, content_type)
     VALUES ($1, 'Beats-Antique-Youtube-Link.html', 'Beats Antique', 'youtube')
-    RETURNING id, question_id, content, title, type
+    RETURNING id, question_id, content, title, content_type
     `,
     [question1.id]
   );
 
   let result10 = await db.query(`
-    INSERT INTO choices (question_id, content, title, type)
+    INSERT INTO choices (question_id, content, title, content_type)
     VALUES ($1, 'Slugabed-Youtube-Link.html', 'Slugabed', 'youtube')
-    RETURNING id, question_id, content, title, type
+    RETURNING id, question_id, content, title, content_type
     `,
     [question1.id]
   );
@@ -125,33 +125,33 @@ async function insertTestData() {
   // 4 choices for top bootcamp school ceo
 
   let result11 = await db.query(`
-    INSERT INTO choices (question_id, content, title, type)
+    INSERT INTO choices (question_id, content, title, content_type)
     VALUES ($1, 'Elie-CEO.html', 'Elie Schoppik', 'text')
-    RETURNING id, question_id, content, title, type
+    RETURNING id, question_id, content, title, content_type
     `,
     [question2.id]
   );
 
   let result12 = await db.query(`
-    INSERT INTO choices (question_id, content, title, type)
+    INSERT INTO choices (question_id, content, title, content_type)
     VALUES ($1, 'Matt-CEO.html', 'Matthew Lane', 'text')
-    RETURNING id, question_id, content, title, type
+    RETURNING id, question_id, content, title, content_type
     `,
     [question2.id]
   );
 
   let result13 = await db.query(`
-    INSERT INTO choices (question_id, content, title, type)
+    INSERT INTO choices (question_id, content, title, content_type)
     VALUES ($1, 'Steve-Jerbs-CEO.html', 'Steve Jerbs', 'text')
-    RETURNING id, question_id, content, title, type
+    RETURNING id, question_id, content, title, content_type
     `,
     [question2.id]
   );
 
   let result14 = await db.query(`
-    INSERT INTO choices (question_id, content, title, type)
+    INSERT INTO choices (question_id, content, title, content_type)
     VALUES ($1, 'Chill-Gates-CEO.html', 'Chill Gates', 'text')
-    RETURNING id, question_id, content, title, type
+    RETURNING id, question_id, content, title, content_type
     `,
     [question2.id]
   );

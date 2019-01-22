@@ -99,35 +99,35 @@ describe('GET /surveys/:survey_id/questions', () => {
         _id: question1.id,
         _survey_id: survey1.id,
         title: question1.title,
-        type: question1.type,
+        question_type: question1.question_type,
         choices: [
           {
             _id: choice1.id,
             _question_id: question1.id,
             content: choice1.content,
             title: choice1.title,
-            type: choice1.type,
+            content_type: choice1.content_type,
           },
           {
             _id: choice2.id,
             _question_id: question1.id,
             content: choice2.content,
             title: choice2.title,
-            type: choice2.type,
+            content_type: choice2.content_type,
           },
           {
             _id: choice3.id,
             _question_id: question1.id,
             content: choice3.content,
             title: choice3.title,
-            type: choice3.type,
+            content_type: choice3.content_type,
           },
           {
             _id: choice4.id,
             _question_id: question1.id,
             content: choice4.content,
             title: choice4.title,
-            type: choice4.type,
+            content_type: choice4.content_type,
           },
         ],
       },
@@ -145,35 +145,35 @@ describe('GET /surveys/:survey_id/questions/:question_id', () => {
       _id: question1.id,
       _survey_id: survey1.id,
       title: question1.title,
-      type: question1.type,
+      question_type: question1.question_type,
       choices: [
         {
           _id: choice1.id,
           _question_id: question1.id,
           content: choice1.content,
           title: choice1.title,
-          type: choice1.type,
+          content_type: choice1.content_type,
         },
         {
           _id: choice2.id,
           _question_id: question1.id,
           content: choice2.content,
           title: choice2.title,
-          type: choice2.type,
+          content_type: choice2.content_type,
         },
         {
           _id: choice3.id,
           _question_id: question1.id,
           content: choice3.content,
           title: choice3.title,
-          type: choice3.type,
+          content_type: choice3.content_type,
         },
         {
           _id: choice4.id,
           _question_id: question1.id,
           content: choice4.content,
           title: choice4.title,
-          type: choice4.type,
+          content_type: choice4.content_type,
         },
       ],
     });
@@ -194,7 +194,7 @@ describe('POST /surveys/:survey_id/questions', () => {
       .send({
         _token: userToken,
         title: 'TestQuestion1',
-        type: 'ranked',
+        question_type: 'ranked',
       });
 
     expect(response.body).toEqual({
@@ -202,7 +202,7 @@ describe('POST /surveys/:survey_id/questions', () => {
         _id: 3,
         _survey_id: survey3._id,
         title: 'TestQuestion1',
-        type: 'ranked',
+        question_type: 'ranked',
         choices: [],
       },
     });
@@ -217,22 +217,22 @@ describe('POST /surveys/:survey_id/questions', () => {
       .send({
         _token: userToken,
         title: 'Favorite President',
-        type: 'ranked',
+        question_type: 'ranked',
         choices: [
           {
-            type: 'text',
+            content_type: 'text',
             title: 'FDR',
           },
           {
-            type: 'text',
+            content_type: 'text',
             title: 'Barack Obama',
           },
           {
-            type: 'text',
+            content_type: 'text',
             title: 'George Bush',
           },
           {
-            type: 'text',
+            content_type: 'text',
             title: 'George Washington',
           },
         ],
@@ -243,32 +243,32 @@ describe('POST /surveys/:survey_id/questions', () => {
         _id: 3,
         _survey_id: survey3._id,
         title: 'Favorite President',
-        type: 'ranked',
+        question_type: 'ranked',
         choices: [
           {
             _id: 9,
-            type: 'text',
+            content_type: 'text',
             title: 'FDR',
             content: null,
             _question_id: 3,
           },
           {
             _id: 10,
-            type: 'text',
+            content_type: 'text',
             title: 'Barack Obama',
             content: null,
             _question_id: 3,
           },
           {
             _id: 11,
-            type: 'text',
+            content_type: 'text',
             title: 'George Bush',
             content: null,
             _question_id: 3,
           },
           {
             _id: 12,
-            type: 'text',
+            content_type: 'text',
             title: 'George Washington',
             content: null,
             _question_id: 3,
@@ -297,7 +297,7 @@ describe('POST /surveys/:survey_id/questions', () => {
       .send({
         _token: userToken.concat('3s8sd3'),
         title: 'TestQuestionBadUser',
-        type: 'ranked',
+        question_type: 'ranked',
       });
 
     expect(response.status).toEqual(401);
@@ -309,7 +309,7 @@ describe('POST /surveys/:survey_id/questions', () => {
       .send({
         _token: userToken,
         title: 'TestQuestion2',
-        type: 'nonvalidtype',
+        question_type: 'nonvalidtype',
       });
 
     expect(response.status).toEqual(400);
@@ -324,7 +324,7 @@ describe('PATCH /surveys/:survey_id/questions/:question_id', () => {
       .send({
         _token: userToken,
         title: 'TestQuestion1',
-        type: 'ranked',
+        question_type: 'ranked',
       });
 
     expect(response.body).toEqual({
@@ -332,7 +332,7 @@ describe('PATCH /surveys/:survey_id/questions/:question_id', () => {
         _id: 3,
         _survey_id: survey3._id,
         title: 'TestQuestion1',
-        type: 'ranked',
+        question_type: 'ranked',
         choices: [],
       },
     });
@@ -345,7 +345,7 @@ describe('PATCH /surveys/:survey_id/questions/:question_id', () => {
       });
 
     expect(patchResponse.body.question.title).toEqual('__muchbetter__');
-    expect(patchResponse.body.question.type).toEqual('ranked');
+    expect(patchResponse.body.question.question_type).toEqual('ranked');
   });
 
   it('Should refuse to update the survey_id for a question', async function() {
@@ -354,7 +354,7 @@ describe('PATCH /surveys/:survey_id/questions/:question_id', () => {
       .send({
         _token: userToken,
         title: 'TestQuestion1',
-        type: 'ranked',
+        question_type: 'ranked',
       });
 
     expect(response.body).toEqual({
@@ -362,7 +362,7 @@ describe('PATCH /surveys/:survey_id/questions/:question_id', () => {
         _id: 3,
         _survey_id: survey3._id,
         title: 'TestQuestion1',
-        type: 'ranked',
+        question_type: 'ranked',
         choices: [],
       },
     });
@@ -387,7 +387,7 @@ describe('DELETE /surveys/:survey_id/questions/:question_id', () => {
       .send({
         _token: userToken,
         title: 'TestQuestion1',
-        type: 'ranked',
+        question_type: 'ranked',
       });
 
     expect(response.body).toEqual({
@@ -395,7 +395,7 @@ describe('DELETE /surveys/:survey_id/questions/:question_id', () => {
         _id: 3,
         _survey_id: survey3._id,
         title: 'TestQuestion1',
-        type: 'ranked',
+        question_type: 'ranked',
         choices: [],
       },
     });
@@ -423,7 +423,7 @@ describe('DELETE /surveys/:survey_id/questions/:question_id', () => {
       .send({
         _token: userToken,
         title: 'TestQuestion1',
-        type: 'ranked',
+        question_type: 'ranked',
       });
 
     expect(response.body).toEqual({
@@ -431,7 +431,7 @@ describe('DELETE /surveys/:survey_id/questions/:question_id', () => {
         _id: 3,
         _survey_id: survey3._id,
         title: 'TestQuestion1',
-        type: 'ranked',
+        question_type: 'ranked',
         choices: [],
       },
     });

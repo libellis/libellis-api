@@ -5,12 +5,12 @@ const {
 } = require('../helpers/partialUpdate');
 
 class Choice {
-  constructor({ id, question_id, content, title, type }) {
+  constructor({ id, question_id, content, title, content_type }) {
     this.id = id;
     this.question_id = question_id;
     this.content = content;
     this.title = title;
-    this.type = type;
+    this.content_type = content_type;
   }
 
   // make setter/getter that makes it so you can't change primary key
@@ -45,7 +45,7 @@ class Choice {
   static async getAll({ question_id }) {
 
     let result = await db.query(`
-      SELECT id, question_id, title, content, type
+      SELECT id, question_id, title, content, content_type
       FROM choices 
       WHERE question_id=$1
       `,
@@ -64,7 +64,7 @@ class Choice {
     if (id === undefined) throw new Error(`Missing id parameter`);
 
     const result = await db.query(`
-      SELECT id, question_id, title, content, type
+      SELECT id, question_id, title, content, content_type
       FROM choices
       WHERE id=$1
       `, [id]
@@ -84,19 +84,19 @@ class Choice {
    * given question and returns it as a new instance of Choice class.
    * 
    */
-  static async create({ question_id, title, content, type }) {
-    if (type === undefined || question_id === undefined ||
+  static async create({ question_id, title, content, content_type }) {
+    if (content_type === undefined || question_id === undefined ||
         title === undefined) {
-      const err = new Error(`Must supply title, type and question_id`);
+      const err = new Error(`Must supply title, content_type and question_id`);
       err.status = 400;
       throw err;
     }
     const result = await db.query(`
-      INSERT INTO choices (question_id, title, content, type)
+      INSERT INTO choices (question_id, title, content, content_type)
       VALUES ($1,$2,$3,$4)
-      RETURNING id, question_id, title, content, type
+      RETURNING id, question_id, title, content, content_type
     `,
-      [question_id, title, content, type]
+      [question_id, title, content, content_type]
     );
 
     if (result.rows.length === 0) {
@@ -122,7 +122,7 @@ class Choice {
         question_id: this.question_id,
         title: this.title,
         content: this.content,
-        type: this.type
+        content_type: this.content_type
       },
       'id',
       this.id

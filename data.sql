@@ -25,7 +25,7 @@ CREATE TABLE questions
 (
   id SERIAL PRIMARY KEY,
   survey_id integer NOT NULL REFERENCES surveys ON DELETE cascade,
-  type text NOT NULL,
+  question_type text NOT NULL,
   title text NOT NULL
 );
 
@@ -34,7 +34,7 @@ CREATE TABLE choices
   id SERIAL PRIMARY KEY,
   question_id integer NOT NULL REFERENCES questions ON DELETE cascade,
   content text,
-  type text NOT NULL,
+  content_type text NOT NULL,
   title text NOT NULL
 );
 

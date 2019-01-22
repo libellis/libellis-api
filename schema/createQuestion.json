@@ -8,13 +8,13 @@
   "default": null,
   "additionalProperties": false,
   "required": [
-    "type",
+    "question_type",
     "title",
     "_token"
   ],
   "properties": {
-    "type": {
-      "$id": "#/properties/type",
+    "question_type": {
+      "$id": "#/properties/question_type",
       "type": "string",
       "title": "The Type Schema",
       "default": "",
@@ -57,12 +57,12 @@
         "additionalProperties": false,
         "required": [
           "title",
-          "type"
+          "content_type"
         ],
         "properties": {
           "title": {
             "$id": "#/properties/choices/items/properties/title",
-            "type": "string",
+            "content_type": "string",
             "title": "The Title Schema",
             "default": "",
             "examples": [
@@ -81,9 +81,9 @@
             "pattern": "^(.*)$",
             "format": "uri-reference"
           },
-          "type": {
-            "$id": "#/properties/choices/items/properties/type",
-            "type": "string",
+          "content_type": {
+            "$id": "#/properties/choices/items/properties/content_type",
+            "content_type": "string",
             "title": "The Type Schema",
             "default": "",
             "examples": [
