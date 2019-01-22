@@ -83,25 +83,28 @@ describe('GET /surveys', () => {
   it('should correctly return a list of surveys including it\'s questions', async function () {
     const response = await request(app).get('/surveys');
     expect(response.statusCode).toBe(200);
-    expect(response.body.surveys.length).toBe(2);
-    expect(response.body.surveys).toEqual(
+    expect(response.body.surveys.length).toBe(0);
+
+    let survey_result = await db.query(`
+    INSERT INTO surveys (author, title, description, published)
+    VALUES ('joerocket', 'Best Books Ever', 'J.k rowling aint got shit on this', true)
+    RETURNING id, author, title, description, anonymous, date_posted
+  `);
+
+    let survey3 = survey_result.rows[0];
+    
+    let response2 = await request(app).get('/surveys');
+    expect(response2.body.surveys).toEqual(
       [{
-        "_id": 1,
-        "published": false,
+        "_id": 3,
+        "published": true,
         "anonymous": true,
-        "author": "joerocket",
+        "author": survey3.author,
         "date_posted": expect.any(String),
-        "description": "hot fiya",
-        "title": "best albums of 2009"
-      }, {
-        "_id": 2,
-        "published": false,
-        "anonymous": true,
-        "author": "spongebob",
-        "date_posted": expect.any(String),
-        "description": "top ceos of all time",
-        "title": "top ceos"
-      }]
+        "description": survey3.description,
+        "title": survey3.title,
+      }, 
+      ]
     );
   });
 
@@ -191,7 +194,7 @@ describe('POST /surveys', () => {
       .send({
         _token: userToken,
         title: 'xxSuperCoolTestSurveyxx',
-        description: '9999ThisIsDescriptive9999'
+        description: '9999ThisIsDescriptive9999',
       });
 
     expect(response.body).toEqual({
@@ -206,8 +209,15 @@ describe('POST /surveys', () => {
       }
     });
 
+    const patchResponse = await request(app)
+      .patch(`/surveys/${response.body.survey._id}`)
+      .send({
+        _token: userToken,
+        published: true
+      });
+
     response = await request(app).get('/surveys');
-    expect(response.body.surveys.length).toBe(3);
+    expect(response.body.surveys.length).toBe(1);
   })
 
   it('should give 400 error for missing title', async function () {

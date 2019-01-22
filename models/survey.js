@@ -63,7 +63,8 @@ class Survey {
     if (search === undefined || search === '') {
       result = await db.query(
         `SELECT id, author, title, description, date_posted, anonymous, published
-        FROM surveys` 
+        FROM surveys
+        WHERE published=true` 
       );
     } else {
       result = await db.query(

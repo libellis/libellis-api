@@ -56,24 +56,27 @@ describe('getAll()', () => {
   it('should get a list of surveys with no filter queries', async function () {
     const surveys = await Survey.getAll();
 
-    expect(surveys.length).toEqual(2);
-    expect(surveys[0]).toEqual({
-      "_id": 1,
-      published: false,
+    expect(surveys.length).toEqual(0);
+    
+
+    let survey_result = await db.query(`
+    INSERT INTO surveys (author, title, description, published)
+    VALUES ('joerocket', 'Best Books Ever', 'J.k rowling aint got shit on this', true)
+    RETURNING id, author, title, description, anonymous, date_posted
+  `);
+
+    let survey3 = survey_result.rows[0];
+
+    let surveys2 = await Survey.getAll();
+
+    expect(surveys2[0]).toEqual({
+      "_id": 3,
+      "published": true,
       "anonymous": true,
-      "author": survey1.author,
+      "author": survey3.author,
       "date_posted": expect.any(Date),
-      "description": survey1.description,
-      "title": survey1.title
-    });
-    expect(surveys[1]).toEqual({
-      "_id": expect.any(Number),
-      published: false,
-      "anonymous": true,
-      "author": survey2.author,
-      "date_posted": expect.any(Date),
-      "description": survey2.description,
-      "title": survey2.title
+      "description": survey3.description,
+      "title": survey3.title
     });
   });
 
@@ -83,7 +86,7 @@ describe('getAll()', () => {
     expect(surveys.length).toEqual(1);
     expect(surveys[0]).toEqual({
       "_id": 1,
-      published: false,
+      "published": false,
       "anonymous": true,
       "author": survey1.author,
       "date_posted": expect.any(Date),
