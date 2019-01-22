@@ -13,23 +13,23 @@ INSERT INTO surveys (author, title, description, published)
 VALUES ('testuser', 'This survey has a description', 'This is a just a test', True);
 
 -- Insert test questions
-INSERT INTO questions (survey_id, type, title)
+INSERT INTO questions (survey_id, question_type, title)
 VALUES (1, 'multiple', 'first question');
 
-INSERT INTO questions (survey_id, type, title)
+INSERT INTO questions (survey_id, question_type, title)
 VALUES (1, 'multiple', 'second question');
 
 -- Insert test choices
-INSERT INTO choices (question_id, content, type, title)
+INSERT INTO choices (question_id, content, content_type, title)
 VALUES (1, 'CONTENT HERE', 'type', 'selection number 1');
 
-INSERT INTO choices (question_id, content, type, title)
+INSERT INTO choices (question_id, content, content_type, title)
 VALUES (1, 'CONTENT HERE', 'type', 'selection number 2');
 
-INSERT INTO choices (question_id, content, type, title)
+INSERT INTO choices (question_id, content, content_type, title)
 VALUES (2, 'CONTENT HERE', 'type', 'selection number 1');
 
-INSERT INTO choices (question_id, content, type, title)
+INSERT INTO choices (question_id, content, content_type, title)
 VALUES (2, 'CONTENT HERE', 'type', 'selection number 2');
 
 -- Insert test votes

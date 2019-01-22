@@ -26,33 +26,33 @@ describe('get()', () => {
         _id: choice1.id,
         title: choice1.title,
         content: choice1.content,
-        type: 'youtube',
+        content_type: 'youtube',
         _question_id: question1.id,
-        type: choice1.type
+        content_type: choice1.type
       },
       {
         _id: choice2.id,
         title: choice2.title,
         content: choice2.content,
-        type: 'youtube',
+        content_type: 'youtube',
         _question_id: question1.id,
-        type: choice2.type
+        content_type: choice2.type
       },
       {
         _id: choice3.id,
         title: choice3.title,
         content: choice3.content,
-        type: 'youtube',
+        content_type: 'youtube',
         _question_id: question1.id,
-        type: choice3.type
+        content_type: choice3.type
       },
       {
         _id: choice4.id,
         title: choice4.title,
         content: choice4.content,
-        type: 'youtube',
+        content_type: 'youtube',
         _question_id: question1.id,
-        type: choice4.type
+        content_type: choice4.type
       }
     ]);
   });
@@ -64,7 +64,7 @@ describe('create()', () => {
     const newChoice = await Choice.create({
       title: 'Elie Schoppik',
       content: 'Youtube-Embed-Code-Elie-Dancing',
-      type: 'youtube',
+      content_type: 'youtube',
       question_id: question2.id,
     });
 

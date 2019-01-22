@@ -25,7 +25,7 @@ describe('get()', () => {
       {
         _id: question1.id,
         title: question1.title,
-        type: question1.type,
+        question_type: question1.question_type,
         _survey_id: question1.survey_id
       }
     ]);
@@ -37,7 +37,7 @@ describe('create()', () => {
   it('should correctly add a question', async function () {
     const newQuestion = await Question.create({
       title: 'Favorite Millenial CEO',
-      type: 'Multiple Choice',
+      question_type: 'Multiple Choice',
       survey_id: survey2.id,
     });
 
@@ -51,7 +51,7 @@ describe('get()', () => {
   it('should correctly return a question by id', async function () {
     const question = await Question.get(question1.id);
     expect(question.id).toEqual(question1.id);
-    expect(question.type).toEqual(question1.type);
+    expect(question.question_type).toEqual(question1.question_type);
 
     //get a question that doesn't exist and check failure
     try {
