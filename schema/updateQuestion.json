@@ -18,8 +18,8 @@
       ],
       "pattern": "^(.*)$"
     },
-    "type": {
-      "$id": "#/properties/type",
+    "content_type": {
+      "$id": "#/properties/content_type",
       "type": "string",
       "title": "The Type Schema",
       "default": "",
