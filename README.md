@@ -56,6 +56,25 @@ Lastly we will create our first database user:
 [postgres]$ createuser --interactive
 ```
 
+Now that we've covered how to get `PostgreSQL` setup on linux, let's see how we
+can set it up on Mac OSX.
+
+### OSX Postgres Install
+
+Make sure you have homebrew installed.  If not you can install homebrew with
+this terminal command:
+
+```terminal
+$ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
+
+Now we just install postgres using homebrew and enable it as a service:
+
+```terminal
+$ brew install postgresql
+$ brew services start postgresql
+```
+
 That's it! Now we can create our Libellis database. There's an easy and a harder
 way to create the Libellis database. Let's go the easy path first
 
