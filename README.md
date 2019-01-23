@@ -5,381 +5,170 @@
 
 A modern voting application that allows users to create and vote on ranked polls.
 
-[Play with our API!](https://libellis.docs.apiary.io)
+[APIary Docs for Understanding Routes](https://libellis.docs.apiary.io)
 
 ## Introduction
 Libellis is a ranked voting application with a simple API for users to create, share, and vote on surveys, where each survey question would effictively be a poll.
 
-To start please create a user account - you will need a token to use many of our routes.
+## Setup
 
-## User Resource [/users]
-Create a user by supplying a username, password, first name, last name and email address.  Your password will be stored as an encrypted password on our server.  If you lose your password it is **impossible** for us to get it for you.  We also do NOT keep server logs.
+We have currently only tested Libellis on unix-like systems (Linux, OSX, FreeBSD). If you are using Windows you will (for now) need to figure out setup yourself. There are a few things we need to setup to run libellis locally. Libellis relies
+on `postgres`.  If you don't have `postgres` installed we will do that now -
+otherwise skip to the [next](#building-libellis-db-with-birdseed) section.
 
-### Create a User [POST]
+### Postgres Installation
 
-```
-+ Request (application/json)
+Postgres can be installed on a variety of operating systems. We will cover Linux
+and OSX in this guide.
 
-    {
-        "username": "hackerman",
-        "password": "hackerman",
-        "first_name": "hacker",
-        "last_name": "man",
-        "email": "hackerman@hacker.com"
-    }
-```
+### Linux Postgres Install
 
-```
-+ Response 200 (application/json)
+Install the `postgresql` package for your linux distro. I will cover arch linux
+in this guide:
 
-    {
-      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhhY2tlcm1hbiIsImlzX2FkbWluIjpmYWxzZSwiaWF0IjoxNTQ2OTcwNDAzfQ.YfTiu1e1YPy8pa4need1m4rg3VGHzmcKepcUunHI_HA"
-    }
-```
-    
-## Login Path [/login]
-Log in with your username and password if you need a fresh token.
-
-### Login for Token [POST]
-
-```
-+ Request (application/json)
-
-    {
-        "username": "hackerman",
-        "password": "hackerman",
-    }
+```terminal
+$ sudo pacman -S postgresql
 ```
 
-```
-+ Response 200 (application/json)
+Once we have installed PostgreSQL we will need to switch to the PostgreSQL user:
 
-    {
-      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhhY2tlcm1hbiIsImlzX2FkbWluIjpmYWxzZSwiaWF0IjoxNTQ2OTcwNDAzfQ.YfTiu1e1YPy8pa4need1m4rg3VGHzmcKepcUunHI_HA"
-    }
+```terminal
+$ sudo -iu postgres
 ```
 
-## Surveys Resource [/surveys]
+We will now initialize the database cluster:
 
-### List All Surveys [GET]
-
-```
-+ Response 200 (application/json)
-
-    {
-        "surveys": [
-            {
-                "title": "Best Dance Music 2019",
-                "date_posted": "2019-01-02T23:37:08.064Z",
-                "published": true,
-                "description": "Hottest dance hits from 2019 survey",
-                "anonymous": true,
-                "_id": 40,
-                "author": "Michael Jackson"
-            },
-            {
-                "title": "Favorite Spiritual Advisor",
-                "date_posted": "2019-01-03T21:02:05.064Z",
-                "published": true,
-                "description": "Newage Poll for Facebook Moms",
-                "anonymous": true,
-                "_id": 41,
-                "author": "Deepak Choprah"
-            }
-        ]
-    }
-```
-    
-### Create a Survey [POST]
-You may create your own survey using this action.
-This action takes a JSON payload as part of the request.
-Response then return details about survey created.
-
-```
-+ Request (application/json)
-
-        {
-            "title": "Best Dance Music 2019",
-            "description": "Hottest dance hits from 2019 survey"
-            "_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlVycGxlRWVwbGUiLCJpc19hZG1pbiI6ZmFsc2UsImlhdCI6MTU0Mjk1NTYwMn0.CfvAlM6xXS7uK0B5X1JwRj3lb5kGJSJ7qaCdWxyGgCQ"
-        }
+```terminal
+[postgres]$ initdb -D /var/lib/postgres/data
 ```
 
-```
-+ Response 200 (application/json)
+Now that we've inintialized the cluster we must **start** and **enable** the
+`postgresql.service`:
 
-    {
-        "survey": [
-            {
-                "title": "Best Dance Music 2019",
-                "date_posted": "2019-01-02T23:37:08.064Z",
-                "published": false,
-                "description": "Hottest dance hits from 2019 survey",
-                "anonymous": true,
-                "_id": 40,
-                "author": "Michael Jackson"
-            }
-        ]
-    }
+```terminal
+$ systemctl enable postgresql.service
+$ systemctl start postgresql.service
 ```
 
-## Single Survey [/surveys/{survey_id}]
-    
-### Get One Survey [GET]
+Lastly we will create our first database user:
 
-```
-+ Response 200 (application/json)
-
-    {
-        "survey": [
-            {
-                "title": "Best Dance Music 2019",
-                "date_posted": "2019-01-02T23:37:08.064Z",
-                "published": true,
-                "description": "Hottest dance hits from 2019 survey",
-                "anonymous": true,
-                "_id": 40,
-                "author": "Michael Jackson",
-                "questions": [
-                    {
-                        "title": "Best House Music of the Year"
-                        "type": "ranked",
-                        "_survey_id": 40,
-                        "_id": 20
-                    },
-                    {
-                        "title": "Best Bass Music of the Year"
-                        "type": "ranked",
-                        "_survey_id": 40,
-                        "_id": 21
-                    }
-                ]
-            }
-        ]
-    }
-``` 
-
-    
-## Questions Sub-Resource [/surveys/{survey_id}/questions]
-
-### List All Questions by a Survey id [GET]
-
-```
-+ Response 200 (application/json)
-
-    {
-      "questions": [
-        {
-          "_id": 20,
-          "_survey_id": 40,
-          "type": "ranked",
-          "title": "Favorite Popsicle Flavor",
-          "choices": [
-            {
-              "_id": 68,
-              "_question_id": 20,
-              "content": null,
-              "title": "Strawberry",
-              "type": "text"
-            },
-            {
-              "_id": 69,
-              "_question_id": 20,
-              "content": null,
-              "title": "Vanilla",
-              "type": "text"
-            },
-            {
-              "_id": 70,
-              "_question_id": 20,
-              "content": null,
-              "title": "Cherry",
-              "type": "text"
-            },
-            {
-              "_id": 71,
-              "_question_id": 20,
-              "content": null,
-              "title": "Blueberry",
-              "type": "text"
-            }
-          ]
-        }
-      ]
-    }
+```terminal
+[postgres]$ createuser --interactive
 ```
 
-### Create a New Question [POST]
+That's it! Now we can create our Libellis database. There's an easy and a harder
+way to create the Libellis database. Let's go the easy path first
 
-You may create your own question using this action. It takes a JSON
-object containing a question and an array of choices to pick from
+## Building Libellis DB with Birdseed
+
+We can very easily build both our primary and test database using the
+[birdseed](https://github.com/libellis/birdseed) terminal application. Once
+you've installed birdseed simply type:
+
+```terminal
+$ birdseed build -a
+```
+
+This will create both the libellis and libellis_test databases and setup all
+tables using up-to-date migration files that are embedded in the birdseed
+binary.
+
+If you ever need to rebuild your databases just run:
+
+```terminal
+$ birdseed rebuild -a
+```
+
+The nice thing about this method is that birdseed will always stay up to date
+and we can update our libellis database (should the schema change, or more
+tables get added in the future) by running:
+
+```terminal
+$ birdseed migrate
+```
+
+Now that we've looked at doing it the easy way, let's try the harder way.
+
+## Building Libellis DB manually
+
+Since we have `PostgreSQL` configured (if you didn't do this then scroll up and
+complete this step first) we can manually create our libellis primary and test
+database and build up their columns per the current spec.  Let's first create
+both the primary and test databases:
+
+```terminal
+$ createdb libellis
+$ createdb libellis_test
+```
+
+Now we will seed both.  We will have to first clone the project:
+
+```terminal
+$ git clone https://github.com/libellis/libellis-backend.git
+$ cd libellis-backend
+$ psql libellis < data.sql
+$ psql libellis_test < data.sql
+```
+
+While this method may seem easier, the downside is that by doing it this way we
+do not have a migrations table, which means we can't use birdseed to easily
+handle our migrations.
+
+Now that we've gotten the database setup out of the way, let's go ahead and
+install the necessary `npm` modules and get the server up and running.
+
+## Installation
+
+If you don't have npm installed, then you can follow [this
+guide](https://www.npmjs.com/get-npm) to get it 
+installed on your system.
+
+Let's cd into the project. If you used birdseed to setup your databases then you
+may not have cloned the repo yet:
+
+```terminal
+$ git clone https://github.com/libellis/libellis-backend.git
+$ cd libellis-backend
+$ npm install
+```
+
+Now we start our server by using `npm start`:
+
+```terminal
+$ npm start
+```
+
+If you would like your server to automatically restart when you are saving
+changes (you are a contributor) then you can use nodemon instead:
+
+```terminal
+$ nodemon server.js
+```
+
+Now we have a running Libellis backend! To understand how all the routes work,
+read our [APIary docs](https://libellis.docs.apiary.io).
+
+Let's lastly look at how we can run comprehensive unit and integration tests
+that come bundled with the libellis backend.
+
+## Tests
+
+To run tests we use the `jest` framework.  Because our tests will setup the test
+database with dummy data and then run a series of tests that tear down and setup
+that database between testing, we need to run our tests in **serial** by using
+the `-i` flag:
 
 ```
-+ Request (application/json)
-    {
-        "_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlVycGxlRWVwbGUiLCJpc19hZG1pbiI6ZmFsc2UsImlhdCI6MTU0Mjk1NTYwMn0.CfvAlM6xXS7uK0B5X1JwRj3lb5kGJSJ7qaCdWxyGgCQ",
-        "title": "Favorite President",
-        "type": "ranked",
-        "choices": [
-            {
-                "type": "text",
-                "title": "FDR"
-            },
-            {
-                "type": "text",
-                "title": "Barack Obama"
-            },
-            {
-                "type": "text",
-                "title": "George Bush"
-            },
-            {
-                "type": "text",
-                "title": "George Washington"
-            }
-        ]
-    }
-``` 
+$ jest -i
+```
+
+To get a full coverage report we can run:
 
 ```
-+ Response 200 (application/json)
-    {
-        "_id": 3,
-        "_survey_id": 20,
-        "title": "Favorite President",
-        "type": "ranked",
-        "choices": [
-            {
-                "_id": 9,
-                "type": "text",
-                "title": "FDR",
-                "content": null,
-                "_question_id": 3
-            },
-            {
-                "_id": 10,
-                "type": "text",
-                "title": "Barack Obama",
-                "content": null,
-                "_question_id": 3
-            },
-            {
-                "_id": 11,
-                "type": "text",
-                "title": "George Bush",
-                "content": null,
-                "_question_id": 3
-            },
-            {
-                "_id": 12,
-                "type": "text",
-                "title": "George Washington",
-                "content": null,
-                "_question_id": 3
-            }
-        ]
-    }
-``` 
-
-## Votes Sub-Resource [/surveys/{survey_id}/votes]
-
-### Get Vote Tally for Survey [GET]
-
+$ jest -i --coverage
 ```
-+ Response 200 (application/json)
 
-    {
-      "results": [
-        {
-          "question_id": 2,
-          "vote_results": [
-            {
-              "votes": 7,
-              "question_title": "Favorite Bootcamp CEO",
-              "choice_title": "Elie Schoppik"
-            },
-            {
-              "votes": 6,
-              "question_title": "Favorite Bootcamp CEO",
-              "choice_title": "Steve Jerbs"
-            },
-            {
-              "votes": 5,
-              "question_title": "Favorite Bootcamp CEO",
-              "choice_title": "Matthew Lane"
-            },
-            {
-              "votes": 2,
-              "question_title": "Favorite Bootcamp CEO",
-              "choice_title": "Chill Gates"
-            }
-          ]
-        }
-      ]
-    }
-```
- 
-### Cast Votes for Survey [POST]
+That's it for tests! If you are contributing a new feature set please add unit
+and integration tests under the appropriate folders within the `__tests__` folder.
 
-```
-+ Request (application/json)
-    {
-      "_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlVycGxlRWVwbGUiLCJpc19hZG1pbiI6ZmFsc2UsImlhdCI6MTU0Mjk1NTYwMn0.CfvAlM6xXS7uK0B5X1JwRj3lb5kGJSJ7qaCdWxyGgCQ",
-      "votes": [
-        {
-          "question_id": 2,
-          "vote_data": [
-            {
-              "choice_id": 5,
-              "score": 4
-            },
-            {
-              "choice_id": 6,
-              "score": 3
-            },
-            {
-              "choice_id": 7,
-              "score": 2
-            },
-            {
-              "choice_id": 8,
-              "score": 1
-            }
-          ]
-        }
-      ]
-    }
-```   
- 
-```
-+ Response 200 (application/json)
-{
-  "results": [
-    {
-      "question_id": 2,
-      "vote_results": [
-        {
-          "votes": 11,
-          "question_title": "Favorite Bootcamp CEO",
-          "choice_title": "Elie Schoppik"
-        },
-        {
-          "votes": 9,
-          "question_title": "Favorite Bootcamp CEO",
-          "choice_title": "Steve Jerbs"
-        },
-        {
-          "votes": 7,
-          "question_title": "Favorite Bootcamp CEO",
-          "choice_title": "Matthew Lane"
-        },
-        {
-          "votes": 3,
-          "question_title": "Favorite Bootcamp CEO",
-          "choice_title": "Chill Gates"
-        }
-      ]
-    }
-  ]
-}
-```
+Enjoy using Libellis!
