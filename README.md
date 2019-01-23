@@ -95,7 +95,7 @@ binary.
 If you ever need to rebuild your databases just run:
 
 ```terminal
-$ birdseed rebuild -a
+$ birdseed rebuild
 ```
 
 The nice thing about this method is that birdseed will always stay up to date
