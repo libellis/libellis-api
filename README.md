@@ -1,9 +1,9 @@
-# Libellis
+# Libellis API
 [![Build Status](https://travis-ci.org/libellis/libellis-backend.svg?branch=master)](https://travis-ci.org/libellis/libellis-backend)
 [![Coverage Status](https://coveralls.io/repos/github/libellis/libellis-backend/badge.svg?branch=master)](https://coveralls.io/github/libellis/libellis-backend?branch=master)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-A modern voting application that allows users to create and vote on ranked polls.
+A RESTful API for a modern voting application that allows users to create and vote on ranked polls.
 
 [APIary Docs for Understanding Routes](https://libellis.docs.apiary.io)
 
@@ -85,10 +85,10 @@ We can very easily build both our primary and test database using the
 you've installed birdseed simply type:
 
 ```terminal
-$ birdseed build -a
+$ birdseed setup 
 ```
 
-This will create both the libellis and libellis_test databases and setup all
+This will setup both the libellis and libellis_test databases and setup all
 tables using up-to-date migration files that are embedded in the birdseed
 binary.
 
