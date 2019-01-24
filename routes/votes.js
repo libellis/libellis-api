@@ -4,7 +4,7 @@ const Survey = require('../models/survey');
 const Question = require('../models/question');
 const Choice = require('../models/choice');
 const Vote = require('../models/vote');
-const { validateVotes } = require('../helpers/validations');
+const { validateVotes } = require('../helpers/scores');
 const db = require('../db');
 
 const createQuestionSchema = require('../schema/createQuestion.json');
@@ -52,7 +52,7 @@ router.post('/', ensureLoggedIn, async function(req, res, next) {
     // and all choices are part of each question - otherwise get out
 
     if (!(await validateVotes(req.body, survey_id))) {
-      let err = new Error(`Either those questions or choices do not exist in survey with id: ${survey_id}`);
+      let err = new Error(`The votes you submitted do not pass validation`);
       err.status = 400;
       throw err;
     }
