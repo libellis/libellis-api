@@ -8,19 +8,14 @@ const Choice = require('../models/choice');
         votes: [
           {question_id: question1.id,
             vote_data: [
-            {choice_id: choice1.id,
-            score: 1}
+            {choice_id: choice1.id}
           ]},
           {question_id: question2.id,
             vote_data: [
-            {choice_id: choice5.id,
-            score: 1},
-            {choice_id: choice6.id,
-            score: 2},
-            {choice_id: choice7.id,
-            score: 3},
-            {choice_id: choice8.id,
-            score: 4},
+            {choice_id: choice5.id},
+            {choice_id: choice6.id},
+            {choice_id: choice7.id},
+            {choice_id: choice8.id},
           ]}} data => input
  */
 
@@ -56,8 +51,7 @@ function attachScoresRanked(voteData) {
 }
 
 function _multipleChoiceHasOnlyOne(voteData) {
-  if (voteData.length === 1) return true;
-  return false;
+  return (voteData.length === 1);
 }
 
 function _isQuestionInSurvey(surveyQuestions, question_id) {
