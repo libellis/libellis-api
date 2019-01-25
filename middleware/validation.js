@@ -4,7 +4,6 @@ function validateInput(schema) {
   return (req, res, next) => {
     const result = validate(req.body, schema);
     if (!result.valid) {
-      console.log('heres reqbody', req.body);
       let error = {};
       error.message = result.errors.map(error => error.stack);
       error.status = 400;
