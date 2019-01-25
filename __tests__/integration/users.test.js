@@ -55,13 +55,33 @@ beforeEach(async function () {
     });
   user3 = await User.getUser('georgetheman');
   user3._token = response.body.token;
+  adminUser = await User.getUser('joerocket');
+    const response2 = await request(app)
+    .post('/login')
+    .send({
+      username: 'joerocket',
+      password: 'testpass'
+    }); 
+  adminUser._token = response2.body.token;
 });
 
 //Test get users route
 describe('GET /users', () => {
-  it('should give 401 for any request not made by an Admin User', async function () {
+  it('should give 401 for any request made by no user', async function () {
     const response = await request(app).get('/users');
     expect(response.statusCode).toBe(401);
+  });
+
+  it('should give 401 for a request made by valid user who is not an admin', async function () {
+    const response = await request(app).get('/users')
+      .send({ _token: user3._token });
+    expect(response.statusCode).toBe(401);
+  });
+
+  it('should correctly give users list to an admin', async function () {
+    const response = await request(app).get('/users')
+      .send({ _token: adminUser._token });
+    expect(response.statusCode).toBe(200);
   });
 });
 
