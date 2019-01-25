@@ -7,10 +7,16 @@ const { classPartialUpdate } = require('../helpers/partialUpdate');
 const validateInput = require('../middleware/validation');
 const newUserSchema = require('../schema/newUser.json');
 const updateUserSchema = require('../schema/updateUser.json');
-const { ensureLoggedIn, ensureCorrectUser } = require('../middleware/auth');
+const { ensureAdminUser, ensureLoggedIn, ensureCorrectUser } = require('../middleware/auth');
 
-//Get a list of users
-router.get('/', async function (req, res, next) {
+/** 
+ * users endpoints are restricted
+ * users can only make requests concerning their own profile
+ * only admin users can make a GET request for all users   
+ */
+
+// Get a list of users, admin only
+router.get('/', ensureAdminUser, async function (req, res, next) {
   try {
     const users = await User.getUsers();
     return res.json({ users });
@@ -19,7 +25,7 @@ router.get('/', async function (req, res, next) {
   }
 });
 
-//Create a new user
+// Create/Register a new user
 router.post('/', validateInput(newUserSchema), async function (req, res, next) {
   try {
     await User.createUser(req.body);
@@ -30,7 +36,7 @@ router.post('/', validateInput(newUserSchema), async function (req, res, next) {
   }
 });
 
-//Get a user by username
+// Get a user by username
 router.get('/:username', ensureCorrectUser, async function (req, res, next) {
   try {
     const user = await User.getUser(req.params.username);
@@ -51,7 +57,7 @@ router.get('/:username/surveys', ensureCorrectUser, async function (req, res, ne
   }
 });
 
-// Get a list of surveys voted on by this user
+// Get a list of surveys voted on by this user, 
 router.get('/:username/history', ensureCorrectUser, async function (req, res, next) {
   try {
     const surveys = await User.getHistory(req.params.username);
