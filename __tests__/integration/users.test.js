@@ -134,16 +134,17 @@ describe('GET /users/:username/surveys', () => {
   });
 
   it('should get an empty array of surveys for existing user with no created surveys', async function () {
-    const response = await request(app)
-      .get(`/users/${user3.username}/surveys`)
+    const invalidResponse = await request(app)
+      .get(`/users/${user1.username}/surveys`)
       .query({
         _token: user3._token
       });
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({
-      surveys: []
+    expect(invalidResponse.statusCode).toBe(401);
+    expect(invalidResponse.body).toEqual({
+      error: "Unauthorized"
     });
   });
+
 });
 
 
