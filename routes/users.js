@@ -17,12 +17,8 @@ const { ensureAdminUser, ensureLoggedIn, ensureCorrectUser } = require('../middl
 
 // Get a list of users, admin only
 router.get('/', ensureAdminUser, async function (req, res, next) {
-  try {
-    const users = await User.getUsers();
-    return res.json({ users });
-  } catch (error) {
-    return next(error);
-  }
+  const users = await User.getUsers();
+  return res.json({ users });
 });
 
 // Create/Register a new user
