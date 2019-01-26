@@ -7,7 +7,8 @@ env:
 services:
   - postgresql
 before_script:
-  - psql -c 'create database libellis_test; create database libellis;' -U postgres
+  - psql -c 'create database libellis_test;' -U postgres
+  - psql -c 'create database libellis;' -U postgres
 sudo: required
 before_install:
   - npm install -g npm
