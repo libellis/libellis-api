@@ -195,9 +195,13 @@ class User /* extends Model */ {
     RETURNING username`,
       [this.username]
     );
+
     if (result.rows.length === 0) {
-      throw new Error(`Could not delete user: ${this.username}`);
+      let err = new Error(`Could not find user to delete`)
+      err.status = 400;
+      throw err;
     }
+
     return 'User Deleted';
   }
 }
