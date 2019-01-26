@@ -450,6 +450,15 @@ describe('DELETE /surveys/:id', () => {
   });
 })
 
+// Test Generic 404 catcher
+describe('GET /fakeaddress', () => {
+  it('should not allow us to go to a fake address', async function () {
+    const response = await request(app).get('/fakeaddress');
+    
+      expect(response.status).toEqual(404);
+      expect(response.body.error).toEqual("Not Found");
+  });
+});
 
 //Delete tables after each tets
 afterEach(async function () {

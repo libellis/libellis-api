@@ -25,6 +25,24 @@ beforeEach(async function () {
 
 });
 
+describe('Setters/Getters testing', () => {
+  it('should deny directly changing id', async function() {
+    try {
+      let survey = await Survey.create({
+        author: user2.username,
+        title: "What's your favorite kind of chocolate?",
+        description: "Dark or Milk?"
+      });
+      survey.id = 25;
+      throw new Error();
+    } catch (e) {
+      expect(e.message).toMatch(
+        `Can't change id!`,
+      );
+    }
+  });
+});
+
 // Test get filtered users
 describe('get(id)', () => {
   it('should get a survey by id', async function () {
@@ -41,12 +59,21 @@ describe('get(id)', () => {
   });
 
   it('should throw error if use not found', async function () {
-
     try {
       const response = await Survey.get(3456);
+      throw new Error();
     } catch (err) {
       expect(err.status).toBe(404);
       expect(err.message).toEqual('Not Found');
+    }
+  });
+
+  it('should throw error if id not supplied', async function () {
+    try {
+      const response = await Survey.get();
+      throw new Error();
+    } catch (e) {
+      expect(e.message).toMatch(`Missing id parameter`);
     }
   });
 });
@@ -267,6 +294,26 @@ describe('save(id, title, description, anonymous)', async function () {
       anonymous: survey1.anonymous
     });
   })
+
+  it('should fail to update a non-existent survey', async function () {
+    let survey = new Survey({
+      id: 987, 
+      title: 'faketitle', 
+      description: 'fakedescription',
+      author: 'fakeauthor',
+      date_posted: Date.now(),
+      anonymous: true,
+      published: true,
+    });
+    
+    try {
+      survey.title = "nice-buns";
+      await survey.save();
+      throw new Error();
+    } catch (e) {
+      expect(e.message).toMatch(`Cannot find survey to update`);
+    }
+  });
 });
 
 
@@ -279,6 +326,23 @@ describe('delete(id)', () => {
     } catch (err) {
       expect(err.status).toBe(404);
       expect(err.message).toEqual('Not Found');
+    }
+  });
+
+  it('should fail to delete a survey that does not exist', async function() {
+    try {
+      let fakeSurvey = new Survey({
+        id: 987, 
+        title: 'faketitle', 
+        description: 'fakedescription',
+        author: 'fakeauthor',
+        date_posted: Date.now(),
+        anonymous: true,
+        published: true,
+      });
+      const message = await fakeSurvey.delete();
+    } catch (e) {
+      expect(e.message).toMatch(`Could not delete survey: 987`);
     }
   });
 });
