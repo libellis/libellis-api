@@ -83,6 +83,7 @@ describe('GET /users', () => {
       .send({ _token: adminUser._token });
     expect(response.statusCode).toBe(200);
   });
+
 });
 
 
@@ -116,6 +117,20 @@ describe('POST /users', () => {
 
     expect(invalidResponse.statusCode).toBe(400);
   })
+
+  it('should throw an error if we try to create a user that already exists', async function () {
+    const response = await request(app)
+      .post('/users')
+      .send({
+        username: 'georgetheman',
+        password: 'georgeisawesome',
+        first_name: 'george',
+        last_name: 'johnson',
+        email: 'george@gmail.com'
+      });
+    expect(response.statusCode).toBe(400);
+    expect(response.body.error).toBe(`Username "georgetheman" already exists`);
+  })
 });
 
 
@@ -135,6 +150,16 @@ describe('GET /users/:username', () => {
       "last_name": "johnson",
       "photo_url": "https://moonvillageassociation.org/wp-content/uploads/2018/06/default-profile-picture1.jpg",
     })
+  });
+
+  it('should provide a helpful error message when asking for non-existent user (admin request)', async function () {
+    const response = await request(app)
+      .get(`/users/superfakeusertest`)
+      .query({
+        _token: adminUser._token
+      });
+    expect(response.statusCode).toBe(400);
+    expect(response.body.error).toEqual("Cannot find user by username: superfakeusertest")
   });
 
   it('should reject requests for other users information', async function () {

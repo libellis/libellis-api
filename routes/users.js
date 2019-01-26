@@ -7,7 +7,7 @@ const { classPartialUpdate } = require('../helpers/partialUpdate');
 const validateInput = require('../middleware/validation');
 const newUserSchema = require('../schema/newUser.json');
 const updateUserSchema = require('../schema/updateUser.json');
-const { ensureAdminUser, ensureLoggedIn, ensureCorrectUser } = require('../middleware/auth');
+const { ensureAdminUser, ensureLoggedIn, ensureCorrectUserOrAdmin } = require('../middleware/auth');
 
 /** 
  * users endpoints are restricted
@@ -33,7 +33,7 @@ router.post('/', validateInput(newUserSchema), async function (req, res, next) {
 });
 
 // Get a user by username
-router.get('/:username', ensureCorrectUser, async function (req, res, next) {
+router.get('/:username', ensureCorrectUserOrAdmin, async function (req, res, next) {
   try {
     const user = await User.getUser(req.params.username);
     // user.surveys = await User.getSurveys(req.params.username);
@@ -44,29 +44,21 @@ router.get('/:username', ensureCorrectUser, async function (req, res, next) {
 });
 
 // Get a list of surveys created by this user
-router.get('/:username/surveys', ensureCorrectUser, async function (req, res, next) {
-  try {
+router.get('/:username/surveys', ensureCorrectUserOrAdmin, async function (req, res, next) {
     const surveys = await User.getSurveys(req.params.username);
     return res.json({ surveys });
-  } catch (error) {
-    return next(error);
-  }
 });
 
 // Get a list of surveys voted on by this user, 
-router.get('/:username/history', ensureCorrectUser, async function (req, res, next) {
-  try {
+router.get('/:username/history', ensureCorrectUserOrAdmin, async function (req, res, next) {
     const surveys = await User.getHistory(req.params.username);
     return res.json({ surveys });
-  } catch (error) {
-    return next(error);
-  }
 });
 
 //Update a user
 router.patch(
   '/:username',
-  ensureCorrectUser,
+  ensureCorrectUserOrAdmin,
   validateInput(updateUserSchema),
   async function (req, res, next) {
     try {
@@ -81,7 +73,7 @@ router.patch(
 );
 
 //Delete a user
-router.delete('/:username', ensureCorrectUser, async function (req, res, next) {
+router.delete('/:username', ensureCorrectUserOrAdmin, async function (req, res, next) {
   try {
     const user = await User.getUser(req.params.username);
     const message = await user.deleteUser();
