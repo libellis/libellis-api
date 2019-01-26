@@ -115,12 +115,6 @@ class Vote {
       [username, choice_id, score],
     );
 
-    if (result.rows.length === 0) {
-      const err = new Error(`Can't create vote`);
-      err.status = 400;
-      throw err;
-    }
-
     return new Vote(result.rows[0]);
   }
 

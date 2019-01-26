@@ -55,13 +55,33 @@ beforeEach(async function () {
     });
   user3 = await User.getUser('georgetheman');
   user3._token = response.body.token;
+  adminUser = await User.getUser('joerocket');
+    const response2 = await request(app)
+    .post('/login')
+    .send({
+      username: 'joerocket',
+      password: 'testpass'
+    }); 
+  adminUser._token = response2.body.token;
 });
 
 //Test get users route
 describe('GET /users', () => {
-  it('should give 401 for any request not made by an Admin User', async function () {
+  it('should give 401 for any request made by no user', async function () {
     const response = await request(app).get('/users');
     expect(response.statusCode).toBe(401);
+  });
+
+  it('should give 401 for a request made by valid user who is not an admin', async function () {
+    const response = await request(app).get('/users')
+      .send({ _token: user3._token });
+    expect(response.statusCode).toBe(401);
+  });
+
+  it('should correctly give users list to an admin', async function () {
+    const response = await request(app).get('/users')
+      .send({ _token: adminUser._token });
+    expect(response.statusCode).toBe(200);
   });
 });
 
@@ -82,17 +102,17 @@ describe('POST /users', () => {
     expect(response.body).toHaveProperty('token');
   });
 
-  it('should validate for proper email address format', async function() {
+  it('should validate for proper email address format', async function () {
     // TEST FOR JSON SCHEMA
     const invalidResponse = await request(app)
-    .post('/users')
-    .send({
-      username: 'bobcat',
-      password: 'bob',
-      first_name: 'bob',
-      last_name: 'johnson',
-      email: 'bob.com'
-    });
+      .post('/users')
+      .send({
+        username: 'bobcat',
+        password: 'bob',
+        first_name: 'bob',
+        last_name: 'johnson',
+        email: 'bob.com'
+      });
 
     expect(invalidResponse.statusCode).toBe(400);
   })
@@ -142,18 +162,6 @@ describe('GET /users/:username/surveys', () => {
     });
   });
 
-  it('should get an empty array of surveys for existing user with no created surveys', async function () {
-    const response = await request(app)
-      .get(`/users/${user3.username}/surveys`)
-      .query({
-        _token: user3._token
-      });
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({
-      surveys: []
-    });
-  });
-
   it('should reject requests for other users information', async function () {
     const response = await request(app)
       .get(`/users/${user2.username}/surveys`)
@@ -163,7 +171,6 @@ describe('GET /users/:username/surveys', () => {
     expect(response.statusCode).toBe(401);
   });
 });
-
 
 // test get user's history, list of survey id's that user has voted on
 describe('GET /users/:username/history', () => {
@@ -176,14 +183,14 @@ describe('GET /users/:username/history', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
       "surveys": [{
-          "anonymous": true,
-          "date_posted": expect.any(String),
-          "description": "hot fiya",
-          "author": "joerocket",
-          "published": false,
-          "survey_id": 1,
-          "title": "best albums of 2009",
-        }
+        "anonymous": true,
+        "date_posted": expect.any(String),
+        "description": "hot fiya",
+        "author": "joerocket",
+        "published": false,
+        "survey_id": 1,
+        "title": "best albums of 2009",
+      }
       ],
     });
   });

@@ -71,6 +71,40 @@ beforeEach(async function() {
   user3 = userResult.rows[0];
 });
 
+describe('Setters/Getters testing', () => {
+  it('should deny directly changing choice_id', async function() {
+    try {
+      const vote = await Vote.create({
+        username: user3.username,
+        choice_id: choice3.id,
+        score: 1,
+      });
+      vote.choice_id = 5;
+      throw new Error();
+    } catch (e) {
+      expect(e.message).toMatch(
+        `Can't change choice_id!`,
+      );
+    }
+  });
+
+  it('should deny directly changing username', async function() {
+    try {
+      const vote = await Vote.create({
+        username: user3.username,
+        choice_id: choice3.id,
+        score: 1,
+      });
+      vote.username = "fred";
+      throw new Error();
+    } catch (e) {
+      expect(e.message).toMatch(
+        `Can't change user id!`,
+      );
+    }
+  });
+});
+
 // Test getting all votes by a question_id
 describe('getAll()', () => {
   it('should correctly return a list of votes', async function() {
@@ -158,6 +192,17 @@ describe('get()', () => {
       expect(e.message).toMatch(`Cannot find vote`);
     }
   });
+
+  it('should throw an error if we are missing either username or choice_id', async function() {
+    try {
+      const {question_id, survey_id, username, choice_id} = vote1;
+      const vote = await Vote.get({question_id, survey_id, choice_id});
+      throw new Error();
+    } catch (e) {
+      expect(e.message).toMatch(`Missing parameters`);
+    }
+    
+  });
 });
 
 //Delete a vote test
@@ -166,6 +211,15 @@ describe('deleteVote()', () => {
     const voteToBeDeleted = await Vote.get(vote1);
     const message = await voteToBeDeleted.delete();
     expect(message).toBe('Vote Removed');
+  });
+
+  it('should fail to delete a vote that does not exist', async function() {
+    try {
+      const fakeVote = new Vote({choice_id: 50, username: "bob", score: 5});
+      const message = await fakeVote.delete();
+    } catch (e) {
+      expect(e.message).toMatch(`Could not delete vote`);
+    }
   });
 });
 
