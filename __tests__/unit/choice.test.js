@@ -97,6 +97,15 @@ describe('get()', () => {
       expect(e.message).toMatch(`Cannot find choice by id: -30`);
     }
   });
+
+  it('should throw a missing id parameter if get is called with no id', async function() {
+    try {
+      await Choice.get();
+      throw new Error();
+    } catch (e) {
+      expect(e.message).toMatch(`Missing id parameter`);
+    }
+  }); 
 });
 
 //Update a choice test
@@ -119,6 +128,18 @@ describe('updateChoice()', () => {
     expect(() => {
       choice.question_id = 'THISSHOULDFAIL';
     }).toThrowError(`Can't change question id!`);
+  });
+
+  it('should fail to update a non-existent choice', async function () {
+    let choice = new Choice({id: 987, question_id: -20, content: '', title: 'blah', content_type: 'text'});
+    
+    try {
+      choice.title = "nice-buns";
+      await choice.save();
+      throw new Error();
+    } catch (e) {
+      expect(e.message).toMatch(`Cannot find choice to update`);
+    }
   });
 });
 

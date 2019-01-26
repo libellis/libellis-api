@@ -44,6 +44,18 @@ describe('create()', () => {
     const questions = await Question.getAll({ survey_id: survey2.id });
     expect(questions.length).toEqual(2);
   });
+
+  it('Should fail to add a question if title is missing', async function () {
+    try {
+      const badQuestion = await Question.create({
+        question_type: 'Multiple Choice',
+        survey_id: survey2.id,
+      });
+      throw new Error();
+    } catch(e) {
+      expect(e.message).toMatch(`Must supply title, question_type and survey_id`);
+    };
+  });
 });
 
 //Test get one question
@@ -83,6 +95,18 @@ describe('updateQuestion()', () => {
     expect(() => {
       question.survey_id = 'THISSHOULDFAIL';
     }).toThrowError(`Can't change survey id!`);
+  });
+
+  it('should fail to update a non-existent question', async function () {
+    let question = new Question({id: 987, title: 'blah', content_type: 'multiple'});
+    
+    try {
+      question.title = "nice-buns";
+      await question.save();
+      throw new Error();
+    } catch (e) {
+      expect(e.message).toMatch(`Cannot find question to update`);
+    }
   });
 });
 

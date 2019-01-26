@@ -141,9 +141,6 @@ class Choice {
       [this.id]
     );
 
-    if (result.rows.length === 0) {
-      throw new Error(`Could not delete choice: ${this.id}`);
-    }
     return `Choice Deleted`;
   }
 }

@@ -87,6 +87,12 @@ class Question {
    * 
    */
   static async create({ survey_id, title, question_type }) {
+    if (survey_id === undefined || title === undefined ||
+        question_type === undefined) {
+      const err = new Error(`Must supply title, question_type and survey_id`);
+      err.status = 400;
+      throw err;
+    }
     const result = await db.query(
       `
     INSERT INTO questions (survey_id, title, question_type)
@@ -95,12 +101,6 @@ class Question {
     `,
       [survey_id, title, question_type]
     );
-
-    if (result.rows.length === 0) {
-      const err = new Error(`Can't create question`);
-      err.status = 400;
-      throw err;
-    }
 
     return new Question(result.rows[0]);
   }
@@ -143,10 +143,7 @@ class Question {
       [this.id]
     );
 
-    if (result.rows.length === 0) {
-      throw new Error(`Could not delete question: ${this.id}`);
-    }
-    //return boolean
+    // Update to return boolean
     return `Question Deleted`;
   }
 }
