@@ -16,6 +16,7 @@ CREATE TABLE surveys
   author text NOT NULL REFERENCES users ON DELETE cascade,
   title text NOT NULL UNIQUE,
   description text,
+  category text NOT NULL REFERENCES categories(title) ON DELETE cascade,
   anonymous boolean NOT NULL default true,
   published boolean NOT NULL default false,
   date_posted TIMESTAMP NOT NULL default CURRENT_TIMESTAMP
@@ -44,6 +45,11 @@ CREATE TABLE votes
   username text NOT NULL REFERENCES users ON DELETE cascade,
   PRIMARY KEY (choice_id, username),
   score integer NOT NULL
+);
+
+CREATE TABLE categories
+(
+  title text NOT NULL PRIMARY KEY,
 );
 
 CREATE VIEW users_votes AS

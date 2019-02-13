@@ -1,0 +1,31 @@
+{
+  "[html]": {
+    "editor.formatOnSave": false
+  },
+  "[python]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4
+  },
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "files.associations": {
+    "*.js": "javascriptreact"
+  },
+  "javascript.validate.enable": false,
+  "prettier.eslintIntegration": false,
+  "prettier.singleQuote": true,
+  "python.formatting.provider": "yapf",
+  "python.formatting.yapfPath": "/Library/Frameworks/Python.framework/Versions/3.6/bin/yapf",
+  "python.linting.flake8Args": [
+    "--ignore",
+    "E501 E402"
+  ],
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Path": "/Library/Frameworks/Python.framework/Versions/3.6/bin/flake8",
+  "python.linting.pylintEnabled": false,
+  "python.pythonPath": "python3",
+  "python.venvPath": "~/.virtualenvs",
+  "terminal.integrated.shell.osx": "/bin/zsh",
+  "terminal.integrated.shellArgs.osx": [],
+  "typescript.validate.enable": false
+}
