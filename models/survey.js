@@ -6,7 +6,7 @@ const {
 
 
 class Survey {
-  constructor({ id, author, title, description, category, date_posted, anonymous, published}) {
+  constructor({ id, author, title, description, category, date_posted, anonymous, published }) {
     this.id = id;
     this.author = author;
     this.title = title;
@@ -64,7 +64,8 @@ class Survey {
     if (search === undefined || search === '') {
       result = await db.query(
         `SELECT id, author, title, description, category, date_posted, anonymous, published
-        FROM surveys` 
+        FROM surveys
+        WHERE published=true`
       );
     } else {
       result = await db.query(
@@ -72,10 +73,10 @@ class Survey {
                 FROM surveys WHERE 
                 author ILIKE $1 OR
                 title ILIKE $1 OR
-                description ILIKE $1`, [`%${search}%`] 
+                description ILIKE $1`, [`%${search}%`]
       );
     }
-    
+
     return result.rows.map(s => new Survey(s));
   }
 
@@ -89,7 +90,7 @@ class Survey {
   //   return result.rows.map(s => new Survey(s));
   // }
 
-  
+
   /**
    * createSurvey(author, title, description) <- returns created survey details
    * 

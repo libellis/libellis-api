@@ -22,11 +22,11 @@ function ensureLoggedIn(req, res, next) {
 
 /** Middleware: Requires :username is logged in. */
 
-function ensureCorrectUser(req, res, next) {
+function ensureCorrectUserOrAdmin(req, res, next) {
   try {
     const token = req.body._token || req.query._token;
     const payload = jwt.verify(token, SECRET);
-    if (payload.username === req.params.username) {
+    if (payload.username === req.params.username || payload.is_admin) {
       // put username on request as a convenience for routes
       req.username = payload.username;
       return next();
@@ -66,7 +66,7 @@ async function ensureAuthor(req, res, next) {
     req.survey = survey;
 
     // if user is not author of survey, throw 401
-    if (req.survey.author !== req.username) 
+    if (req.survey.author !== req.username)
       throw new Error();
 
     return next();
@@ -77,7 +77,7 @@ async function ensureAuthor(req, res, next) {
 
 module.exports = {
   ensureLoggedIn,
-  ensureCorrectUser,
+  ensureCorrectUserOrAdmin,
   ensureAdminUser,
   ensureAuthor
 };

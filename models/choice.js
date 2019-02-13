@@ -99,12 +99,6 @@ class Choice {
       [question_id, title, content, content_type]
     );
 
-    if (result.rows.length === 0) {
-      const err = new Error(`Can't create choice`);
-      err.status = 400;
-      throw err;
-    }
-
     return new Choice(result.rows[0]);
   }
 
@@ -147,9 +141,6 @@ class Choice {
       [this.id]
     );
 
-    if (result.rows.length === 0) {
-      throw new Error(`Could not delete choice: ${this.id}`);
-    }
     return `Choice Deleted`;
   }
 }

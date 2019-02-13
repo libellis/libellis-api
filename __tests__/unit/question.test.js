@@ -7,7 +7,7 @@ const {
   dropTables
 } = require('../../test_helpers/setup');
 
-let survey1, survey2, question1, question2, user1, user2;
+let survey1, survey2, question1;
 // Insert 2 questions before each test
 beforeEach(async function () {
   // Build up our test tables and return inserted test questions, surveys and users
@@ -35,7 +35,7 @@ describe('get()', () => {
 //Test creating question
 describe('create()', () => {
   it('should correctly add a question', async function () {
-    const newQuestion = await Question.create({
+    await Question.create({
       title: 'Favorite Millenial CEO',
       question_type: 'Multiple Choice',
       survey_id: survey2.id,
@@ -43,6 +43,18 @@ describe('create()', () => {
 
     const questions = await Question.getAll({ survey_id: survey2.id });
     expect(questions.length).toEqual(2);
+  });
+
+  it('Should fail to add a question if title is missing', async function () {
+    try {
+      await Question.create({
+        question_type: 'Multiple Choice',
+        survey_id: survey2.id,
+      });
+      throw new Error();
+    } catch(e) {
+      expect(e.message).toMatch(`Must supply title, question_type and survey_id`);
+    }
   });
 });
 
@@ -83,6 +95,22 @@ describe('updateQuestion()', () => {
     expect(() => {
       question.survey_id = 'THISSHOULDFAIL';
     }).toThrowError(`Can't change survey id!`);
+  });
+
+  it('should fail to update a non-existent question', async function () {
+    let question = new Question({
+      id: 987, 
+      title: 'blah', 
+      content_type: 'multiple'
+    });
+    
+    try {
+      question.title = "nice-buns";
+      await question.save();
+      throw new Error();
+    } catch (e) {
+      expect(e.message).toMatch(`Cannot find question to update`);
+    }
   });
 });
 

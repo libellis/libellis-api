@@ -168,6 +168,25 @@ describe('updateUser()', () => {
       user.username = 'JosephinaRocketina';
     }).toThrowError(`Can't change username!`);
   });
+  
+  it('should fail to update a non-existent user', async function () {
+    let fakeuser = new User({
+      username: 'fakeuser',
+      first_name: 'fake',
+      last_name: 'user',
+      email: 'fake@fakeuser.com',
+      photo_url: 'superfake.jpg',
+      is_admin: true,
+    });
+    
+    try {
+      fakeuser.first_name = "superfake";
+      await fakeuser.save();
+      throw new Error();
+    } catch (e) {
+      expect(e.message).toMatch(`Cannot find user to update`);
+    }
+  });
 });
 
 // Delete a user test
@@ -176,6 +195,16 @@ describe('deleteUser()', () => {
     const user = await User.getUser(user1.username);
     const message = await user.deleteUser();
     expect(message).toBe('User Deleted');
+  });
+
+  it('should fail to delete a user twice', async function () {
+    try {
+      const user = await User.getUser(user1.username);
+      const message = await user.deleteUser();
+      const failed = await user.deleteUser();
+    } catch(e) {
+      expect(e.message).toMatch(`Could not find user to delete`);
+    }
   });
 });
 

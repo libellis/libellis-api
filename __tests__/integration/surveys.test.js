@@ -77,35 +77,34 @@ beforeEach(async function () {
   hackerToken = responseForHacker.body.token;
 });
 
-
-
-
 // Test get surveys route
 describe('GET /surveys', () => {
   it('should correctly return a list of surveys including it\'s questions', async function () {
     const response = await request(app).get('/surveys');
     expect(response.statusCode).toBe(200);
-    expect(response.body.surveys.length).toBe(2);
-    expect(response.body.surveys).toEqual(
+    expect(response.body.surveys.length).toBe(0);
+
+    let survey_result = await db.query(`
+    INSERT INTO surveys (author, title, description, published, category)
+    VALUES ('joerocket', 'Best Books Ever', 'J.k rowling aint got shit on this', true, 'music')
+    RETURNING id, author, title, description, anonymous, date_posted, category
+  `);
+
+    let survey3 = survey_result.rows[0];
+
+    let response2 = await request(app).get('/surveys');
+    expect(response2.body.surveys).toEqual(
       [{
-        "_id": 1,
-        "published": false,
+        "_id": 3,
+        "published": true,
         "anonymous": true,
-        "author": "joerocket",
+        "author": survey3.author,
         "date_posted": expect.any(String),
-        "description": "hot fiya",
-        "category": survey1.category,
-        "title": "best albums of 2009"
-      }, {
-        "_id": 2,
-        "published": false,
-        "anonymous": true,
-        "author": "spongebob",
-        "date_posted": expect.any(String),
-        "description": "top ceos of all time",
-        "category": survey2.category,
-        "title": "top ceos"
-      }]
+        "description": survey3.description,
+        "category": survey3.category,
+        "title": survey3.title,
+      },
+      ]
     );
   });
 
@@ -216,8 +215,15 @@ describe('POST /surveys', () => {
       }
     });
 
+    const patchResponse = await request(app)
+      .patch(`/surveys/${response.body.survey._id}`)
+      .send({
+        _token: userToken,
+        published: true
+      });
+
     response = await request(app).get('/surveys');
-    expect(response.body.surveys.length).toBe(3);
+    expect(response.body.surveys.length).toBe(1);
   })
 
   it('should give 400 error for missing title', async function () {
@@ -248,7 +254,7 @@ describe('POST /surveys', () => {
 
 
 describe('PATCH /surveys/:id', () => {
-  it('Should update the title of a survey only', async function() {
+  it('Should update the title of a survey only', async function () {
     // first create a new survey by testUser
     const postReponse = await request(app)
       .post('/surveys')
@@ -258,7 +264,7 @@ describe('PATCH /surveys/:id', () => {
         description: '9999ThisIsDescriptive9999',
         category: 'music',
       });
-    
+
     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
 
     const patchResponse = await request(app)
@@ -274,7 +280,7 @@ describe('PATCH /surveys/:id', () => {
     expect(patchResponse.body.survey.title).toEqual('__muchbetter__');
   });
 
-  it('Should allow a user to publish a survey via patch', async function() {
+  it('Should allow a user to publish a survey via patch', async function () {
     // first create a new survey by testUser
     const postReponse = await request(app)
       .post('/surveys')
@@ -284,7 +290,7 @@ describe('PATCH /surveys/:id', () => {
         description: '9999ThisIsDescriptive9999',
         category: 'music',
       });
-    
+
     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
 
     const patchResponse = await request(app)
@@ -298,7 +304,7 @@ describe('PATCH /surveys/:id', () => {
     expect(patchResponse.body.survey.published).toEqual(true);
   });
 
-  it('Should update the description of a survey only', async function() {
+  it('Should update the description of a survey only', async function () {
     // first create a new survey by testUser
     const postReponse = await request(app)
       .post('/surveys')
@@ -308,7 +314,7 @@ describe('PATCH /surveys/:id', () => {
         description: '9999ThisIsDescriptive9999',
         category: 'music',
       });
-    
+
     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
 
     const patchResponse = await request(app)
@@ -325,7 +331,7 @@ describe('PATCH /surveys/:id', () => {
 
 
 
-  it('Should update the title and description of a survey only', async function() {
+  it('Should update the title and description of a survey only', async function () {
     // first create a new survey by testUser
     const postReponse = await request(app)
       .post('/surveys')
@@ -335,7 +341,7 @@ describe('PATCH /surveys/:id', () => {
         description: '9999ThisIsDescriptive9999',
         category: 'music',
       });
-    
+
     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
 
     const patchResponse = await request(app)
@@ -353,7 +359,7 @@ describe('PATCH /surveys/:id', () => {
 
 
 
-  it('Should ignore all invalid or immutable fields', async function() {
+  it('Should ignore all invalid or immutable fields', async function () {
     // first create a new survey by testUser
     const postReponse = await request(app)
       .post('/surveys')
@@ -363,7 +369,7 @@ describe('PATCH /surveys/:id', () => {
         description: '9999ThisIsDescriptive9999',
         category: 'music',
       });
-    
+
     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
 
     const patchResponse = await request(app)
@@ -378,7 +384,7 @@ describe('PATCH /surveys/:id', () => {
     expect(patchResponse.status).toBe(400);
   });
 
-  it('Should not authorize to update if survey owned by other user', async function() {
+  it('Should not authorize to update if survey owned by other user', async function () {
     // first create a new survey by testUser
     const postReponse = await request(app)
       .post('/surveys')
@@ -388,9 +394,9 @@ describe('PATCH /surveys/:id', () => {
         description: '9999ThisIsDescriptive9999',
         category: 'music',
       });
-    
+
     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
-    
+
     /** Try to edit a survey whose author is "kevin" with the token for "hackerman" */
     const patchResponse = await request(app)
       .patch(`/surveys/${postReponse.body.survey._id}`)
@@ -400,14 +406,14 @@ describe('PATCH /surveys/:id', () => {
         notdescription: '__muchbetter__',
         title: '__bettertitle__'
       });
-    
+
     expect(patchResponse.status).toEqual(401);
     expect(patchResponse.body.error).toEqual("Unauthorized");
   });
 })
 
 describe('DELETE /surveys/:id', () => {
-  it('Should delete a survey', async function() {
+  it('Should delete a survey', async function () {
     // first create a new survey by testUser
     const postReponse = await request(app)
       .post('/surveys')
@@ -417,7 +423,7 @@ describe('DELETE /surveys/:id', () => {
         description: '9999ThisIsDescriptive9999',
         category: 'music',
       });
-    
+
     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
 
     const deleteResponse = await request(app)
@@ -425,18 +431,18 @@ describe('DELETE /surveys/:id', () => {
       .send({
         _token: userToken,
       });
-    
+
     expect(deleteResponse.status).toEqual(200);
     expect(deleteResponse.body).toEqual("Deleted");
 
     const getResponse = await request(app)
       .get(`/surveys/${postReponse.body.survey._id}`)
-    
-      expect(getResponse.status).toBe(404);
+
+    expect(getResponse.status).toBe(404);
   });
 
 
-  it('Should not authorize to delete if survey owned by other user', async function() {
+  it('Should not authorize to delete if survey owned by other user', async function () {
     // first create a new survey by testUser
     const postReponse = await request(app)
       .post('/surveys')
@@ -446,7 +452,7 @@ describe('DELETE /surveys/:id', () => {
         description: '9999ThisIsDescriptive9999',
         category: 'music',
       });
-    
+
     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
 
     /** Try to delete a survey whose author is "kevin" with the token for "hackerman" */
@@ -455,12 +461,21 @@ describe('DELETE /surveys/:id', () => {
       .send({
         _token: hackerToken
       });
-    
+
     expect(deleteResponse.status).toEqual(401);
     expect(deleteResponse.body.error).toEqual("Unauthorized");
   });
 })
 
+// Test Generic 404 catcher
+describe('GET /fakeaddress', () => {
+  it('should not allow us to go to a fake address', async function () {
+    const response = await request(app).get('/fakeaddress');
+
+    expect(response.status).toEqual(404);
+    expect(response.body.error).toEqual("Not Found");
+  });
+});
 
 //Delete tables after each tets
 afterEach(async function () {

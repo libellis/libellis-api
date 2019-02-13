@@ -55,16 +55,35 @@ beforeEach(async function () {
     });
   user3 = await User.getUser('georgetheman');
   user3._token = response.body.token;
+  adminUser = await User.getUser('joerocket');
+  const response2 = await request(app)
+    .post('/login')
+    .send({
+      username: 'joerocket',
+      password: 'testpass'
+    });
+  adminUser._token = response2.body.token;
 });
 
 //Test get users route
 describe('GET /users', () => {
-  it('should correctly return a list of users', async function () {
+  it('should give 401 for any request made by no user', async function () {
     const response = await request(app).get('/users');
-    expect(response.statusCode).toBe(200);
-    expect(response.body.users.length).toBe(3);
-    expect(response.body.users[0]).toHaveProperty('_username', user1.username);
+    expect(response.statusCode).toBe(401);
   });
+
+  it('should give 401 for a request made by valid user who is not an admin', async function () {
+    const response = await request(app).get('/users')
+      .send({ _token: user3._token });
+    expect(response.statusCode).toBe(401);
+  });
+
+  it('should correctly give users list to an admin', async function () {
+    const response = await request(app).get('/users')
+      .send({ _token: adminUser._token });
+    expect(response.statusCode).toBe(200);
+  });
+
 });
 
 
@@ -82,7 +101,9 @@ describe('POST /users', () => {
       });
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty('token');
+  });
 
+  it('should validate for proper email address format', async function () {
     // TEST FOR JSON SCHEMA
     const invalidResponse = await request(app)
       .post('/users')
@@ -95,7 +116,21 @@ describe('POST /users', () => {
       });
 
     expect(invalidResponse.statusCode).toBe(400);
-  });
+  })
+
+  it('should throw an error if we try to create a user that already exists', async function () {
+    const response = await request(app)
+      .post('/users')
+      .send({
+        username: 'georgetheman',
+        password: 'georgeisawesome',
+        first_name: 'george',
+        last_name: 'johnson',
+        email: 'george@gmail.com'
+      });
+    expect(response.statusCode).toBe(400);
+    expect(response.body.error).toBe(`Username "georgetheman" already exists`);
+  })
 });
 
 
@@ -116,6 +151,25 @@ describe('GET /users/:username', () => {
       "photo_url": "https://moonvillageassociation.org/wp-content/uploads/2018/06/default-profile-picture1.jpg",
     })
   });
+
+  it('should provide a helpful error message when asking for non-existent user (admin request)', async function () {
+    const response = await request(app)
+      .get(`/users/superfakeusertest`)
+      .query({
+        _token: adminUser._token
+      });
+    expect(response.statusCode).toBe(400);
+    expect(response.body.error).toEqual("Cannot find user by username: superfakeusertest")
+  });
+
+  it('should reject requests for other users information', async function () {
+    const response = await request(app)
+      .get(`/users/${user2.username}`)
+      .query({
+        _token: user3._token
+      });
+    expect(response.statusCode).toBe(401);
+  });
 });
 
 
@@ -133,19 +187,15 @@ describe('GET /users/:username/surveys', () => {
     });
   });
 
-  it('should get an empty array of surveys for existing user with no created surveys', async function () {
+  it('should reject requests for other users information', async function () {
     const response = await request(app)
-      .get(`/users/${user3.username}/surveys`)
+      .get(`/users/${user2.username}/surveys`)
       .query({
         _token: user3._token
       });
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({
-      surveys: []
-    });
+    expect(response.statusCode).toBe(401);
   });
 });
-
 
 // test get user's history, list of survey id's that user has voted on
 describe('GET /users/:username/history', () => {
@@ -158,14 +208,14 @@ describe('GET /users/:username/history', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).toEqual({
       "surveys": [{
-          "anonymous": true,
-          "date_posted": expect.any(String),
-          "description": "hot fiya",
-          "author": "joerocket",
-          "published": false,
-          "survey_id": 1,
-          "title": "best albums of 2009",
-        }
+        "anonymous": true,
+        "date_posted": expect.any(String),
+        "description": "hot fiya",
+        "author": "joerocket",
+        "published": false,
+        "survey_id": 1,
+        "title": "best albums of 2009",
+      }
       ],
     });
   });
@@ -180,6 +230,15 @@ describe('GET /users/:username/history', () => {
     expect(response.body).toEqual({
       surveys: []
     });
+  });
+
+  it('should reject requests for other users information', async function () {
+    const response = await request(app)
+      .get(`/users/${user2.username}/history`)
+      .query({
+        _token: user3._token
+      });
+    expect(response.statusCode).toBe(401);
   });
 });
 
@@ -208,6 +267,38 @@ describe('PATCH /users/:username', () => {
       });
     expect(invalidResponse.statusCode).toBe(400);
   });
+
+  it('should fail to patch a username to another users username in db', async function () {
+    const invalidResponse = await request(app)
+      .patch(`/users/${user3.username}`)
+      .send({
+        username: 'joerocket'
+      })
+      .query({
+        _token: user3._token
+      });
+
+    expect(invalidResponse.statusCode).toBe(400);
+  });
+
+  it('should fail to patch a user that has been deleted', async function () {
+    const response = await request(app)
+      .delete(`/users/${user3.username}`)
+      .send({
+        _token: user3._token
+      });
+    const invalidResponse = await request(app)
+      .patch(`/users/${user3.username}`)
+      .send({
+        first_name: 'dumby'
+      })
+      .query({
+        _token: user3._token
+      });
+
+    expect(invalidResponse.statusCode).toBe(400);
+    expect(invalidResponse.body.error).toMatch(`Cannot find user by username: georgetheman`);
+  });
 });
 
 
@@ -221,6 +312,21 @@ describe('DELETE /users/:username', () => {
       });
     expect(response.statusCode).toBe(200);
     expect(response.body.message).toBe('User Deleted');
+  });
+
+  it('should fail to delete a user who tries to delete themselves more than once', async function () {
+    const response = await request(app)
+      .delete(`/users/${user3.username}`)
+      .send({
+        _token: user3._token
+      });
+    const badResponse = await request(app)
+      .delete(`/users/${user3.username}`)
+      .send({
+        _token: user3._token
+      });
+    expect(badResponse.statusCode).toBe(400);
+    expect(badResponse.body.error).toBe('Cannot find user by username: georgetheman');
   });
 });
 
