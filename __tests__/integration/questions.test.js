@@ -84,6 +84,7 @@ beforeEach(async function() {
       _token: userToken,
       title: 'xxSuperCoolTestSurveyxx',
       description: '9999ThisIsDescriptive9999',
+      category: 'music',
     });
   survey3 = surveyResponse.body.survey;
 });
