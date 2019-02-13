@@ -10,6 +10,11 @@ CREATE TABLE users
   is_admin boolean NOT NULL default false
 );
 
+CREATE TABLE categories
+(
+  title text NOT NULL PRIMARY KEY
+);
+
 CREATE TABLE surveys
 (
   id SERIAL PRIMARY KEY,
@@ -45,11 +50,6 @@ CREATE TABLE votes
   username text NOT NULL REFERENCES users ON DELETE cascade,
   PRIMARY KEY (choice_id, username),
   score integer NOT NULL
-);
-
-CREATE TABLE categories
-(
-  title text NOT NULL PRIMARY KEY,
 );
 
 CREATE VIEW users_votes AS

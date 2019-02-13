@@ -92,6 +92,7 @@ describe('GET /surveys', () => {
         "author": "joerocket",
         "date_posted": expect.any(String),
         "description": "hot fiya",
+        "category": survey1.category,
         "title": "best albums of 2009"
       }, {
         "_id": 2,
@@ -100,6 +101,7 @@ describe('GET /surveys', () => {
         "author": "spongebob",
         "date_posted": expect.any(String),
         "description": "top ceos of all time",
+        "category": survey2.category,
         "title": "top ceos"
       }]
     );
@@ -117,6 +119,7 @@ describe('GET /surveys', () => {
         "author": "spongebob",
         "date_posted": expect.any(String),
         "description": "top ceos of all time",
+        "category": survey2.category,
         "title": "top ceos"
       }]
     );
@@ -134,6 +137,7 @@ describe('GET /surveys', () => {
         "author": "joerocket",
         "date_posted": expect.any(String),
         "description": "hot fiya",
+        "category": survey1.category,
         "title": "best albums of 2009"
       }]
     );
@@ -151,6 +155,7 @@ describe('GET /surveys', () => {
         "author": "spongebob",
         "date_posted": expect.any(String),
         "description": "top ceos of all time",
+        "category": survey2.category,
         "title": "top ceos"
       }]
     );
@@ -167,6 +172,7 @@ describe('GET /surveys/:id', () => {
       author: 'joerocket',
       title: 'best albums of 2009',
       description: 'hot fiya',
+      category: survey1.category,
       date_posted: expect.any(String),
       anonymous: true,
       questions: [{
@@ -191,7 +197,8 @@ describe('POST /surveys', () => {
       .send({
         _token: userToken,
         title: 'xxSuperCoolTestSurveyxx',
-        description: '9999ThisIsDescriptive9999'
+        description: '9999ThisIsDescriptive9999',
+        category: 'music',
       });
 
     expect(response.body).toEqual({
@@ -201,6 +208,7 @@ describe('POST /surveys', () => {
         author: testUser.username,
         title: 'xxSuperCoolTestSurveyxx',
         description: '9999ThisIsDescriptive9999',
+        category: 'music',
         date_posted: expect.any(String),
         anonymous: true
       }

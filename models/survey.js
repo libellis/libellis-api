@@ -123,7 +123,7 @@ class Survey {
         title: this.title,
         anonymous: this.anonymous,
         published: this.published,
-        cateogyr: this.category,
+        category: this.category,
       },
       'id',
       this.id

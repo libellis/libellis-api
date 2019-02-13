@@ -54,18 +54,18 @@ async function insertTestData() {
 
   let result25 = await db.query(`
     INSERT INTO categories (title)
-    VALUES (music)
+    VALUES ('music')
     RETURNING title
   `);
 
   let result26 = await db.query(`
     INSERT INTO categories (title)
-    VALUES (video)
+    VALUES ('video')
     RETURNING title
   `);
 
-  const category1 = result3.rows[0];
-  const category2 = result4.rows[0];
+  const category1 = result25.rows[0];
+  const category2 = result26.rows[0];
 
   /***************************************/
   /** Create surveys for user1 and user2 */
@@ -322,6 +322,7 @@ async function dropTables() {
   await db.query(`DROP TABLE choices`);
   await db.query(`DROP TABLE questions`);
   await db.query(`DROP TABLE surveys`);
+  await db.query(`DROP TABLE categories`);
   await db.query(`DROP TABLE users`);
 }
 

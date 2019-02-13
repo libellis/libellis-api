@@ -34,6 +34,7 @@ describe('get(id)', () => {
       published: false,
       anonymous: true,
       author: "joerocket",
+      category: survey1.category,
       date_posted: expect.any(Date),
       description: "hot fiya",
       title: "best albums of 2009",
@@ -64,6 +65,7 @@ describe('getAll()', () => {
       "author": survey1.author,
       "date_posted": expect.any(Date),
       "description": survey1.description,
+      "category": survey1.category,
       "title": survey1.title
     });
     expect(surveys[1]).toEqual({
@@ -73,6 +75,7 @@ describe('getAll()', () => {
       "author": survey2.author,
       "date_posted": expect.any(Date),
       "description": survey2.description,
+      "category": survey2.category,
       "title": survey2.title
     });
   });
@@ -88,6 +91,7 @@ describe('getAll()', () => {
       "author": survey1.author,
       "date_posted": expect.any(Date),
       "description": survey1.description,
+      "category": survey1.category,
       "title": survey1.title
     });
   });
@@ -132,7 +136,8 @@ describe('create(author, title, description)', () => {
     const newSurvey = {
       author: user1.username,
       title: "How do you like your drink mixed?",
-      description: "Shaken or Stirred. Which will it be?"
+      description: "Shaken or Stirred. Which will it be?",
+      category: "music",
     }
 
     const survey = await Survey.create(newSurvey)
@@ -143,6 +148,7 @@ describe('create(author, title, description)', () => {
       author: newSurvey.author,
       title: newSurvey.title,
       description: newSurvey.description,
+      category: newSurvey.category,
       date_posted: expect.any(Date),
       anonymous: true
     })
@@ -152,6 +158,7 @@ describe('create(author, title, description)', () => {
     const newSurvey = {
       author: user1.username,
       title: "How do you like your drink mixed?",
+      category: "music",
     }
 
     const survey = await Survey.create(newSurvey)
@@ -161,6 +168,7 @@ describe('create(author, title, description)', () => {
       published: false,
       author: newSurvey.author,
       title: newSurvey.title,
+      category: newSurvey.category,
       description: null,
       date_posted: expect.any(Date),
       anonymous: true
@@ -198,6 +206,7 @@ describe('save(id, title, description, anonymous)', async function () {
       author: survey1.author,
       title: 'New Title',
       description: 'new description',
+      category: survey1.category,
       date_posted: survey1.date_posted,
       anonymous: false
     })
@@ -218,6 +227,7 @@ describe('save(id, title, description, anonymous)', async function () {
       author: survey1.author,
       title: survey1.title,
       description: 'new description',
+      category: survey1.category,
       date_posted: survey1.date_posted,
       anonymous: survey1.anonymous
     });
@@ -239,6 +249,7 @@ describe('save(id, title, description, anonymous)', async function () {
       author: survey1.author,
       title: survey1.title,
       description: survey1.description,
+      category: survey1.category,
       date_posted: survey1.date_posted,
       anonymous: survey1.anonymous
     });
@@ -260,6 +271,7 @@ describe('save(id, title, description, anonymous)', async function () {
       author: survey1.author,
       title: survey1.title,
       description: survey1.description,
+      category: survey1.category,
       date_posted: survey1.date_posted,
       anonymous: survey1.anonymous
     });

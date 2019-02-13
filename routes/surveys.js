@@ -48,8 +48,8 @@ router.get('/:id', async function (req, res, next) {
 */
 router.post('/', ensureLoggedIn, validateInput(createSurveySchema), async function (req, res, next) {
   try {
-    let { title, description } = req.body
-    const survey = await Survey.create({author: req.username, title, description });
+    let { title, description, category } = req.body
+    const survey = await Survey.create({author: req.username, title, description, category });
     return res.json({
       survey
     });
