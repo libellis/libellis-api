@@ -10,12 +10,18 @@ CREATE TABLE users
   is_admin boolean NOT NULL default false
 );
 
+CREATE TABLE categories
+(
+  title text NOT NULL PRIMARY KEY
+);
+
 CREATE TABLE surveys
 (
   id SERIAL PRIMARY KEY,
   author text NOT NULL REFERENCES users ON DELETE cascade,
   title text NOT NULL UNIQUE,
   description text,
+  category text NOT NULL REFERENCES categories(title) ON DELETE cascade,
   anonymous boolean NOT NULL default true,
   published boolean NOT NULL default false,
   date_posted TIMESTAMP NOT NULL default CURRENT_TIMESTAMP

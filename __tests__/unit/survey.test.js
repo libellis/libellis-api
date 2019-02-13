@@ -26,12 +26,13 @@ beforeEach(async function () {
 });
 
 describe('Setters/Getters testing', () => {
-  it('should deny directly changing id', async function() {
+  it('should deny directly changing id', async function () {
     try {
       let survey = await Survey.create({
         author: user2.username,
         title: "What's your favorite kind of chocolate?",
-        description: "Dark or Milk?"
+        description: "Dark or Milk?",
+        category: "music"
       });
       survey.id = 25;
       throw new Error();
@@ -52,6 +53,7 @@ describe('get(id)', () => {
       published: false,
       anonymous: true,
       author: "joerocket",
+      category: survey1.category,
       date_posted: expect.any(Date),
       description: "hot fiya",
       title: "best albums of 2009",
@@ -84,12 +86,12 @@ describe('getAll()', () => {
     const surveys = await Survey.getAll();
 
     expect(surveys.length).toEqual(0);
-    
+
 
     let survey_result = await db.query(`
-    INSERT INTO surveys (author, title, description, published)
-    VALUES ('joerocket', 'Best Books Ever', 'J.k rowling aint got shit on this', true)
-    RETURNING id, author, title, description, anonymous, date_posted
+    INSERT INTO surveys (author, title, description, published, category)
+    VALUES ('joerocket', 'Best Books Ever', 'J.k rowling aint got shit on this', true, 'music')
+    RETURNING id, author, title, description, anonymous, date_posted, category
   `);
 
     let survey3 = survey_result.rows[0];
@@ -103,6 +105,7 @@ describe('getAll()', () => {
       "author": survey3.author,
       "date_posted": expect.any(Date),
       "description": survey3.description,
+      "category": survey3.category,
       "title": survey3.title
     });
   });
@@ -118,6 +121,7 @@ describe('getAll()', () => {
       "author": survey1.author,
       "date_posted": expect.any(Date),
       "description": survey1.description,
+      "category": survey1.category,
       "title": survey1.title
     });
   });
@@ -162,7 +166,8 @@ describe('create(author, title, description)', () => {
     const newSurvey = {
       author: user1.username,
       title: "How do you like your drink mixed?",
-      description: "Shaken or Stirred. Which will it be?"
+      description: "Shaken or Stirred. Which will it be?",
+      category: "music",
     }
 
     const survey = await Survey.create(newSurvey)
@@ -173,6 +178,7 @@ describe('create(author, title, description)', () => {
       author: newSurvey.author,
       title: newSurvey.title,
       description: newSurvey.description,
+      category: newSurvey.category,
       date_posted: expect.any(Date),
       anonymous: true
     })
@@ -182,6 +188,7 @@ describe('create(author, title, description)', () => {
     const newSurvey = {
       author: user1.username,
       title: "How do you like your drink mixed?",
+      category: "music",
     }
 
     const survey = await Survey.create(newSurvey)
@@ -191,6 +198,7 @@ describe('create(author, title, description)', () => {
       published: false,
       author: newSurvey.author,
       title: newSurvey.title,
+      category: newSurvey.category,
       description: null,
       date_posted: expect.any(Date),
       anonymous: true
@@ -228,6 +236,7 @@ describe('save(id, title, description, anonymous)', async function () {
       author: survey1.author,
       title: 'New Title',
       description: 'new description',
+      category: survey1.category,
       date_posted: survey1.date_posted,
       anonymous: false
     })
@@ -248,6 +257,7 @@ describe('save(id, title, description, anonymous)', async function () {
       author: survey1.author,
       title: survey1.title,
       description: 'new description',
+      category: survey1.category,
       date_posted: survey1.date_posted,
       anonymous: survey1.anonymous
     });
@@ -257,7 +267,7 @@ describe('save(id, title, description, anonymous)', async function () {
     let survey = await Survey.get(survey1.id);
 
     // should update all save checks to use this!
-    survey.updateFromValues({published: true});
+    survey.updateFromValues({ published: true });
 
     await survey.save();
 
@@ -269,6 +279,7 @@ describe('save(id, title, description, anonymous)', async function () {
       author: survey1.author,
       title: survey1.title,
       description: survey1.description,
+      category: survey1.category,
       date_posted: survey1.date_posted,
       anonymous: survey1.anonymous
     });
@@ -290,6 +301,7 @@ describe('save(id, title, description, anonymous)', async function () {
       author: survey1.author,
       title: survey1.title,
       description: survey1.description,
+      category: survey1.category,
       date_posted: survey1.date_posted,
       anonymous: survey1.anonymous
     });
@@ -297,15 +309,15 @@ describe('save(id, title, description, anonymous)', async function () {
 
   it('should fail to update a non-existent survey', async function () {
     let survey = new Survey({
-      id: 987, 
-      title: 'faketitle', 
+      id: 987,
+      title: 'faketitle',
       description: 'fakedescription',
       author: 'fakeauthor',
       date_posted: Date.now(),
       anonymous: true,
       published: true,
     });
-    
+
     try {
       survey.title = "nice-buns";
       await survey.save();
@@ -329,11 +341,11 @@ describe('delete(id)', () => {
     }
   });
 
-  it('should fail to delete a survey that does not exist', async function() {
+  it('should fail to delete a survey that does not exist', async function () {
     try {
       let fakeSurvey = new Survey({
-        id: 987, 
-        title: 'faketitle', 
+        id: 987,
+        title: 'faketitle',
         description: 'fakedescription',
         author: 'fakeauthor',
         date_posted: Date.now(),

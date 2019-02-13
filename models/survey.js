@@ -6,11 +6,12 @@ const {
 
 
 class Survey {
-  constructor({ id, author, title, description, date_posted, anonymous, published}) {
+  constructor({ id, author, title, description, category, date_posted, anonymous, published }) {
     this.id = id;
     this.author = author;
     this.title = title;
     this.description = description;
+    this.category = category;
     this.date_posted = date_posted
     this.anonymous = anonymous;
     this.published = published;
@@ -39,7 +40,7 @@ class Survey {
     if (id === undefined) throw new Error('Missing id parameter')
 
     let result = await db.query(
-      `SELECT id, author, title, description, date_posted, anonymous, published
+      `SELECT id, author, title, description, category, date_posted, anonymous, published
             FROM surveys
             WHERE id=$1`, [id]
     )
@@ -62,20 +63,20 @@ class Survey {
     let result;
     if (search === undefined || search === '') {
       result = await db.query(
-        `SELECT id, author, title, description, date_posted, anonymous, published
+        `SELECT id, author, title, description, category, date_posted, anonymous, published
         FROM surveys
-        WHERE published=true` 
+        WHERE published=true`
       );
     } else {
       result = await db.query(
-        `SELECT id, author, title, description, date_posted, anonymous, published
+        `SELECT id, author, title, description, category, date_posted, anonymous, published
                 FROM surveys WHERE 
                 author ILIKE $1 OR
                 title ILIKE $1 OR
-                description ILIKE $1`, [`%${search}%`] 
+                description ILIKE $1`, [`%${search}%`]
       );
     }
-    
+
     return result.rows.map(s => new Survey(s));
   }
 
@@ -89,20 +90,20 @@ class Survey {
   //   return result.rows.map(s => new Survey(s));
   // }
 
-  
+
   /**
    * createSurvey(author, title, description) <- returns created survey details
    * 
    * @param {Object}
    */
-  static async create({ author, username, title, description }) {
+  static async create({ author, username, title, description, category }) {
     if (!author || !title) throw new Error('Missing author or title parameter');
 
     let result = await db.query(
-      `INSERT INTO surveys (author, title, description)
-            VALUES ($1, $2, $3)
-            RETURNING id, author, title, description, date_posted, anonymous, published`,
-      [author, title, description]
+      `INSERT INTO surveys (author, title, description, category)
+            VALUES ($1, $2, $3, $4)
+            RETURNING id, author, title, description, category, date_posted, anonymous, published`,
+      [author, title, description, category]
     )
 
     return new Survey(result.rows[0]);
@@ -122,7 +123,8 @@ class Survey {
         description: this.description,
         title: this.title,
         anonymous: this.anonymous,
-        published: this.published
+        published: this.published,
+        category: this.category,
       },
       'id',
       this.id

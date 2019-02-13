@@ -56,12 +56,12 @@ beforeEach(async function () {
   user3 = await User.getUser('georgetheman');
   user3._token = response.body.token;
   adminUser = await User.getUser('joerocket');
-    const response2 = await request(app)
+  const response2 = await request(app)
     .post('/login')
     .send({
       username: 'joerocket',
       password: 'testpass'
-    }); 
+    });
   adminUser._token = response2.body.token;
 });
 
