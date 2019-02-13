@@ -49,18 +49,36 @@ async function insertTestData() {
     password: 'gary'
   });
 
-  /************************************* */
+  /***********************************************/
+  /** Create categories so Surveys can have them */
+
+  let result25 = await db.query(`
+    INSERT INTO categories (title)
+    VALUES (music)
+    RETURNING title
+  `);
+
+  let result26 = await db.query(`
+    INSERT INTO categories (title)
+    VALUES (video)
+    RETURNING title
+  `);
+
+  const category1 = result3.rows[0];
+  const category2 = result4.rows[0];
+
+  /***************************************/
   /** Create surveys for user1 and user2 */
 
   let result3 = await db.query(`
-    INSERT INTO surveys (author, title, description)
-    VALUES ('joerocket', 'best albums of 2009', 'hot fiya')
-    RETURNING id, author, title, description, anonymous, date_posted
+    INSERT INTO surveys (author, title, description, category)
+    VALUES ('joerocket', 'best albums of 2009', 'hot fiya', 'music')
+    RETURNING id, author, title, description, anonymous, date_posted, category
   `);
   let result4 = await db.query(`
-    INSERT INTO surveys (author, title, description)
-    VALUES ('spongebob','top ceos','top ceos of all time')
-    RETURNING id, author, title, description, anonymous, date_posted
+    INSERT INTO surveys (author, title, description, category)
+    VALUES ('spongebob','top ceos','top ceos of all time', 'video')
+    RETURNING id, author, title, description, anonymous, date_posted, category
   `);
 
   const survey1 = result3.rows[0];
