@@ -10,6 +10,7 @@ const {
 } = require('../../test_helpers/setup');
 
 let survey1,
+  survey2,
   question1,
   question2,
   user1,
@@ -41,6 +42,7 @@ beforeEach(async function () {
     question1,
     question2,
     survey1,
+    survey2,
     user1,
     choice1,
     choice2,
@@ -223,7 +225,8 @@ describe('POST /surveys', () => {
       .post('/surveys')
       .send({
         _token: userToken,
-        description: '9999ThisIsDescriptive9999'
+        description: '9999ThisIsDescriptive9999',
+        category: 'music',
       });
 
     expect(response.status).toEqual(400);
@@ -235,7 +238,8 @@ describe('POST /surveys', () => {
       .send({
         _token: userToken.concat("3s8sd3"),
         title: 'xxSuperCoolTestSurveyxx',
-        description: '9999ThisIsDescriptive9999'
+        description: '9999ThisIsDescriptive9999',
+        category: 'music',
       });
 
     expect(response.status).toEqual(401);
@@ -251,7 +255,8 @@ describe('PATCH /surveys/:id', () => {
       .send({
         _token: userToken,
         title: 'xxSuperCoolTestSurveyxx',
-        description: '9999ThisIsDescriptive9999'
+        description: '9999ThisIsDescriptive9999',
+        category: 'music',
       });
     
     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
@@ -261,6 +266,7 @@ describe('PATCH /surveys/:id', () => {
       .send({
         _token: userToken,
         title: '__muchbetter__',
+        category: 'music',
       });
 
     expect(patchResponse.status).toEqual(200);
@@ -275,7 +281,8 @@ describe('PATCH /surveys/:id', () => {
       .send({
         _token: userToken,
         title: 'xxSuperCoolTestSurveyxx',
-        description: '9999ThisIsDescriptive9999'
+        description: '9999ThisIsDescriptive9999',
+        category: 'music',
       });
     
     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
@@ -298,7 +305,8 @@ describe('PATCH /surveys/:id', () => {
       .send({
         _token: userToken,
         title: 'xxSuperCoolTestSurveyxx',
-        description: '9999ThisIsDescriptive9999'
+        description: '9999ThisIsDescriptive9999',
+        category: 'music',
       });
     
     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
@@ -324,7 +332,8 @@ describe('PATCH /surveys/:id', () => {
       .send({
         _token: userToken,
         title: 'xxSuperCoolTestSurveyxx',
-        description: '9999ThisIsDescriptive9999'
+        description: '9999ThisIsDescriptive9999',
+        category: 'music',
       });
     
     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
@@ -351,7 +360,8 @@ describe('PATCH /surveys/:id', () => {
       .send({
         _token: userToken,
         title: 'xxSuperCoolTestSurveyxx',
-        description: '9999ThisIsDescriptive9999'
+        description: '9999ThisIsDescriptive9999',
+        category: 'music',
       });
     
     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
@@ -375,7 +385,8 @@ describe('PATCH /surveys/:id', () => {
       .send({
         _token: userToken,
         title: 'xxSuperCoolTestSurveyxx',
-        description: '9999ThisIsDescriptive9999'
+        description: '9999ThisIsDescriptive9999',
+        category: 'music',
       });
     
     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
@@ -403,7 +414,8 @@ describe('DELETE /surveys/:id', () => {
       .send({
         _token: userToken,
         title: 'xxSuperCoolTestSurveyxx',
-        description: '9999ThisIsDescriptive9999'
+        description: '9999ThisIsDescriptive9999',
+        category: 'music',
       });
     
     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
@@ -411,7 +423,7 @@ describe('DELETE /surveys/:id', () => {
     const deleteResponse = await request(app)
       .delete(`/surveys/${postReponse.body.survey._id}`)
       .send({
-        _token: userToken
+        _token: userToken,
       });
     
     expect(deleteResponse.status).toEqual(200);
@@ -431,7 +443,8 @@ describe('DELETE /surveys/:id', () => {
       .send({
         _token: userToken,
         title: 'xxSuperCoolTestSurveyxx',
-        description: '9999ThisIsDescriptive9999'
+        description: '9999ThisIsDescriptive9999',
+        category: 'music',
       });
     
     expect(postReponse.body.survey.title).toEqual('xxSuperCoolTestSurveyxx');
