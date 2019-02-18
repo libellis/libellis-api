@@ -4,6 +4,7 @@ node_js:
   - node
 env:
   - CXX=g++-5
+  - PSQL_URL=postgres://postgres:@localhost/
 services:
   - postgresql
 before_script:
