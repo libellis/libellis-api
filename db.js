@@ -15,8 +15,8 @@ const pool = new Pool({
   password,
   port: 5432,
   ssl: false,
-  max: 30,
-  min: 10,
+  max: 24,
+  min: 4,
   idleTimeoutMillis: 1000,
   connectionTimeoutMillis: 2000,
 });
