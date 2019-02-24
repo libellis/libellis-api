@@ -16,6 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 const authRouter = require('./routes/auth');
 const userRouter = require('./routes/users');
 const surveyRouter = require('./routes/surveys');
+const fenceRouter = require('./routes/fences');
 const questionRouter = require('./routes/questions');
 const voteRouter = require('./routes/votes');
 // const choicesRouter = require('./routes/choices');
@@ -33,6 +34,7 @@ surveyRouter.use('/:id/votes', voteRouter);
 // add routes here
 app.use(authRouter);
 app.use('/users', userRouter);
+app.use('/fences', fenceRouter);
 app.use('/surveys', surveyRouter);
 // app.use('/choices', choicesRouter);
 
