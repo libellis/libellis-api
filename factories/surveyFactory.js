@@ -1,7 +1,7 @@
 /*
  * Create survey in database and return the new survey object
  */
-async function insertSurvey(data) {
+async function surveyFactory(data) {
   const { author, title, description, category, questions } = data;
 
   let surveyResult = await db.query(`
