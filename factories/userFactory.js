@@ -14,5 +14,4 @@ async function userFactory(data) {
 
   return user;
 }
-
-async;
+}
