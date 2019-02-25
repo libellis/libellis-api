@@ -8,12 +8,13 @@ const params = url.parse(DB_URI);
 const [user, password] = params.auth.split(':');
 const database = params.pathname.slice(1);
 const host = params.hostname;
+const port = params.port;
 
 const pool = new Pool({
   database,
   user,
   password,
-  port: 5432,
+  port,
   ssl: false,
   max: 24,
   min: 4,
