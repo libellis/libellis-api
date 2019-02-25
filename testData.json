@@ -1,0 +1,71 @@
+{
+  "users": [{
+      "username": "jenn_randgeo",
+      "password": "password",
+      "first_name": "Jennifer",
+      "last_name": "Randgeo",
+      "email": "genrandgeo@rand.com",
+      "is_admin": "true"
+    },
+    {
+      "username": "spongebob",
+      "password": "gary",
+      "first_name": "SpongeBob",
+      "last_name": "SquarePants",
+      "email": "sponge@gmail.com"
+    }
+  ],
+  "surveys": [{
+    "id": 11,
+    "title": "Best Dance Music 2019",
+    "description": "Hottest dance hits from 2019 survey",
+    "anonymous": true,
+    "author": "Michael Jackson",
+    "questions": [{
+        "id": 22,
+        "title": "Best House Music of the Year",
+        "question_type": "ranked",
+        "choices": [{
+            "id": 33,
+            "title": "Martin Garrix",
+            "choice_type": "text"
+          },
+          {
+            "id": 34,
+            "title": "Duke Dumont",
+            "choice_type": "text"
+          },
+          {
+            "id": 35,
+            "title": "Disclosure",
+            "choice_type": "text"
+          }
+        ]
+
+      },
+      {
+        "id": 23,
+        "title": "Best Bass Music of the Year",
+        "question_type": "ranked",
+        "survey_id": 44,
+        "choices": [{
+            "id": 36,
+            "title": "Martin Garrix",
+            "choice_type": "text"
+          },
+          {
+            "id": 37,
+            "title": "Duke Dumont",
+            "choice_type": "text"
+          },
+          {
+            "id": 38,
+            "title": "Disclosure",
+            "choice_type": "text"
+          }
+        ]
+      }
+    ],
+    "votes": []
+  }]
+}
