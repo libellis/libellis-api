@@ -96,7 +96,10 @@ describe('getUser()', () => {
 describe('getSurveys()', () => {
   it('should return a list of surveys authored by a user', async function () {
     const user = userFactory(userData[0]);
-    const survey = surveyFactory(surveyData[0]);
+
+    /** need to insert categories before a survey can be inserted */
+
+    // const survey = surveyFactory(surveyData[0]);
 
     // const surveys = await User.getSurveys(user.username);
     // expect(surveys).toEqual([
