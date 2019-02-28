@@ -3,7 +3,7 @@ const User = require('../../models/user');
 const db = require('../../db');
 const {
   createTables,
-  insertTestData,
+  clearTables,
   dropTables
 } = require('../../test_helpers/setup');
 
@@ -11,8 +11,7 @@ const userFactory = require("../../factories/userFactory");
 const surveyFactory = require("../../factories/surveyFactory");
 const { userData, surveyData } = require("../../test_helpers/sample");
 
-beforeEach(async function () {
-  // Build up our test tables and return inserted test questions, surveys and users
+beforeAll(async function () {
   await createTables();
 });
 
@@ -220,12 +219,13 @@ describe('getSurveys()', () => {
 //   });
 // });
 
-// Delete all tables after each tets
+// Clear rows from tables
 afterEach(async function () {
-  await dropTables();
+  await clearTables();
 });
 
-// Close db connection
+// Drop tables and close db connection
 afterAll(async function () {
+  await dropTables();
   await db.end();
 });
