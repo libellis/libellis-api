@@ -8,24 +8,8 @@ const {
 } = require('../../test_helpers/setup');
 
 const userFactory = require("../../factories/userFactory");
-
-
-const userData = [
-  {
-    username: "hackerman",
-    password: "password",
-    first_name: "Hacker",
-    last_name: "Mann",
-    email: "hacker@haxs.com"
-  },
-  {
-    username: "jen_rand_geo",
-    password: "password",
-    first_name: "Jennifer",
-    last_name: "Rangeo",
-    email: "jrand@random.com"
-  }
-]
+const surveyFactory = require("../../factories/surveyFactory");
+const { userData, surveyData } = require("../../test_helpers/sample");
 
 let survey1, survey2, question1, question2, user1, user2;
 // Insert 2 users before each test
@@ -69,50 +53,50 @@ describe('getUsers()', () => {
   });
 });
 
-// Test creating user
-describe('createUser()', () => {
-  it('should correctly add a user', async function () {
-    const newUser = await User.createUser({
-      username: 'bobcat',
-      password: 'bob',
-      first_name: 'bob',
-      last_name: 'johnson',
-      email: 'bob@gmail.com'
-    });
-    expect(newUser).toHaveProperty('is_admin', false);
-    expect(newUser).toHaveProperty(
-      'photo_url',
-      'https://moonvillageassociation.org/wp-content/uploads/2018/06/default-profile-picture1.jpg'
-    );
-    // Make sure password got hashed
-    const result = await db.query(
-      `SELECT password FROM users WHERE username = $1`,
-      [newUser.username]
-    );
-    expect(result.rows[0].password === 'bob').toBe(false);
-    const users = await User.getUsers();
-    expect(users.length).toEqual(1);
-  });
-});
+// // Test creating user
+// describe('createUser()', () => {
+//   it('should correctly add a user', async function () {
+//     const newUser = await User.createUser({
+//       username: 'bobcat',
+//       password: 'bob',
+//       first_name: 'bob',
+//       last_name: 'johnson',
+//       email: 'bob@gmail.com'
+//     });
+//     expect(newUser).toHaveProperty('is_admin', false);
+//     expect(newUser).toHaveProperty(
+//       'photo_url',
+//       'https://moonvillageassociation.org/wp-content/uploads/2018/06/default-profile-picture1.jpg'
+//     );
+//     // Make sure password got hashed
+//     const result = await db.query(
+//       `SELECT password FROM users WHERE username = $1`,
+//       [newUser.username]
+//     );
+//     expect(result.rows[0].password === 'bob').toBe(false);
+//     const users = await User.getUsers();
+//     expect(users.length).toEqual(1);
+//   });
+// });
 
-// Test get one user
-describe('getUser()', () => {
-  it('should correctly return a user by username', async function () {
-    const user1 = await userFactory(userData[0]);
+// // Test get one user
+// describe('getUser()', () => {
+//   it('should correctly return a user by username', async function () {
+//     const user1 = await userFactory(userData[0]);
 
-    const user = await User.getUser(user1._username);
-    expect(user._username).toEqual(user1._username);
-    expect(user.email).toEqual(user1.email);
+//     const user = await User.getUser(user1._username);
+//     expect(user._username).toEqual(user1._username);
+//     expect(user.email).toEqual(user1.email);
 
-    // Get a user that doesn't exist and check failure
-    try {
-      await User.getUser('nouser');
-      throw new Error();
-    } catch (e) {
-      expect(e.message).toMatch(`Cannot find user by username: nouser`);
-    }
-  });
-});
+//     // Get a user that doesn't exist and check failure
+//     try {
+//       await User.getUser('nouser');
+//       throw new Error();
+//     } catch (e) {
+//       expect(e.message).toMatch(`Cannot find user by username: nouser`);
+//     }
+//   });
+// });
 
 // /** Get Surveys authored by user */
 // describe('getSurveys()', () => {

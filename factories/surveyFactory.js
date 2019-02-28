@@ -39,7 +39,9 @@ async function insertQuestion(survey_id, data) {
   );
 
   const question = questionResult.rows[0];
-  question.chocies = question.choices.map(c => await insertChoice(c));
+  question.chocies = question.choices.map(c => {
+    return await insertChoice(c)
+  });
   return question
 }
 
