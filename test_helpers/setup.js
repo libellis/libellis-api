@@ -328,6 +328,15 @@ async function insertTestData() {
   };
 }
 
+async function clearTables() {
+  await db.query(`DELETE FROM votes`);
+  await db.query(`DELETE FROM choices`);
+  await db.query(`DELETE FROM questions`);
+  await db.query(`DELETE FROM surveys`);
+  await db.query(`DELETE FROM categories`);
+  await db.query(`DELETE FROM users`);
+}
+
 async function dropTables() {
   await db.query(`DROP VIEW users_votes`);
   await db.query(`DROP TABLE votes`);
@@ -340,6 +349,7 @@ async function dropTables() {
 
 module.exports = {
   createTables,
+  clearTables,
   insertTestData,
   dropTables
 };
