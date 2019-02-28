@@ -1,3 +1,5 @@
+const User = require('../models/user');
+
 async function userFactory(data) {
   const { username, password, first_name, last_name, email, is_admin } = data;
 
@@ -14,4 +16,5 @@ async function userFactory(data) {
 
   return user;
 }
-}
+
+module.exports = userFactory;
