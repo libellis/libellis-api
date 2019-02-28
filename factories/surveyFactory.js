@@ -39,9 +39,7 @@ async function insertQuestion(survey_id, data) {
   );
 
   const question = questionResult.rows[0];
-  question.chocies = question.choices.map(c => {
-    return await insertChoice(c)
-  });
+  question.chocies = question.choices.map(async c => await insertChoice(c));
   return question
 }
 
@@ -59,7 +57,7 @@ async function insertSurvey(data) {
 
   const survey = result3.rows[0];
 
-  survey.questions = survey.questions.map(q => await insertQuestion(survey._id));
+  survey.questions = survey.questions.map(async q => await insertQuestion(survey._id));
 
   return survey;
 }
