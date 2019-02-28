@@ -2,18 +2,13 @@
  * Create survey in database and return the new survey object
  */
 async function surveyFactory(data) {
-  const { author, title, description, category, questions } = data;
-
-  let surveyResult = await db.query(`
-    INSERT INTO surveys (author, title, description, category)
-    VALUES ('${author}', '${title}', '${description}', '${category1}')
-    RETURNING id, author, title, description, anonymous, date_posted, category
-  `);
-
-  const survey = result3.rows[0];
+  const survey = await insertSurvey(data);
   return survey;
 }
 
+/**
+ * Insert a choice for a given question id and JSON data
+ */
 async function insertChoice(qid, data) {
   const { content, title, ctype } = data;
   let choiceResult = await db.query(
@@ -24,6 +19,8 @@ async function insertChoice(qid, data) {
     `,
     [qid, content, title, ctype]
   );
+  const choice = choiceResult.rows[0];
+  return choice;
 }
 
 /**
@@ -40,6 +37,10 @@ async function insertQuestion(survey_id, data) {
   `,
     [title, qtype, survey1.id]
   );
+
+  const question = questionResult.rows[0];
+  question.chocies = question.choices.map(c => await insertChoice(c));
+  return question
 }
 
 /*
@@ -55,5 +56,10 @@ async function insertSurvey(data) {
   `);
 
   const survey = result3.rows[0];
+
+  survey.questions = survey.questions.map(q => await insertQuestion(survey._id));
+
   return survey;
 }
+
+module.exports = surveyFactory;
