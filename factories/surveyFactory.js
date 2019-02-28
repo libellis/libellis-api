@@ -1,3 +1,5 @@
+const db = require('../db');
+
 /*
  * Create survey in database and return the new survey object
  */
@@ -51,9 +53,9 @@ async function insertSurvey(data) {
 
   let surveyResult = await db.query(`
     INSERT INTO surveys (author, title, description, category)
-    VALUES ('${author}', '${title}', '${description}', '${category1}')
+    VALUES ($1, $2, $3, $4)
     RETURNING id, author, title, description, anonymous, date_posted, category
-  `);
+  `, [author, title, description, category]);
 
   const survey = result3.rows[0];
 

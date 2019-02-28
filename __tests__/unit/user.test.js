@@ -92,23 +92,26 @@ describe('getUser()', () => {
   });
 });
 
-// /** Get Surveys authored by user */
-// describe('getSurveys()', () => {
-//   it('should return a list of surveys authored by a user', async function() {
-//     const surveys = await User.getSurveys(user1.username);
-//     expect(surveys).toEqual([
-//       {
-//         _id: 1,
-//         anonymous: true,
-//         author: 'joerocket',
-//         date_posted: expect.any(Date),
-//         description: 'hot fiya',
-//         published: false,
-//         title: 'best albums of 2009'
-//       }
-//     ]);
-//   });
-// });
+/** Get Surveys authored by user */
+describe('getSurveys()', () => {
+  it('should return a list of surveys authored by a user', async function () {
+    const user = userFactory(userData[0]);
+    const survey = surveyFactory(surveyData[0]);
+
+    // const surveys = await User.getSurveys(user.username);
+    // expect(surveys).toEqual([
+    //   {
+    //     _id: 1,
+    //     anonymous: true,
+    //     author: 'joerocket',
+    //     date_posted: expect.any(Date),
+    //     description: 'hot fiya',
+    //     published: false,
+    //     title: 'best albums of 2009'
+    //   }
+    // ]);
+  });
+});
 
 // /** Get Surveys taken by user */
 // describe('getHistory()', () => {
