@@ -9,6 +9,7 @@ const {
 
 const userFactory = require("../../factories/userFactory");
 const surveyFactory = require("../../factories/surveyFactory");
+const categoryFactory = require("../../factories/categoryFactory");
 const { userData, surveyData } = require("../../test_helpers/sample");
 
 beforeAll(async function () {
@@ -94,24 +95,31 @@ describe('getUser()', () => {
 /** Get Surveys authored by user */
 describe('getSurveys()', () => {
   it('should return a list of surveys authored by a user', async function () {
-    const user = userFactory(userData[0]);
+    const user = await userFactory(userData[0]);
 
-    /** need to insert categories before a survey can be inserted */
+    const category1 = await categoryFactory(surveyData[0]);
+    const survey1 = await surveyFactory(surveyData[0]);
+    console.log("Survey 1", survey1);
 
-    // const survey = surveyFactory(surveyData[0]);
+    const category2 = await categoryFactory(surveyData[1]);
+    const survey2 = await surveyFactory(surveyData[1]);
+    console.log("Survey 2", survey2);
 
-    // const surveys = await User.getSurveys(user.username);
-    // expect(surveys).toEqual([
-    //   {
-    //     _id: 1,
-    //     anonymous: true,
-    //     author: 'joerocket',
-    //     date_posted: expect.any(Date),
-    //     description: 'hot fiya',
-    //     published: false,
-    //     title: 'best albums of 2009'
-    //   }
-    // ]);
+    expect(survey1.id).toEqual(expect.any(Number));
+    expect(survey1.author).toEqual(userData[0].username);
+    expect(survey1.title).toEqual(surveyData[0].title);
+    expect(survey1.description).toEqual(surveyData[0].description);
+    expect(survey1.category).toEqual(surveyData[0].category)
+    expect(survey1.date_posted).toEqual(expect.any(Date))
+    expect(survey1.anonymous).toEqual(true)
+
+    expect(survey2.id).toEqual(expect.any(Number));
+    expect(survey2.author).toEqual(userData[0].username);
+    expect(survey2.title).toEqual(surveyData[1].title);
+    expect(survey2.description).toBeNull();
+    expect(survey2.category).toEqual(surveyData[1].category)
+    expect(survey2.date_posted).toEqual(expect.any(Date))
+    expect(survey2.anonymous).toEqual(true)
   });
 });
 

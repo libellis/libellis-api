@@ -1,5 +1,7 @@
 const db = require('../db');
 const Survey = require('../models/survey');
+const Question = require('../models/question');
+const Choice = require('../models/choice');
 
 /*
  * Create survey in database and return the new survey object
@@ -12,37 +14,27 @@ async function surveyFactory(data) {
 /**
  * Insert a choice for a given question id and JSON data
  */
-async function insertChoice(qid, data) {
-  const { content, title, ctype } = data;
-  let choiceResult = await db.query(
-    `
-    INSERT INTO choices (question_id, content, title, content_type)
-    VALUES ($1, $2, $3, $4)
-    RETURNING id, question_id, content, title, content_type
-    `,
-    [qid, content, title, ctype]
-  );
-  const choice = choiceResult.rows[0];
+async function insertChoice(data) {
+  const { question_id, content, title, content_type } = data;
+  const choice = await Choice.create(data)
   return choice;
 }
 
 /**
  * Insert a question for a given survey id and JSON data
  */
-async function insertQuestion(survey_id, data) {
-  const { title, qtype } = data;
+async function insertQuestion(data) {
+  const question = await Question.create(data);
 
-  let questionResult = await db.query(
-    `
-    INSERT INTO questions (title, question_type, survey_id)
-    VALUES ($1, $2, $3)
-    RETURNING id, title, question_type, survey_id
-  `,
-    [title, qtype, survey1.id]
-  );
+  // question.choices = await data.choices.map(async c => 
+  //   await insertChoice({ question_id: question.id, ...c })
+  // );
 
-  const question = questionResult.rows[0];
-  question.chocies = question.choices.map(async c => await insertChoice(c));
+  /** 
+   * Foreign key constraint error that must be investigated,
+   * return empty array for now
+   */
+  question.choices = []
   return question
 }
 
@@ -52,17 +44,10 @@ async function insertQuestion(survey_id, data) {
 async function insertSurvey(data) {
   const { author, title, description, category, questions } = data;
 
-  let survey = await Survey.create(data)
-  // let surveyResult = await db.query(`
-  //   INSERT INTO surveys (author, title, description, category)
-  //   VALUES ($1, $2, $3, $4)
-  //   RETURNING id, author, title, description, anonymous, date_posted, category
-  // `, [author, title, description, category]);
-
-  // const survey = surveyResult.rows[0];
-  console.log(survey);
-
-  // survey.questions = survey.questions.map(async q => await insertQuestion(survey._id));
+  const survey = await Survey.create(data)
+  survey.questions = await questions.map(async q =>
+    await insertQuestion({ survey_id: survey._id, ...q })
+  );
 
   return survey;
 }
