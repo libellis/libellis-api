@@ -1,4 +1,5 @@
 const db = require('../db');
+const Survey = require('../models/survey');
 
 /*
  * Create survey in database and return the new survey object
@@ -51,15 +52,17 @@ async function insertQuestion(survey_id, data) {
 async function insertSurvey(data) {
   const { author, title, description, category, questions } = data;
 
-  let surveyResult = await db.query(`
-    INSERT INTO surveys (author, title, description, category)
-    VALUES ($1, $2, $3, $4)
-    RETURNING id, author, title, description, anonymous, date_posted, category
-  `, [author, title, description, category]);
+  let survey = await Survey.create(data)
+  // let surveyResult = await db.query(`
+  //   INSERT INTO surveys (author, title, description, category)
+  //   VALUES ($1, $2, $3, $4)
+  //   RETURNING id, author, title, description, anonymous, date_posted, category
+  // `, [author, title, description, category]);
 
-  const survey = result3.rows[0];
+  // const survey = surveyResult.rows[0];
+  console.log(survey);
 
-  survey.questions = survey.questions.map(async q => await insertQuestion(survey._id));
+  // survey.questions = survey.questions.map(async q => await insertQuestion(survey._id));
 
   return survey;
 }
