@@ -26,65 +26,65 @@ const surveyData = [
     "questions": [
       {
         "title": "Rank your favorite programming languages",
-        "qtype": "ranked",
+        "question_type": "ranked",
         "choices": [
           {
             "title": "Javascript",
-            "ctype": "text"
+            "content_type": "text"
           },
           {
             "title": "Python",
-            "ctype": "text"
+            "content_type": "text"
           },
           {
             "title": "C++",
-            "ctype": "text"
+            "content_type": "text"
           },
           {
             "title": "Rust",
-            "ctype": "text"
+            "content_type": "text"
           },
           {
             "title": "Ruby",
-            "ctype": "text"
+            "content_type": "text"
           },
           {
             "title": "Go",
-            "ctype": "text"
+            "content_type": "text"
           },
           {
             "title": "Java",
-            "ctype": "text"
+            "content_type": "text"
           }
         ]
       },
       {
         "title": "What is the DBMS do you use the most?",
-        "qtype": "multiple",
+        "question_type": "multiple",
         "choices": [
           {
             "title": "MongoDB",
-            "ctype": "text"
+            "content_type": "text"
           },
           {
             "title": "MySQL",
-            "ctype": "text"
+            "content_type": "text"
           },
           {
             "title": "PostgreSQL",
-            "ctype": "text"
+            "content_type": "text"
           },
           {
             "title": "CouchDB",
-            "ctype": "text"
+            "content_type": "text"
           },
           {
             "title": "Oracle",
-            "ctype": "text"
+            "content_type": "text"
           },
           {
             "title": "Cassandra",
-            "ctype": "text"
+            "content_type": "text"
           }
         ]
       }
@@ -97,19 +97,19 @@ const surveyData = [
     "questions": [
       {
         "title": "What is your favorite flavor of ice cream?",
-        "qtype": "ranked",
+        "question_type": "ranked",
         "choices": [
           {
             "title": "Chocolate",
-            "ctype": "text"
+            "content_type": "text"
           },
           {
             "title": "Vanilla",
-            "ctype": "text"
+            "content_type": "text"
           },
           {
             "title": "Strawberry",
-            "ctype": "text"
+            "content_type": "text"
           }
         ]
       }
