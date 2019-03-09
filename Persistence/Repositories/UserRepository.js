@@ -67,110 +67,35 @@ class UserRepository /* extends Model */ {
     return new User(result.rows[0]);
   }
 
-  // Authenticate user - returns JWT
-  // async authenticate(, { username, password }) {
-  //   const result = await db.query(`
-  //     SELECT password, is_admin FROM users WHERE username=$1
-  //   `, [username]
-  //   );
-  //   const user = result.rows[0];
-  //   if (user) {
-  //     if (bcrypt.compareSync(password, user.password)) {
-  //       const token = jwt.sign({ username, is_admin: user.is_admin }, SECRET);
-  //       return token;
-  //     }
-  //   }
-  //   throw new Error('Invalid username/password')
-  // }
+  updateFromValues(vals) {
+    classPartialUpdate(this, vals);
+  }
 
-  // /** get Surveys created by given user */
-  // async getSurveys(, { username }) {
-  //   let result = await db.query(
-  //     `SELECT id, author, title, description, date_posted, anonymous, published
-  //     FROM surveys WHERE author=$1`, [username]
-  //   );
+  //Update a user instance
+  async save(userEntity) {
+    const { query, values } = sqlForPartialUpdate(
+      'users',
+      {
+        username: this.username,
+        first_name: this.first_name,
+        last_name: this.last_name,
+        email: this.email,
+        photo_url: this.photo_url
+      },
+      'username',
+      this.username
+    );
 
-  //   if (result.rows.length === 0) return [];
+    this.commands.push([query, values]);
+  }
 
-  //   return result.rows.map(s => new Survey({ ...s, db }));
-  // }
-
-  // /** get Surveys user has voted on */
-  // async getHistory(, { username }) {
-  //   let result = await db.query(
-  //     `SELECT 
-  //       survey_id, 
-  //       s.author AS author,
-  //       s.title AS title,
-  //       s.description AS description,
-  //       s.date_posted AS date_posted,
-  //       s.anonymous AS anonymous,
-  //       s.published AS published
-  //     FROM users_votes
-  //     JOIN surveys AS s 
-  //     ON users_votes.survey_id = s.id
-  //     WHERE s.author = $1
-  //     GROUP BY 
-  //       survey_id,
-  //       s.author, 
-  //       s.title, 
-  //       s.description, 
-  //       s.anonymous, 
-  //       s.published,
-  //       s.date_posted;`,
-  //     [username]
-  //   );
-
-  //   if (result.rows.length === 0) return [];
-
-  //   return result.rows;
-  // }
-
-  // updateFromValues(vals) {
-  //   classPartialUpdate(this, vals);
-  // }
-
-  // //Update a user instance
-  // async save() {
-  //   const { query, values } = sqlForPartialUpdate(
-  //     'users',
-  //     {
-  //       username: this.username,
-  //       first_name: this.first_name,
-  //       last_name: this.last_name,
-  //       email: this.email,
-  //       photo_url: this.photo_url
-  //     },
-  //     'username',
-  //     this.username
-  //   );
-  //   const result = await this.db.query(query, values);
-
-  //   if (result.rows.length === 0) {
-  //     const err = new Error('Cannot find user to update');
-  //     err.status = 400;
-  //     throw err;
-  //   }
-  // }
-
-  // //Delete user and return a message
-  // async delete() {
-  //   const result = await this.db.query(
-  //     `
-  //   DELETE FROM users 
-  //   WHERE username=$1
-  //   RETURNING username`,
-  //     [this.username]
-  //   );
-
-  //   if (result.rows.length === 0) {
-  //     let err = new Error(`Could not find user to delete`)
-  //     err.status = 400;
-  //     throw err;
-  //   }
-
-  //   return 'User Deleted';
-  // }
+  //Delete user and return a message
+  async remove(userEntity) {
+    this.commands.push([
+      `DELETE FROM users WHERE username=$1 RETURNING username`,
+      [userEntity.username]
+    ]);
+  }
 }
 
 module.exports = User;
