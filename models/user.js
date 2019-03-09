@@ -33,7 +33,7 @@ class User /* extends Model */ {
   }
 
   /** get User details - returns shallow user data */
-  static async get(username) {
+  static async get({ db }, { username }) {
     let result = await db.query(
       `
     SELECT username, first_name, last_name, email, photo_url
@@ -48,7 +48,7 @@ class User /* extends Model */ {
       throw err;
     }
 
-    return new User(result.rows[0]);
+    return new User({ ...result.rows[0], db });
   }
 
   // Get all users
@@ -62,7 +62,7 @@ class User /* extends Model */ {
   }
 
   //Create a new user and return an instance
-  static async create({
+  static async create({ db }, {
     username,
     password,
     first_name,
@@ -90,7 +90,7 @@ class User /* extends Model */ {
         ]
       );
 
-      return new User(result.rows[0]);
+      return new User({ ...result.rows[0], db });
     } catch (err) {
       let error = new Error(`Username "${username}" already exists`);
       error.status = 400;
@@ -99,7 +99,7 @@ class User /* extends Model */ {
   }
 
   // Authenticate user - returns JWT
-  static async authenticate({ username, password }) {
+  static async authenticate({ db }, { username, password }) {
     const result = await db.query(`
       SELECT password, is_admin FROM users WHERE username=$1
     `, [username]
@@ -115,7 +115,7 @@ class User /* extends Model */ {
   }
 
   /** get Surveys created by given user */
-  static async getSurveys(username) {
+  static async getSurveys({ db }, { username }) {
     let result = await db.query(
       `SELECT id, author, title, description, date_posted, anonymous, published
       FROM surveys WHERE author=$1`, [username]
@@ -123,11 +123,11 @@ class User /* extends Model */ {
 
     if (result.rows.length === 0) return [];
 
-    return result.rows.map(s => new Survey(s));
+    return result.rows.map(s => new Survey({ ...s, db }));
   }
 
   /** get Surveys user has voted on */
-  static async getHistory(username) {
+  static async getHistory({ db }, { username }) {
     let result = await db.query(
       `SELECT 
         survey_id, 
@@ -175,7 +175,7 @@ class User /* extends Model */ {
       'username',
       this.username
     );
-    const result = await db.query(query, values);
+    const result = await this.db.query(query, values);
 
     if (result.rows.length === 0) {
       const err = new Error('Cannot find user to update');
@@ -186,7 +186,7 @@ class User /* extends Model */ {
 
   //Delete user and return a message
   async delete() {
-    const result = await db.query(
+    const result = await this.db.query(
       `
     DELETE FROM users 
     WHERE username=$1

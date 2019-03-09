@@ -1,4 +1,5 @@
-const db = require('../db');
+const deps = require('../dep_container/IoC');
+const { db } = deps;
 var fs = require('fs');
 
 const User = require('../models/user');
@@ -22,7 +23,7 @@ async function insertTestData() {
   // `);
 
 
-  const user1 = await User.create({
+  const user1 = await User.create(deps, {
     username: 'joerocket',
     password: 'testpass',
     first_name: 'joe',
@@ -31,12 +32,12 @@ async function insertTestData() {
     is_admin: true
   });
 
-  user1._token = await User.authenticate({
+  user1._token = await User.authenticate(deps, {
     username: user1.username,
     password: 'testpass'
   });
 
-  const user2 = await User.create({
+  const user2 = await User.create(deps, {
     username: 'spongebob',
     password: 'gary',
     first_name: 'SpongeBob',
@@ -44,7 +45,7 @@ async function insertTestData() {
     email: 'sponge@gmail.com'
   });
 
-  user2._token = await User.authenticate({
+  user2._token = await User.authenticate(deps, {
     username: user2.username,
     password: 'gary'
   });
