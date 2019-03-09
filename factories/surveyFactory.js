@@ -24,17 +24,15 @@ async function insertChoice(data) {
  * Insert a question for a given survey id and JSON data
  */
 async function insertQuestion(data) {
+  const { choices } = data;
   const question = await Question.create(data);
 
-  // question.choices = await data.choices.map(async c => 
-  //   await insertChoice({ question_id: question.id, ...c })
-  // );
+  question.choices = [];
+  for (let choice of choices) {
+    let result = await insertQuestion({ question_id: question._id, ...choice });
+    question.choices.push(result);
+  }
 
-  /** 
-   * Foreign key constraint error that must be investigated,
-   * return empty array for now
-   */
-  question.choices = []
   return question
 }
 
@@ -45,10 +43,15 @@ async function insertSurvey(data) {
   const { author, title, description, category, questions } = data;
 
   const survey = await Survey.create(data)
-  survey.questions = await questions.map(async q =>
-    await insertQuestion({ survey_id: survey._id, ...q })
-  );
+  survey.questions = [];
+  for (const q of questions) {
+    const result = await insertQuestion({ survey_id: survey._id, ...q });
+    survey.questions.push(result);
+  }
 
+  // survey.questions = await questions.map(async q =>
+  //   await insertQuestion({ survey_id: survey._id, ...q })
+  // );
   return survey;
 }
 
