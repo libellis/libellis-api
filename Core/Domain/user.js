@@ -1,6 +1,9 @@
+const { BWF, SECRET, DEFAULT_PHOTO } = require('../config');
+
 class User /* extends Model */ {
-  constructor(username, first_name, last_name, email, photo_url, is_admin, db) {
+  constructor(username, password, first_name, last_name, email, photo_url, is_admin, db) {
     this.username = username;
+    this.password = password
     this.first_name = first_name;
     this.last_name = last_name;
     this.email = email;
@@ -18,6 +21,16 @@ class User /* extends Model */ {
 
   get username() {
     return this._username;
+  }
+
+  set password(val) {
+    const salt = bcrypt.genSaltSync(BWF);
+    const hash = bcrypt.hashSync(password, salt),
+    this._password = hash;
+  }
+
+  get password() {
+    return this._password;
   }
 }
 
