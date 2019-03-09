@@ -1,4 +1,3 @@
-const db = require('../db');
 const {
   sqlForPartialUpdate,
   classPartialUpdate
@@ -10,13 +9,14 @@ const Survey = require('../models/survey');
 
 
 class User /* extends Model */ {
-  constructor({ username, first_name, last_name, email, photo_url, is_admin }) {
+  constructor({ username, first_name, last_name, email, photo_url, is_admin, db }) {
     this.username = username;
     this.first_name = first_name;
     this.last_name = last_name;
     this.email = email;
     this.photo_url = photo_url;
     this.is_admin = is_admin;
+    this.db = db;
   }
 
   // make setter/getter that makes it so you can't change primary key
@@ -32,20 +32,37 @@ class User /* extends Model */ {
     return this._username;
   }
 
-  //Get a filtered list of users and return array of instances
-  static async getUsers() {
-    //If search is undefined then search will be %%
+  /** get User details - returns shallow user data */
+  static async get(username) {
     let result = await db.query(
       `
+    SELECT username, first_name, last_name, email, photo_url
+    FROM users 
+    WHERE username = $1`,
+      [username]
+    );
+
+    if (result.rows.length === 0) {
+      const err = new Error(`Cannot find user by username: ${username}`);
+      err.status = 400;
+      throw err;
+    }
+
+    return new User(result.rows[0]);
+  }
+
+  // Get all users
+  static async getAll({ db }) {
+    let result = await db.query(`
     SELECT username, first_name, last_name, email
     FROM users`
     );
 
-    return result.rows.map(user => new User(user));
+    return result.rows.map(user => new User({ ...user, db }));
   }
 
   //Create a new user and return an instance
-  static async createUser({
+  static async create({
     username,
     password,
     first_name,
@@ -73,7 +90,7 @@ class User /* extends Model */ {
         ]
       );
 
-      return new User(result.rows[0]);  
+      return new User(result.rows[0]);
     } catch (err) {
       let error = new Error(`Username "${username}" already exists`);
       error.status = 400;
@@ -95,25 +112,6 @@ class User /* extends Model */ {
       }
     }
     throw new Error('Invalid username/password')
-  }
-
-  /** get User details - returns shallow user data */
-  static async getUser(username) {
-    let result = await db.query(
-      `
-    SELECT username, first_name, last_name, email, photo_url
-    FROM users 
-    WHERE username = $1`,
-      [username]
-    );
-
-    if (result.rows.length === 0) {
-      const err = new Error(`Cannot find user by username: ${username}`);
-      err.status = 400;
-      throw err;
-    }
-
-    return new User(result.rows[0]);
   }
 
   /** get Surveys created by given user */
@@ -150,10 +148,10 @@ class User /* extends Model */ {
         s.description, 
         s.anonymous, 
         s.published,
-        s.date_posted;`, 
+        s.date_posted;`,
       [username]
     );
-    
+
     if (result.rows.length === 0) return [];
 
     return result.rows;
@@ -187,7 +185,7 @@ class User /* extends Model */ {
   }
 
   //Delete user and return a message
-  async deleteUser() {
+  async delete() {
     const result = await db.query(
       `
     DELETE FROM users 

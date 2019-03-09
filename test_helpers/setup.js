@@ -11,18 +11,18 @@ async function createTables() {
 
 async function insertTestData() {
   // let result1 = await db.query(`
-    // INSERT INTO users (username, password, first_name, last_name, email, is_admin)
-    // VALUES ('joerocket', 'testpass', 'joe', 'smith', 'joe@gmail.com', True)
-    // RETURNING username, first_name, last_name, email, photo_url, is_admin
+  // INSERT INTO users (username, password, first_name, last_name, email, is_admin)
+  // VALUES ('joerocket', 'testpass', 'joe', 'smith', 'joe@gmail.com', True)
+  // RETURNING username, first_name, last_name, email, photo_url, is_admin
   // `);
   // let result2 = await db.query(`
-    // INSERT INTO users (username, password, first_name, last_name, email, is_admin)
-    // VALUES ('spongebob', 'garry', 'SpongeBob', 'SquarePants', 'sponge@gmail.com', False)
-    // RETURNING username, first_name, last_name, email, photo_url, is_admin
+  // INSERT INTO users (username, password, first_name, last_name, email, is_admin)
+  // VALUES ('spongebob', 'garry', 'SpongeBob', 'SquarePants', 'sponge@gmail.com', False)
+  // RETURNING username, first_name, last_name, email, photo_url, is_admin
   // `);
 
 
-  const user1 = await User.createUser({
+  const user1 = await User.create({
     username: 'joerocket',
     password: 'testpass',
     first_name: 'joe',
@@ -30,13 +30,13 @@ async function insertTestData() {
     email: 'joe@gmail.com',
     is_admin: true
   });
-  
+
   user1._token = await User.authenticate({
     username: user1.username,
     password: 'testpass'
   });
 
-  const user2 = await User.createUser({
+  const user2 = await User.create({
     username: 'spongebob',
     password: 'gary',
     first_name: 'SpongeBob',

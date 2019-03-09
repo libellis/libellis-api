@@ -23,31 +23,31 @@ beforeEach(async function () {
 });
 
 // Test get filtered users
-describe('getUsers()', () => {
+describe('getAll()', () => {
   it('should correctly return a list of users', async function () {
-    const users = await User.getUsers();
+    const users = await User.getAll();
 
     // Check that returned structure matches this exactly
     expect(users).toEqual([{
-        _username: user1.username,
-        first_name: user1.first_name,
-        last_name: user1.last_name,
-        email: user1.email
-      },
-      {
-        _username: user2.username,
-        first_name: user2.first_name,
-        last_name: user2.last_name,
-        email: user2.email
-      }
+      _username: user1.username,
+      first_name: user1.first_name,
+      last_name: user1.last_name,
+      email: user1.email
+    },
+    {
+      _username: user2.username,
+      first_name: user2.first_name,
+      last_name: user2.last_name,
+      email: user2.email
+    }
     ]);
   });
 });
 
 // Test creating user
-describe('createUser()', () => {
+describe('create()', () => {
   it('should correctly add a user', async function () {
-    const newUser = await User.createUser({
+    const newUser = await User.create({
       username: 'bobcat',
       password: 'bob',
       first_name: 'bob',
@@ -65,21 +65,21 @@ describe('createUser()', () => {
       [newUser.username]
     );
     expect(result.rows[0].password === 'bob').toBe(false);
-    const users = await User.getUsers();
+    const users = await User.getAll();
     expect(users.length).toEqual(3);
   });
 });
 
 // Test get one user
-describe('getUser()', () => {
+describe('get()', () => {
   it('should correctly return a user by username', async function () {
-    const user = await User.getUser(user1.username);
+    const user = await User.get(user1.username);
     expect(user.username).toEqual(user1.username);
     expect(user.email).toEqual(user1.email);
 
     // Get a user that doesn't exist and check failure
     try {
-      await User.getUser('nouser');
+      await User.get('nouser');
       throw new Error();
     } catch (e) {
       expect(e.message).toMatch(`Cannot find user by username: nouser`);
@@ -125,7 +125,7 @@ describe('getHistory()', () => {
 // Authenticate one user
 describe('authenticate()', () => {
   it('should correctly return a json web token', async function () {
-    const newUser = await User.createUser({
+    const newUser = await User.create({
       username: 'bobcat',
       password: 'bob',
       first_name: 'bob',
@@ -153,22 +153,22 @@ describe('authenticate()', () => {
 // Update a user test
 describe('updateUser()', () => {
   it('should correctly update a user', async function () {
-    let user = await User.getUser(user1.username);
+    let user = await User.get(user1.username);
     user.first_name = 'Josephina';
 
     await user.save();
 
-    user = await User.getUser(user1.username);
+    user = await User.get(user1.username);
     expect(user.first_name).toEqual('Josephina');
 
-    const users = await User.getUsers({});
+    const users = await User.getAll({});
     expect(users.length).toEqual(2);
 
     expect(() => {
       user.username = 'JosephinaRocketina';
     }).toThrowError(`Can't change username!`);
   });
-  
+
   it('should fail to update a non-existent user', async function () {
     let fakeuser = new User({
       username: 'fakeuser',
@@ -178,7 +178,7 @@ describe('updateUser()', () => {
       photo_url: 'superfake.jpg',
       is_admin: true,
     });
-    
+
     try {
       fakeuser.first_name = "superfake";
       await fakeuser.save();
@@ -190,19 +190,19 @@ describe('updateUser()', () => {
 });
 
 // Delete a user test
-describe('deleteUser()', () => {
+describe('delete()', () => {
   it('should correctly delete a user', async function () {
-    const user = await User.getUser(user1.username);
-    const message = await user.deleteUser();
+    const user = await User.get(user1.username);
+    const message = await user.delete();
     expect(message).toBe('User Deleted');
   });
 
   it('should fail to delete a user twice', async function () {
     try {
-      const user = await User.getUser(user1.username);
-      const message = await user.deleteUser();
-      const failed = await user.deleteUser();
-    } catch(e) {
+      const user = await User.get(user1.username);
+      const message = await user.delete();
+      const failed = await user.delete();
+    } catch (e) {
       expect(e.message).toMatch(`Could not find user to delete`);
     }
   });

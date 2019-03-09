@@ -53,9 +53,9 @@ beforeEach(async function () {
       last_name: 'johnson',
       email: 'george@gmail.com'
     });
-  user3 = await User.getUser('georgetheman');
+  user3 = await User.get('georgetheman');
   user3._token = response.body.token;
-  adminUser = await User.getUser('joerocket');
+  adminUser = await User.get('joerocket');
   const response2 = await request(app)
     .post('/login')
     .send({
