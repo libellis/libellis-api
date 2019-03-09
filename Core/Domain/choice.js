@@ -1,11 +1,11 @@
 class Choice {
-  constructor( id, question_id, content, title, content_type, voteTally) {
+  constructor({ id, question_id, content, title, content_type, vote_tally = null }) {
     this.id = id;
-    this.question_id = question_id;
+    this.questionId = question_id;
     this.content = content;
     this.title = title;
-    this.content_type = content_type;
-    this.voteTally = voteTally;
+    this.contentType = content_type;
+    this.voteTally = vote_tally;
   }
 
   // make setter/getter that makes it so you can't change primary key
