@@ -76,14 +76,15 @@ class UserRepository /* extends Model */ {
     const { query, values } = sqlForPartialUpdate(
       'users',
       {
-        username: this.username,
-        first_name: this.first_name,
-        last_name: this.last_name,
-        email: this.email,
-        photo_url: this.photo_url
+        username: userEntity.username,
+        password: userEntity.password,
+        first_name: userEntity.first_name,
+        last_name: userEntity.last_name,
+        email: userEntity.email,
+        photo_url: userEntity.photo_url
       },
       'username',
-      this.username
+      userEntity.username
     );
 
     this.commands.push([query, values]);
