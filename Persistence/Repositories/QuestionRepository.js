@@ -3,6 +3,8 @@ const {
   classPartialUpdate
 } = require('../helpers/partialUpdate');
 
+const { Question } = require('../../Core/Domain/question');
+
 class QuestionRepository {
   constructor(db) {
     this.db = db;
@@ -12,31 +14,10 @@ class QuestionRepository {
   /**
    *  READS
    */
-
-  /**
-   * getAll() -> only use case is to return all questions by a survey_id
-   * so that's what this does
-   * 
-   */
-  static async getAll({ db }, { survey_id }) {
-
-    //If search, type or survey_id are undefined then they will be %%
-    //helps fix bug if passed in object does not have all 3, or search
-    //is intentionally empty to get all
-    let result = await db.query(`
-      SELECT id, survey_id, title, question_type
-      FROM questions 
-      WHERE survey_id=$1
-      `,
-      [survey_id]
-    );
-
-    return result.rows.map(q => new Question({ ...q, db }));
-  }
-
+  
   /**
    * get(id) -> return a question by id
-   * 
+   *
    */
   async get({ id }) {
 
@@ -57,6 +38,57 @@ class QuestionRepository {
 
     return new Question( result.rows[0] );
   }
+
+  /**
+   * getAll() -> only use case is to return all questions by a survey_id
+   * so that's what this does
+   * 
+   */
+  async getAll( survey_id ) {
+    //If search, type or survey_id are undefined then they will be %%
+    //helps fix bug if passed in object does not have all 3, or search
+    //is intentionally empty to get all
+    let result = await db.query(`
+      SELECT id, survey_id, title, question_type
+      FROM questions 
+      WHERE survey_id=$1
+      `,
+      [survey_id]
+    );
+
+    return result.rows.map(q => new Question(q));
+  }
+  
+  /**
+   * getQuestionWithChoicesVoteTallys() ->
+   * get's a the vote tally based on a question id
+   * and returns that aggregate data appropriately.
+   */
+  static async getQuestionWithChoicesVoteTallys(question_id) {
+    
+    const question = await this.get({ id: question_id });
+
+    const result = await this.db.query(`
+      SELECT SUM(score) AS vote_tally,
+             choices.id as id, 
+             choices.question_id as question_id, 
+             choices.title as title, 
+             choices.content as content, 
+             choices.content_type as content_type
+      FROM votes 
+      JOIN choices ON votes.choice_id = choices.id
+      WHERE question_id=$1
+      GROUP BY id
+      `,
+      [question_id]
+    );
+
+    const choices = result.rows.map(q => new Choice(q));
+    question.choices = choices;
+    
+    return question;
+  }
+
   
   /**
    *  WRITES
@@ -89,72 +121,33 @@ class QuestionRepository {
   }
 
   //Update a question instance
-  async save() {
+  async save(questionEntity) {
     const {
       query,
       values
     } = sqlForPartialUpdate(
       'questions', {
-        survey_id: this.survey_id,
-        title: this.title,
-        question_type: this.question_type
+        survey_id: questionEntity.survey_id,
+        title: questionEntity.title,
+        question_type: questionEntity.question_type
       },
       'id',
-      this.id
+      questionEntity.id
     );
 
-    const result = await this.db.query(query, values);
-
-    if (result.rows.length === 0) {
-      const err = new Error(`Cannot find question to update`);
-      err.status = 400;
-      throw err;
-    }
+    this.commands.push([query, values]);
   }
 
   //Delete question and return a message
-  async delete() {
-    const result = await this.db.query(
-      `
-        DELETE FROM questions 
-        WHERE id=$1
-        RETURNING id`,
-      [this.id]
+  async remove(questionEntity) {
+    this.commands.push([
+      `DELETE
+       FROM questions
+       WHERE id = $1 RETURNING id`,
+      [questionEntity.id]]
     );
-
-    // Update to return boolean
-    return `Question Deleted`;
   }
 
-  /** 
-   * Extra custom rep methods
-   */
-
-  /**
-   * getVoteTallyByQuestionId() ->
-   * get's a the vote tally based on a question id
-   * and returns that aggregate data appropriately.
-   *
-   */
-  static async getVoteTallyByQuestionId(question_id) {
-
-    let result = await this.db.query(`
-      SELECT SUM(score) AS vote_tally,
-             choices.id as id, 
-             choices.question_id as question_id, 
-             choices.title as title, 
-             choices.content as content, 
-             choices.content_type as content_type
-      FROM votes 
-      JOIN choices ON votes.choice_id = choices.id
-      WHERE question_id=$1
-      GROUP BY id
-      `,
-      [question_id]
-    );
-
-    return result.rows.map(q => new Choice({ ...q, db}));
-  }
 
 }
 

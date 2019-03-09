@@ -5,8 +5,8 @@ const {
 
 const { db } = require('db');
 
-const { ChoiceRepository } = require('dbModels/ChoiceRepository');
-const { QuestionRepository } = require('dbModels/ChoiceRepository');
+const { ChoiceRepository } = require('Repositories/ChoiceRepository');
+const { QuestionRepository } = require('Repositories/ChoiceRepository');
 
 class UnitOfWork {
   constructor(db) {
