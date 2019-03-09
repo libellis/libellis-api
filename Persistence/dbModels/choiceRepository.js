@@ -15,7 +15,7 @@ class ChoiceRepository {
    */
 
   /**
-   * get(id) -> return a choice by id
+   * get(id) -> return a choice by id (PK)
    *
    */
   static get({ id }) {
@@ -43,7 +43,7 @@ class ChoiceRepository {
    * so that's what this does
    *
    */
-  static getAll({ question_id }) {
+  static getAll( question_id ) {
 
     let result = await this.db.query(`
           SELECT id, question_id, title, content, content_type
@@ -53,6 +53,32 @@ class ChoiceRepository {
       [question_id]
     );
     
+    return result.rows.map(q => new Choice(q));
+  }
+  
+  /**
+   * getVoteTallyByQuestionId() ->
+   * get's a the vote tally based on a question id
+   * and returns that choices with their vote tallys.
+   *
+   */
+  static async getAllChoicesWithVoteTallys(question_id) {
+
+    let result = await this.db.query(`
+      SELECT SUM(score) AS vote_tally,
+             choices.id as id, 
+             choices.question_id as question_id, 
+             choices.title as title, 
+             choices.content as content, 
+             choices.content_type as content_type
+      FROM votes 
+      JOIN choices ON votes.choice_id = choices.id
+      WHERE question_id=$1
+      GROUP BY id
+      `,
+      [question_id]
+    );
+
     return result.rows.map(q => new Choice(q));
   }
 
@@ -82,36 +108,34 @@ class ChoiceRepository {
   }
 
   //Update a choice instance
-  async save() {
+  async save(choiceEntity) {
     const {
       query,
       values
     } = sqlForPartialUpdate(
       'choices', {
-        question_id: this.question_id,
-        title: this.title,
-        content: this.content,
-        content_type: this.content_type
+        question_id: choiceEntity.question_id,
+        title: choiceEntity.title,
+        content: choiceEntity.content,
+        content_type: choiceEntity.content_type
       },
       'id',
-      this.id
+      choiceEntity.id
     );
 
     this.commands.push([query, values]);
   }
 
   async remove(choiceEntity) {
-    const { id } = choiceEntity;
-    
     this.commands.push([`
       DELETE FROM choices 
       WHERE id=$1
       RETURNING id
     `,
-      [this.id]]
+      [choiceEntity.id]]
     );
     
   }
 }
 
-module.exports = Choice;
+module.exports = ChoiceRepository;
