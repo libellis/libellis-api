@@ -18,7 +18,7 @@ beforeEach(async function () {
 // Test getting all questions by a survey_id
 describe('get()', () => {
   it('should correctly return a list of questions', async function () {
-    const questions = await Question.getAll({ survey_id: survey1.id });
+    const questions = await Question.getAll({ db }, { survey_id: survey1.id });
 
     // Check that returned structure matches this exactly
     expect(questions).toEqual([
@@ -26,7 +26,8 @@ describe('get()', () => {
         _id: question1.id,
         title: question1.title,
         question_type: question1.question_type,
-        _survey_id: question1.survey_id
+        _survey_id: question1.survey_id,
+        db,
       }
     ]);
   });
@@ -35,19 +36,19 @@ describe('get()', () => {
 //Test creating question
 describe('create()', () => {
   it('should correctly add a question', async function () {
-    await Question.create({
+    await Question.create({ db }, {
       title: 'Favorite Millenial CEO',
       question_type: 'Multiple Choice',
       survey_id: survey2.id,
     });
 
-    const questions = await Question.getAll({ survey_id: survey2.id });
+    const questions = await Question.getAll({ db }, { survey_id: survey2.id });
     expect(questions.length).toEqual(2);
   });
 
   it('Should fail to add a question if title is missing', async function () {
     try {
-      await Question.create({
+      await Question.create({ db }, {
         question_type: 'Multiple Choice',
         survey_id: survey2.id,
       });
@@ -61,13 +62,13 @@ describe('create()', () => {
 //Test get one question
 describe('get()', () => {
   it('should correctly return a question by id', async function () {
-    const question = await Question.get(question1.id);
+    const question = await Question.get({ db }, { id: question1.id });
     expect(question.id).toEqual(question1.id);
     expect(question.question_type).toEqual(question1.question_type);
 
     //get a question that doesn't exist and check failure
     try {
-      await Question.get(-30);
+      await Question.get({ db }, { id: -30 });
       throw new Error();
     } catch (e) {
       expect(e.message).toMatch(`Cannot find question by id: -30`);
@@ -78,14 +79,14 @@ describe('get()', () => {
 //Update a question test
 describe('updateQuestion()', () => {
   it('should correctly update a question', async function () {
-    let question = await Question.get(question1.id);
+    let question = await Question.get({ db }, { id: question1.id });
     question.title = 'Favorite Trance Artist';
 
     await question.save();
-    question = await Question.get(question1.id);
+    question = await Question.get({ db }, {id: question1.id });
     expect(question.title).toEqual('Favorite Trance Artist');
 
-    const questions = await Question.getAll({ survey_id: survey1.id });
+    const questions = await Question.getAll({ db }, { survey_id: survey1.id });
     expect(questions.length).toEqual(1);
 
     expect(() => {
@@ -101,7 +102,8 @@ describe('updateQuestion()', () => {
     let question = new Question({
       id: 987, 
       title: 'blah', 
-      content_type: 'multiple'
+      content_type: 'multiple',
+      db,
     });
     
     try {
@@ -117,7 +119,7 @@ describe('updateQuestion()', () => {
 //Delete a question test
 describe('deleteQuestion()', () => {
   it('should correctly delete a question', async function () {
-    const questionToBeDeleted = await Question.get(question1.id);
+    const questionToBeDeleted = await Question.get({ db }, { id: question1.id });
     const message = await questionToBeDeleted.delete();
     expect(message).toBe('Question Deleted');
   });

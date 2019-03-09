@@ -1,15 +1,15 @@
-const db = require('../db');
 const {
   sqlForPartialUpdate,
   classPartialUpdate
 } = require('../helpers/partialUpdate');
 
 class Question {
-  constructor({ id, survey_id, question_type, title }) {
+  constructor({ id, survey_id, question_type, title, db }) {
     this.id = id;
     this.survey_id = survey_id;
     this.question_type = question_type;
     this.title = title;
+    this.db = db
   }
 
   // make setter/getter that makes it so you can't change primary key
@@ -41,7 +41,7 @@ class Question {
    * so that's what this does
    * 
    */
-  static async getAll({ survey_id }) {
+  static async getAll({ db }, { survey_id }) {
 
     //If search, type or survey_id are undefined then they will be %%
     //helps fix bug if passed in object does not have all 3, or search
@@ -54,14 +54,14 @@ class Question {
       [survey_id]
     );
 
-    return result.rows.map(q => new Question(q));
+    return result.rows.map(q => new Question({ ...q, db }));
   }
 
   /**
    * get(id) -> return a question by id
    * 
    */
-  static async get(id) {
+  static async get({ db }, { id }) {
 
     if (id === undefined) throw new Error('Missing id parameter');
 
@@ -78,7 +78,7 @@ class Question {
       throw err;
     }
 
-    return new Question(result.rows[0]);
+    return new Question({ ...result.rows[0], db });
   }
 
   /**
@@ -86,7 +86,7 @@ class Question {
    * given survey and returns it as a new instance of Question class.
    * 
    */
-  static async create({ survey_id, title, question_type }) {
+  static async create({ db }, { survey_id, title, question_type }) {
     if (survey_id === undefined || title === undefined ||
         question_type === undefined) {
       const err = new Error(`Must supply title, question_type and survey_id`);
@@ -102,7 +102,7 @@ class Question {
       [survey_id, title, question_type]
     );
 
-    return new Question(result.rows[0]);
+    return new Question({ ...result.rows[0], db });
   }
 
   updateFromValues(vals) {
@@ -124,7 +124,7 @@ class Question {
       this.id
     );
 
-    const result = await db.query(query, values);
+    const result = await this.db.query(query, values);
 
     if (result.rows.length === 0) {
       const err = new Error(`Cannot find question to update`);
@@ -135,7 +135,7 @@ class Question {
 
   //Delete question and return a message
   async delete() {
-    const result = await db.query(
+    const result = await this.db.query(
       `
         DELETE FROM questions 
         WHERE id=$1
