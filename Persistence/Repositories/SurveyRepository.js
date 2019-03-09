@@ -102,14 +102,47 @@ class SurveyRepository {
   }
   
   /**
-   * getQuestionWithChoicesVoteTallys() ->
+   * getSurveyWithQuestionsAndChoices() ->
+   * get's a the vote tally based on a question id
+   * and returns that aggregate data appropriately.
+   */
+  async getSurveyWithQuestionsAndChoices(id) {
+    let survey = this.getSurveyWithQuestions(id);
+
+    // Let's perf test this to see if it's a bottleneck - not 
+    // sure if it's better to get all choices by survey id and
+    // then match them to their appropriate question object.
+    for (const question in survey.questions) {
+      const result = await this.db.query(`
+          SELECT id, question_id, title, content, content_type
+          FROM choices
+          WHERE question_id = $1
+      `,
+        [question_id]
+      );
+
+      const choices = result.rows.map(q => new Choice(q));
+
+      question.choices = choices;
+      survey.questions.push(question);
+    }
+
+    return survey;
+  }
+  
+  /**
+   * getSurveyWithQuestionsChoicesAndVoteTallys() ->
    * get's a the vote tally based on a question id
    * and returns that aggregate data appropriately.
    */
   async getSurveyWithQuestionsChoicesAndVoteTallys(id) {
-    let surveys = this.getSurveyWithQuestions(id);
+    let survey = this.getSurveyWithQuestions(id);
     
-    const result = await this.db.query(`
+    // Let's perf test this to see if it's a bottleneck - not 
+    // sure if it's better to get all choices by survey id and
+    // then match them to their appropriate question object.
+    for (const question in survey.questions) {
+      const result = await this.db.query(`
       SELECT SUM(score) AS vote_tally,
              choices.id as id, 
              choices.question_id as question_id, 
@@ -118,17 +151,19 @@ class SurveyRepository {
              choices.content_type as content_type
       FROM votes 
       JOIN choices ON votes.choice_id = choices.id
-      JOIN questions ON choices.question_id = questions.id
-      WHERE questions.survey_id=$1
+      WHERE question_id=$1
       GROUP BY choices.id
       `,
-      [id]
-    );
+        [id]
+      );
 
-    const choices = result.rows.map(q => new Choice(q));
-    question.choices = choices;
+      const choices = result.rows.map(q => new Choice(q));
 
-    return question;
+      question.choices = choices;
+      survey.questions.push(question);
+    }
+    
+    return survey;
   }
 
   /** get surveys by user is handled by User model, so this is commented out */
