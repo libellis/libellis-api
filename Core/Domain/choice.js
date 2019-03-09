@@ -1,8 +1,3 @@
-const {
-  sqlForPartialUpdate,
-  classPartialUpdate
-} = require('../helpers/partialUpdate');
-
 class Choice {
   constructor({ id, question_id, content, title, content_type, voteTally }) {
     this.id = id;
