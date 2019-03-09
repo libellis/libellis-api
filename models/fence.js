@@ -1,10 +1,9 @@
-const db = require('../db');
-
 class Fence {
-  constructor({ title, geo_level, geo }) {
+  constructor({ title, geo_level, geo, db }) {
     this.title = title;
     this.geo_level = geo_level;
     this.geo = geo;
+    this.db = db;
   }
 
   // make setter/getter that makes it so you can't change primary key
@@ -25,7 +24,7 @@ class Fence {
    *
    * @param {int} title
    */
-  static async get(title) {
+  static async get({ db }, { title }) {
 
     if (title === undefined) throw new Error('Missing title parameter')
 
@@ -41,7 +40,7 @@ class Fence {
       throw err;
     }
 
-    return new Fence(result.rows[0]);
+    return new Fence({ ...result.rows[0], db });
   }
 
   /**
@@ -49,7 +48,7 @@ class Fence {
    *
    * @param {{field: value, ...}} search
    */
-  static async getAll() {
+  static async getAll({ db }, { search }) {
     let result;
 
     result = await db.query(
@@ -61,6 +60,7 @@ class Fence {
       title: fence.title,
       geo_level: fence.geo_level,
       geo: JSON.parse(fence.geo)
+      db,
     }));
   }
 
@@ -69,9 +69,8 @@ class Fence {
    *
    * @param {{field: value, ...}} search
    */
-  static async getFenceByCoords(coords) {
+  static async getFenceByCoords({ db }, { coords }) {
     let result;
-    console.log(coords)
     result = await db.query(
       `SELECT title, geo_level, ST_AsGeoJSON(geo) AS geom
       FROM fences
@@ -82,6 +81,7 @@ class Fence {
       title: fence.title,
       geo_level: fence.geo_level,
       geo: JSON.parse(fence.geom)
+      db,
     }));
   }
 
@@ -101,7 +101,7 @@ class Fence {
    *
    * @param {Object}
    */
-  static async create({ title, geo_level, geojson }) {
+  static async create({ db }, { title, geo_level, geojson }) {
     if (!title) throw new Error('Missing title parameter');
 
     let result = await db.query(
@@ -111,12 +111,12 @@ class Fence {
       [title, geo_level, geojson]
     )
 
-    return new Fence(result.rows[0]);
+    return new Fence({ ...result.rows[0], db });
   }
 
   //Delete user and return a message
   async delete() {
-    const result = await db.query(
+    const result = await this.db.query(
       `
         DELETE FROM fences
         WHERE title=$1
