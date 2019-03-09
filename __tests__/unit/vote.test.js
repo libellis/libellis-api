@@ -1,6 +1,7 @@
 process.env.NODE_ENV = 'test';
 const Vote = require('../../models/vote');
 const db = require('../../db');
+const deps = require('../../dep_container/IoC');
 const {
   createTables,
   insertTestData,
@@ -74,7 +75,7 @@ beforeEach(async function() {
 describe('Setters/Getters testing', () => {
   it('should deny directly changing choice_id', async function() {
     try {
-      const vote = await Vote.create({
+      const vote = await Vote.create(deps, {
         username: user3.username,
         choice_id: choice3.id,
         score: 1,
@@ -90,7 +91,7 @@ describe('Setters/Getters testing', () => {
 
   it('should deny directly changing username', async function() {
     try {
-      const vote = await Vote.create({
+      const vote = await Vote.create(deps, {
         username: user3.username,
         choice_id: choice3.id,
         score: 1,
@@ -108,7 +109,7 @@ describe('Setters/Getters testing', () => {
 // Test getting all votes by a question_id
 describe('getAll()', () => {
   it('should correctly return a list of votes', async function() {
-    const votes = await Vote.getAll({question_id: question1.id});
+    const votes = await Vote.getAll(deps, { question_id: question1.id });
 
     //Check that returned structure matches this exactly
     expect(votes).toEqual([
@@ -121,7 +122,7 @@ describe('getAll()', () => {
 
     //Check that ranked voting matches up correctly
 
-    const votes2 = await Vote.getAll({question_id: question2.id});
+    const votes2 = await Vote.getAll(deps, { question_id: question2.id });
     // check ranked voting matches scoring we would expect
     expect(votes2).toEqual([
       {
@@ -151,19 +152,19 @@ describe('getAll()', () => {
 //Test creating vote
 describe('create()', () => {
   it('should correctly add a vote', async function() {
-    const newVote = await Vote.create({
+    const newVote = await Vote.create(deps, {
       username: user3.username,
       choice_id: choice3.id,
       score: 1,
     });
 
-    const votes = await Vote.getAll({question_id: question1.id});
+    const votes = await Vote.getAll(deps, {question_id: question1.id});
     expect(votes[0].votes).toEqual('3');
   });
 
   it('should fail to add a vote with no score', async function() {
     try {
-      const badVote = await Vote.create({
+      const badVote = await Vote.create(deps, {
         username: user3.username,
         choice_id: choice3.id,
       });
@@ -180,13 +181,13 @@ describe('create()', () => {
 describe('get()', () => {
   it('should correctly return a vote by composite key', async function() {
     const {question_id, survey_id, username, choice_id} = vote1;
-    const vote = await Vote.get({question_id, survey_id, username, choice_id});
+    const vote = await Vote.get(deps, {question_id, survey_id, username, choice_id});
     expect(vote.score).toEqual(vote1.score);
 
     //get a vote that doesn't exist and check failure
     try {
       const junkData = {question_id, survey_id, username, choice_id: -30}
-      await Vote.get(junkData);
+      await Vote.get(deps, junkData);
       throw new Error();
     } catch (e) {
       expect(e.message).toMatch(`Cannot find vote`);
@@ -196,7 +197,7 @@ describe('get()', () => {
   it('should throw an error if we are missing either username or choice_id', async function() {
     try {
       const {question_id, survey_id, username, choice_id} = vote1;
-      const vote = await Vote.get({question_id, survey_id, choice_id});
+      const vote = await Vote.get(deps, {question_id, survey_id, choice_id});
       throw new Error();
     } catch (e) {
       expect(e.message).toMatch(`Missing parameters`);
@@ -208,14 +209,14 @@ describe('get()', () => {
 //Delete a vote test
 describe('deleteVote()', () => {
   it('should correctly delete a vote', async function() {
-    const voteToBeDeleted = await Vote.get(vote1);
+    const voteToBeDeleted = await Vote.get(deps, vote1);
     const message = await voteToBeDeleted.delete();
     expect(message).toBe('Vote Removed');
   });
 
   it('should fail to delete a vote that does not exist', async function() {
     try {
-      const fakeVote = new Vote({choice_id: 50, username: "bob", score: 5});
+      const fakeVote = new Vote({choice_id: 50, username: "bob", score: 5, db});
       const message = await fakeVote.delete();
     } catch (e) {
       expect(e.message).toMatch(`Could not delete vote`);
