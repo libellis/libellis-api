@@ -1,12 +1,12 @@
-const db = require('../db');
 const {
   sqlForPartialUpdate,
   classPartialUpdate
 } = require('../helpers/partialUpdate');
 
 class Category {
-  constructor({ title }) {
+  constructor({ title, db }) {
     this.title = title;
+    this.db = db;
   }
 
   // make setter/getter that makes it so you can't change primary key
@@ -26,21 +26,21 @@ class Category {
    * getAll() -> only use case is to return all Categories
    *
    */
-  static async getAll() {
+  static async getAll({ db }, { search }) {
     let result = await db.query(
       `
       SELECT title
       FROM categories 
       `
     );
-    return result.rows.map(q => new Category(q));
+    return result.rows.map(q => new Category({ ...q, db }));
   }
 
   /**
    * get(title) -> return a Category by title
    *
    */
-  static async get(title) {
+  static async get({ db }, { title }) {
     if (title === undefined) throw new Error(`Missing title parameter`);
 
     const result = await db.query(
@@ -58,7 +58,7 @@ class Category {
       throw err;
     }
 
-    return new Category(result.rows[0]);
+    return new Category({ ...result.rows[0], db });
   }
 
   /**
@@ -66,7 +66,7 @@ class Category {
    * @returns   a new instance of Category class.
    *
    */
-  static async create({ title }) {
+  static async create({ db }, { title }) {
     if (title === undefined) {
       const err = new Error(
         `Must supply title, content_type and question_title`
@@ -83,12 +83,12 @@ class Category {
       [title]
     );
 
-    return new Category(result.rows[0]);
+    return new Category({ ...result.rows[0], db});
   }
 
   //Delete Category and return a message
   async delete() {
-    const result = await db.query(
+    const result = await this.db.query(
       `
       DELETE FROM Categories 
       WHERE title=$1
