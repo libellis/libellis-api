@@ -64,7 +64,7 @@ class QuestionRepository {
    * get's a the vote tally based on a question id
    * and returns that aggregate data appropriately.
    */
-  static async getQuestionWithChoicesVoteTallys(question_id) {
+  async getQuestionWithChoicesVoteTallys(question_id) {
     
     const question = await this.get({ id: question_id });
 
