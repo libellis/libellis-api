@@ -7,7 +7,7 @@ const Choice = require('../../Core/Domain/choice');
 class ChoiceRepository {
   constructor(db) {
     this.db = db;
-    this.commands = new Array();
+    this.commands = [];
   }
 
   /**
@@ -18,7 +18,7 @@ class ChoiceRepository {
    * get(id) -> return a choice by id (PK)
    *
    */
-  static get({ id }) {
+  get({ id }) {
 
     if (id === undefined) throw new Error(`Missing id parameter`);
 
@@ -43,7 +43,7 @@ class ChoiceRepository {
    * so that's what this does
    *
    */
-  static getAll( question_id ) {
+  async getAll( question_id ) {
 
     let result = await this.db.query(`
           SELECT id, question_id, title, content, content_type
@@ -56,13 +56,31 @@ class ChoiceRepository {
     return result.rows.map(q => new Choice(q));
   }
   
+  async getChoiceWithVoteTally(id) {
+    let result = await this.db.query(`
+      SELECT SUM(score) AS vote_tally,
+             choices.id as id,
+             choices.question_id as question_id,
+             choices.title as title,
+             choices.content as content,
+             choices.content_type as content_type
+      FROM votes
+             JOIN choices ON votes.choice_id = choices.id
+      WHERE choice_id=$1
+      GROUP BY id
+    `,
+      [id]
+    ); 
+  }
+  
+  
   /**
    * getVoteTallyByQuestionId() ->
    * get's a the vote tally based on a question id
    * and returns that choices with their vote tallys.
    *
    */
-  static async getAllChoicesWithVoteTallys(question_id) {
+  async getAllChoicesWithVoteTallys(question_id) {
 
     let result = await this.db.query(`
       SELECT SUM(score) AS vote_tally,
@@ -91,7 +109,7 @@ class ChoiceRepository {
    * given question and returns it as a new instance of Choice class.
    * 
    */
-  static async add(choiceEntity) {
+  async add(choiceEntity) {
     const { questionId, content, title, contentType } = choiceEntity;
     
     this.commands.push([`

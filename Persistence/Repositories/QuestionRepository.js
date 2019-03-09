@@ -3,10 +3,15 @@ const {
   classPartialUpdate
 } = require('../helpers/partialUpdate');
 
-class Question {
-  constructor({ db }) {
-    this.db = db
+class QuestionRepository {
+  constructor(db) {
+    this.db = db;
+    this.commands = [];
   }
+
+  /**
+   *  READS
+   */
 
   /**
    * getAll() -> only use case is to return all questions by a survey_id
@@ -33,11 +38,11 @@ class Question {
    * get(id) -> return a question by id
    * 
    */
-  static async get({ db }, { id }) {
+  async get({ id }) {
 
     if (id === undefined) throw new Error('Missing id parameter');
 
-    const result = await db.query(`
+    const result = await this.db.query(`
       SELECT id, survey_id, title, question_type
       FROM questions
       WHERE id=$1
@@ -50,31 +55,33 @@ class Question {
       throw err;
     }
 
-    return new Question({ ...result.rows[0], db });
+    return new Question( result.rows[0] );
   }
+  
+  /**
+   *  WRITES
+   */
 
   /**
    * create(survey_id, title, question_type) -> creates a new question for the
    * given survey and returns it as a new instance of Question class.
    * 
    */
-  static async create({ db }, { survey_id, title, question_type }) {
+  async add(questionEntity) {
+    const { survey_id, title, question_type } =  questionEntity;
+    
     if (survey_id === undefined || title === undefined ||
         question_type === undefined) {
       const err = new Error(`Must supply title, question_type and survey_id`);
       err.status = 400;
       throw err;
     }
-    const result = await db.query(
-      `
-    INSERT INTO questions (survey_id, title, question_type)
-    VALUES ($1,$2,$3)
-    RETURNING id, survey_id, title, question_type
-    `,
-      [survey_id, title, question_type]
+    
+    this.commands.push([
+      `INSERT INTO questions (survey_id, title, question_type)
+       VALUES ($1, $2, $3) RETURNING id, survey_id, title, question_type`,
+      [survey_id, title, question_type]]
     );
-
-    return new Question({ ...result.rows[0], db });
   }
 
   updateFromValues(vals) {
@@ -151,4 +158,4 @@ class Question {
 
 }
 
-module.exports = Question;
+module.exports = QuestionRepository;

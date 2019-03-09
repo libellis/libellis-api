@@ -3,7 +3,10 @@ const {
   classPartialUpdate
 } = require('../helpers/partialUpdate');
 
-const { ChoiceRepository } = require('dbModels/choiceRepository');
+const { db } = require('db');
+
+const { ChoiceRepository } = require('dbModels/ChoiceRepository');
+const { QuestionRepository } = require('dbModels/ChoiceRepository');
 
 class UnitOfWork {
   constructor(db) {
@@ -17,7 +20,6 @@ class UnitOfWork {
       categories: new CategoryRepository(db);
       fences: new FenceRepository(db);
     };
-    this.commands = new Array();
   }
 
   /**
@@ -88,7 +90,7 @@ class UnitOfWork {
   dispose() {
     // Clear command storage from all repos
     for (const repo in this.repositories) {
-      repo.commands = new Array();
+      repo.commands = [];
     }
   }
   
