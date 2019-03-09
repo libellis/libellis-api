@@ -1,7 +1,6 @@
 class Category {
   constructor( title ) {
     this.title = title;
-    this.db = db;
   }
 
   // make setter/getter that makes it so you can't change primary key
