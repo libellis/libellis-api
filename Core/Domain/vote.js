@@ -4,11 +4,10 @@ const {
 } = require('../helpers/partialUpdate');
 
 class Vote {
-  constructor({choice_id, username, score, db}) {
+  constructor(choice_id, username, score) {
     this.choice_id = choice_id;
     this.username = username;
     this.score = score;
-    this.db = db;
   }
 
   // make setter/getter that makes it so you can't change primary key
