@@ -1,16 +1,16 @@
-const db = require('../db');
 const {
   sqlForPartialUpdate,
   classPartialUpdate
 } = require('../helpers/partialUpdate');
 
 class Choice {
-  constructor({ id, question_id, content, title, content_type }) {
+  constructor({ id, question_id, content, title, content_type, db }) {
     this.id = id;
     this.question_id = question_id;
     this.content = content;
     this.title = title;
     this.content_type = content_type;
+    this.db = db;
   }
 
   // make setter/getter that makes it so you can't change primary key
@@ -42,7 +42,7 @@ class Choice {
    * so that's what this does
    * 
    */
-  static async getAll({ question_id }) {
+  static async getAll({ db }, { question_id }) {
 
     let result = await db.query(`
       SELECT id, question_id, title, content, content_type
@@ -52,14 +52,14 @@ class Choice {
       [question_id]
     );
 
-    return result.rows.map(q => new Choice(q));
+    return result.rows.map(q => new Choice({ ...q, db}));
   }
 
   /**
    * get(id) -> return a choice by id
    * 
    */
-  static async get(id) {
+  static async get({ db }, { id }) {
 
     if (id === undefined) throw new Error(`Missing id parameter`);
 
@@ -76,7 +76,7 @@ class Choice {
       throw err;
     }
 
-    return new Choice(result.rows[0]);
+    return new Choice({ ...result.rows[0], db });
   }
 
   /**
@@ -84,7 +84,7 @@ class Choice {
    * given question and returns it as a new instance of Choice class.
    * 
    */
-  static async create({ question_id, title, content, content_type }) {
+  static async create({ db }, { question_id, title, content, content_type }) {
     if (content_type === undefined || question_id === undefined ||
         title === undefined) {
       const err = new Error(`Must supply title, content_type and question_id`);
@@ -99,7 +99,7 @@ class Choice {
       [question_id, title, content, content_type]
     );
 
-    return new Choice(result.rows[0]);
+    return new Choice({ ...result.rows[0], db });
   }
 
   updateFromValues(vals) {
@@ -122,7 +122,7 @@ class Choice {
       this.id
     );
 
-    const result = await db.query(query, values);
+    const result = await this.db.query(query, values);
 
     if (result.rows.length === 0) {
       const err = new Error(`Cannot find choice to update`);
@@ -133,7 +133,7 @@ class Choice {
 
   //Delete choice and return a message
   async delete() {
-    const result = await db.query(`
+    const result = await this.db.query(`
       DELETE FROM choices 
       WHERE id=$1
       RETURNING id
