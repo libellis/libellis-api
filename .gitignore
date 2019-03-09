@@ -1,5 +1,7 @@
 coverage
 .env
+.idea*
+.rider*
 node_modules
 drop.sql
 notes.md
