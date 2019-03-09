@@ -16,8 +16,7 @@ const { ensureLoggedIn, ensureAuthor } = require('../middleware/auth');
  */
 router.get('/', async function (req, res, next) {
   try {
-    let { search } = req.query;
-    const surveys = await Survey.getAll(search);
+    const surveys = await Survey.getAll({ db, } req.query);
     return res.json({
       surveys
     });

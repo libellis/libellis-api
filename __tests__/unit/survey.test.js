@@ -28,7 +28,7 @@ beforeEach(async function () {
 describe('Setters/Getters testing', () => {
   it('should deny directly changing id', async function () {
     try {
-      let survey = await Survey.create({
+      let survey = await Survey.create({ db }, {
         author: user2.username,
         title: "What's your favorite kind of chocolate?",
         description: "Dark or Milk?",
@@ -47,7 +47,7 @@ describe('Setters/Getters testing', () => {
 // Test get filtered users
 describe('get(id)', () => {
   it('should get a survey by id', async function () {
-    const survey = await Survey.get(survey1.id);
+    const survey = await Survey.get({ db }, { id: survey1.id });
     expect(survey).toEqual({
       _id: expect.any(Number),
       published: false,
@@ -57,12 +57,13 @@ describe('get(id)', () => {
       date_posted: expect.any(Date),
       description: "hot fiya",
       title: "best albums of 2009",
+      db,
     });
   });
 
   it('should throw error if use not found', async function () {
     try {
-      const response = await Survey.get(3456);
+      const response = await Survey.get({ db }, { id: 3456 });
       throw new Error();
     } catch (err) {
       expect(err.status).toBe(404);
@@ -70,9 +71,9 @@ describe('get(id)', () => {
     }
   });
 
-  it('should throw error if id not supplied', async function () {
+  it('should throw error if id supplied is falsy', async function () {
     try {
-      const response = await Survey.get();
+      const response = await Survey.get({ db }, { id: undefined });
       throw new Error();
     } catch (e) {
       expect(e.message).toMatch(`Missing id parameter`);
@@ -83,7 +84,7 @@ describe('get(id)', () => {
 
 describe('getAll()', () => {
   it('should get a list of surveys with no filter queries', async function () {
-    const surveys = await Survey.getAll();
+    const surveys = await Survey.getAll({ db }, { search: '' });
 
     expect(surveys.length).toEqual(0);
 
@@ -96,7 +97,7 @@ describe('getAll()', () => {
 
     let survey3 = survey_result.rows[0];
 
-    let surveys2 = await Survey.getAll();
+    let surveys2 = await Survey.getAll({ db }, { search: '' });
 
     expect(surveys2[0]).toEqual({
       "_id": 3,
@@ -106,12 +107,13 @@ describe('getAll()', () => {
       "date_posted": expect.any(Date),
       "description": survey3.description,
       "category": survey3.category,
-      "title": survey3.title
+      "title": survey3.title,
+      db,
     });
   });
 
   it('should be able to search for a survey', async function () {
-    const surveys = await Survey.getAll(survey1.author);
+    const surveys = await Survey.getAll({ db }, { search: survey1.author });
 
     expect(surveys.length).toEqual(1);
     expect(surveys[0]).toEqual({
@@ -122,7 +124,8 @@ describe('getAll()', () => {
       "date_posted": expect.any(Date),
       "description": survey1.description,
       "category": survey1.category,
-      "title": survey1.title
+      "title": survey1.title,
+      db,
     });
   });
 });
@@ -170,7 +173,7 @@ describe('create(author, title, description)', () => {
       category: "music",
     }
 
-    const survey = await Survey.create(newSurvey)
+    const survey = await Survey.create({ db }, newSurvey);
 
     expect(survey).toEqual({
       _id: expect.any(Number),
@@ -180,7 +183,8 @@ describe('create(author, title, description)', () => {
       description: newSurvey.description,
       category: newSurvey.category,
       date_posted: expect.any(Date),
-      anonymous: true
+      anonymous: true,
+      db,
     })
   });
 
@@ -191,7 +195,7 @@ describe('create(author, title, description)', () => {
       category: "music",
     }
 
-    const survey = await Survey.create(newSurvey)
+    const survey = await Survey.create({ db }, newSurvey)
 
     expect(survey).toEqual({
       _id: expect.any(Number),
@@ -201,7 +205,8 @@ describe('create(author, title, description)', () => {
       category: newSurvey.category,
       description: null,
       date_posted: expect.any(Date),
-      anonymous: true
+      anonymous: true,
+      db,
     })
   });
 
@@ -210,7 +215,7 @@ describe('create(author, title, description)', () => {
       author: user1.username,
     }
     try {
-      const response = await Survey.create(newSurvey)
+      const response = await Survey.create({ db }, newSurvey)
     } catch (err) {
       expect(err.message).toEqual('Missing author or title parameter')
     }
@@ -220,7 +225,7 @@ describe('create(author, title, description)', () => {
 
 describe('save(id, title, description, anonymous)', async function () {
   it('should update a survey with all fields', async function () {
-    let survey = await Survey.get(survey1.id);
+    let survey = await Survey.get({ db }, { id: survey1.id });
 
     survey.description = 'new description';
     survey.title = 'New Title';
@@ -228,7 +233,7 @@ describe('save(id, title, description, anonymous)', async function () {
 
     await survey.save();
 
-    survey = await Survey.get(survey1.id);
+    survey = await Survey.get({ db }, { id: survey1.id });
 
     expect(survey).toEqual({
       _id: survey1.id,
@@ -238,18 +243,19 @@ describe('save(id, title, description, anonymous)', async function () {
       description: 'new description',
       category: survey1.category,
       date_posted: survey1.date_posted,
-      anonymous: false
+      anonymous: false,
+      db,
     })
   });
 
   it('should update a survey with one field', async function () {
-    let survey = await Survey.get(survey1.id);
+    let survey = await Survey.get({ db }, { id: survey1.id });
 
     survey.description = 'new description';
 
     await survey.save();
 
-    survey = await Survey.get(survey1.id);
+    survey = await Survey.get({ db }, { id: survey1.id });
 
     expect(survey).toEqual({
       _id: survey1.id,
@@ -259,19 +265,20 @@ describe('save(id, title, description, anonymous)', async function () {
       description: 'new description',
       category: survey1.category,
       date_posted: survey1.date_posted,
-      anonymous: survey1.anonymous
+      anonymous: survey1.anonymous,
+      db,
     });
   });
 
   it('should update a survey to published state', async function () {
-    let survey = await Survey.get(survey1.id);
+    let survey = await Survey.get({ db }, { id: survey1.id });
 
     // should update all save checks to use this!
     survey.updateFromValues({ published: true });
 
     await survey.save();
 
-    survey = await Survey.get(survey1.id);
+    survey = await Survey.get({ db }, { id: survey1.id });
 
     expect(survey).toEqual({
       _id: survey1.id,
@@ -281,19 +288,20 @@ describe('save(id, title, description, anonymous)', async function () {
       description: survey1.description,
       category: survey1.category,
       date_posted: survey1.date_posted,
-      anonymous: survey1.anonymous
+      anonymous: survey1.anonymous,
+      db,
     });
   });
 
   it('should throw not change an restricted field', async function () {
-    let survey = await Survey.get(survey1.id);
+    let survey = await Survey.get({ db }, { id: survey1.id });
 
     survey.author = "NewAuthor";
     survey.date_posted = Date.now();
 
     await survey.save();
 
-    survey = await Survey.get(survey1.id);
+    survey = await Survey.get({ db }, { id: survey1.id });
 
     expect(survey).toEqual({
       _id: survey1.id,
@@ -303,7 +311,8 @@ describe('save(id, title, description, anonymous)', async function () {
       description: survey1.description,
       category: survey1.category,
       date_posted: survey1.date_posted,
-      anonymous: survey1.anonymous
+      anonymous: survey1.anonymous,
+      db,
     });
   })
 
@@ -316,6 +325,7 @@ describe('save(id, title, description, anonymous)', async function () {
       date_posted: Date.now(),
       anonymous: true,
       published: true,
+      db,
     });
 
     try {
@@ -331,10 +341,10 @@ describe('save(id, title, description, anonymous)', async function () {
 
 describe('delete(id)', () => {
   it('should delete a survey by id', async function () {
-    let survey = await Survey.get(survey1.id);
+    let survey = await Survey.get({ db }, { id: survey1.id });
     survey.delete();
     try {
-      survey = await Survey.get(survey1.id);
+      survey = await Survey.get({ db }, { id: survey1.id });
     } catch (err) {
       expect(err.status).toBe(404);
       expect(err.message).toEqual('Not Found');
@@ -351,6 +361,7 @@ describe('delete(id)', () => {
         date_posted: Date.now(),
         anonymous: true,
         published: true,
+        db,
       });
       const message = await fakeSurvey.delete();
     } catch (e) {
