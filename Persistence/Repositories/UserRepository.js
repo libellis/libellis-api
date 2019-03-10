@@ -1,6 +1,5 @@
 const {
   sqlForPartialUpdate,
-  classPartialUpdate
 } = require('../helpers/partialUpdate');
 
 const { User } = require('../../Core/Domain/user');
@@ -66,10 +65,6 @@ class UserRepository /* extends Model */ {
         userEntity.is_admin || false
       ]
     );
-  }
-
-  updateFromValues(vals) {
-    classPartialUpdate(this, vals);
   }
 
   //Update a user instance
