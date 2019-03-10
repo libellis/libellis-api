@@ -11,11 +11,12 @@ class UserRepository /* extends Model */ {
     this.commands = [];
   }
 
+  /** READS */
 
   /** get User details - returns shallow user data */
   async get({ username }) {
     let result = await this.db.query(
-      `SELECT username, first_name, last_name, email, photo_url
+      `SELECT username, password, first_name, last_name, email, photo_url, is_admin
       FROM users 
       WHERE username = $1`,
       [username]
@@ -47,10 +48,11 @@ class UserRepository /* extends Model */ {
     return result.rows.map(user => new User({ ...user, db }));
   }
 
+  /** WRITES */
+
   // Create a new user and return an instance
   async add(userEntity) {
-    let result = await db.query(
-      `
+    this.commands.push(`
       INSERT INTO users (username, password, first_name, last_name, email, photo_url, is_admin)
       VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING username, first_name, last_name, email, photo_url, is_admin`,
@@ -64,7 +66,6 @@ class UserRepository /* extends Model */ {
         userEntity.is_admin || false
       ]
     );
-    return new User(result.rows[0]);
   }
 
   updateFromValues(vals) {
