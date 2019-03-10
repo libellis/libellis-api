@@ -26,11 +26,11 @@ class User /* extends Model */ {
   set password(val) {
     const salt = bcrypt.genSaltSync(BWF);
     const hash = bcrypt.hashSync(password, salt),
-    this._password = hash;
+    this.password = hash;
   }
 
   get password() {
-    return this._password;
+    return this.password;
   }
 }
 
