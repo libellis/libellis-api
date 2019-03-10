@@ -39,7 +39,7 @@ class SurveyRepository {
       throw err;
     }
 
-    return new Survey( result.rows[0] );
+    return new Survey(result.rows[0]);
   }
 
   /**
@@ -47,7 +47,7 @@ class SurveyRepository {
    * 
    * @param {{field: value, ...}} search
    */
-  
+
   // Question - does the fact that search is a string mean we
   // should do object destructuring for all getAll input types?
   async getAll({ search }) {
@@ -84,7 +84,7 @@ class SurveyRepository {
 
     return result.rows.map(s => new Survey(s));
   }
-  
+
   async getSurveyWithQuestions(id) {
     const survey = await this.get({ id });
 
@@ -97,10 +97,10 @@ class SurveyRepository {
     );
 
     survey.questions = questionsResult.rows.map(q => new Question(q));
-    
+
     return survey;
   }
-  
+
   /**
    * getSurveyWithQuestionsAndChoices() ->
    * get's a the vote tally based on a question id
@@ -129,7 +129,7 @@ class SurveyRepository {
 
     return survey;
   }
-  
+
   /**
    * getSurveyWithQuestionsChoicesAndVoteTallys() ->
    * get's a the vote tally based on a question id
@@ -137,7 +137,7 @@ class SurveyRepository {
    */
   async getSurveyWithQuestionsChoicesAndVoteTallys(id) {
     let survey = this.getSurveyWithQuestions(id);
-    
+
     // Let's perf test this to see if it's a bottleneck - not 
     // sure if it's better to get all choices by survey id and
     // then match them to their appropriate question object.
@@ -162,7 +162,7 @@ class SurveyRepository {
       question.choices = choices;
       survey.questions.push(question);
     }
-    
+
     return survey;
   }
 
@@ -184,7 +184,7 @@ class SurveyRepository {
    */
   async add(surveyEntity) {
     const { author, username, title, description, category } = surveyEntity;
-    
+
     if (!author || !title) throw new Error('Missing author or title parameter');
 
     this.commands.push([
@@ -198,7 +198,7 @@ class SurveyRepository {
     classPartialUpdate(this, vals);
   }
 
-  //Update a user instance
+  // Update a user instance
   async save(surveyEntity) {
     const {
       query,
@@ -218,8 +218,8 @@ class SurveyRepository {
     this.commands.push([query, values]);
   }
 
-  //Delete user and return a message
-  async delete(surveyEntity) {
+  // Delete user and return a message
+  async remove(surveyEntity) {
     this.commands.push([
       `DELETE
        FROM surveys
