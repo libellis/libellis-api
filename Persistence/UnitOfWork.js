@@ -3,10 +3,13 @@ const {
   classPartialUpdate
 } = require('../helpers/partialUpdate');
 
-const { db } = require('db');
 
+const { SurveyRepository } = require('Repositories/SurveyRepository');
 const { ChoiceRepository } = require('Repositories/ChoiceRepository');
-const { QuestionRepository } = require('Repositories/ChoiceRepository');
+const { QuestionRepository } = require('Repositories/QuestionRepository');
+const { CategoryRepository } = require('Repositories/CategoryRepository');
+const { UserRepository } = require('Repositories/UserRepository');
+// const { FenceRepository } = require('Repositories/Fe');
 
 class UnitOfWork {
   constructor(db) {
@@ -15,10 +18,8 @@ class UnitOfWork {
       surveys: new SurveyRepository(db);
       questions: new QuestionRepository(db);
       choices: new ChoiceRepository(db);
-      votes: new VoteRepository(db);
       users: new UserRepository(db);
       categories: new CategoryRepository(db);
-      fences: new FenceRepository(db);
     };
   }
 
@@ -96,4 +97,4 @@ class UnitOfWork {
   
 }
 
-module.exports = Survey;
+module.exports = UnitOfWork;
