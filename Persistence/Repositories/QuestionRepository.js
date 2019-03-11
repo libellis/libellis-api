@@ -116,10 +116,6 @@ class QuestionRepository {
     );
   }
 
-  updateFromValues(vals) {
-    classPartialUpdate(this, vals);
-  }
-
   //Update a question instance
   async save(questionEntity) {
     const {

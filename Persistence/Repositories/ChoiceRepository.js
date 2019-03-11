@@ -121,10 +121,6 @@ class ChoiceRepository {
     );
   }
 
-  updateFromValues(vals) {
-    classPartialUpdate(this, vals);
-  }
-
   //Update a choice instance
   async save(choiceEntity) {
     const {

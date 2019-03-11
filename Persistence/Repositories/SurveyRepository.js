@@ -194,10 +194,6 @@ class SurveyRepository {
     )
   }
 
-  updateFromValues(vals) {
-    classPartialUpdate(this, vals);
-  }
-
   // Update a user instance
   async save(surveyEntity) {
     const {
