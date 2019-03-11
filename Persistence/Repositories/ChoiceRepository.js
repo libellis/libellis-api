@@ -18,7 +18,7 @@ class ChoiceRepository {
    * get(id) -> return a choice by id (PK)
    *
    */
-  get({ id }) {
+  async get({ id }) {
 
     if (id === undefined) throw new Error(`Missing id parameter`);
 
