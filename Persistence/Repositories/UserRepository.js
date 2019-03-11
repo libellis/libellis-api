@@ -1,6 +1,6 @@
 const {
   sqlForPartialUpdate,
-} = require('../helpers/partialUpdate');
+} = require('../../helpers/partialUpdate');
 
 const { User } = require('../../Core/Domain/user');
 
@@ -95,4 +95,4 @@ class UserRepository /* extends Model */ {
   }
 }
 
-module.exports = User;
+module.exports = UserRepository;

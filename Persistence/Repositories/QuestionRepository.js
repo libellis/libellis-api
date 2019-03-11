@@ -1,7 +1,7 @@
 const {
   sqlForPartialUpdate,
   classPartialUpdate
-} = require('../helpers/partialUpdate');
+} = require('../../helpers/partialUpdate');
 
 const { Question } = require('../../Core/Domain/question');
 

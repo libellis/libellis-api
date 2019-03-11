@@ -1,7 +1,7 @@
 const {
   sqlForPartialUpdate,
   classPartialUpdate
-} = require('../helpers/partialUpdate');
+} = require('../../helpers/partialUpdate');
 const Choice = require('../../Core/Domain/choice');
 
 class ChoiceRepository {
