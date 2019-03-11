@@ -63,13 +63,19 @@ async function updateUserIfAdminOrOwner({ token, username }, userChangeSet) {
             is_admin: user.is_admin,
         });
     } else {
-        throw new Error("You cannot delete an account unless you own the account, or are an admin.")
+        throw new Error("You cannot modify an account unless you own the account, or are an admin.")
     }
 }
 
 async function deleteUserIfAdminOrOwner({ token, username }) {
     if (authorize({token, username}, 1)) {
-        const unitOfWork = new UnitOfWork()
+        const unitOfWork = new UnitOfWork();
+        const user = unitOfWork.users.get({ username });
+        
+        unitOfWork.users.remove(user);
+        unitOfWork.complete();
+    } else {
+        throw new Error("You cannot delete an account unless you own the account, or are an admin.")
     }
 }
 
@@ -78,4 +84,5 @@ module.exports = {
     getUserIfAdminOrOwner,
     createUser,
     updateUserIfAdminOrOwner,
+    deleteUserIfAdminOrOwner,
 }
