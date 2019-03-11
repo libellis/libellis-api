@@ -1,11 +1,6 @@
-const {
-  sqlForPartialUpdate,
-  classPartialUpdate
-} = require('../helpers/partialUpdate');
-
 const { Category } = require('../../Core/Domain/category');
 
-class Category {
+class CategoryRepository {
   constructor(db) {
     this.db = db;
     this.commands = [];
@@ -86,4 +81,4 @@ class Category {
   }
 }
 
-module.exports = Category;
+module.exports = CategoryRepository;

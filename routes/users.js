@@ -1,13 +1,9 @@
 const express = require('express');
 const router = new express.Router();
-const User = require('../models/user');
-const Survey = require('../models/survey');
-// const Question = require('../models/question');
-const { classPartialUpdate } = require('../helpers/partialUpdate');
 const validateInput = require('../middleware/validation');
 const newUserSchema = require('../schema/newUser.json');
 const updateUserSchema = require('../schema/updateUser.json');
-const { ensureAdminUser, ensureLoggedIn, ensureCorrectUserOrAdmin } = require('../middleware/auth');
+const { ensureAdminUser, ensureCorrectUserOrAdmin } = require('../middleware/auth');
 
 /** 
  * users endpoints are restricted
@@ -36,7 +32,6 @@ router.post('/', validateInput(newUserSchema), async function (req, res, next) {
 router.get('/:username', ensureCorrectUserOrAdmin, async function (req, res, next) {
   try {
     const user = await User.get(req.params.username);
-    // user.surveys = await User.getSurveys(req.params.username);
     return res.json({ user });
   } catch (error) {
     return next(error);
