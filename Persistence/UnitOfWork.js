@@ -2,7 +2,7 @@ const {
   sqlForPartialUpdate,
   classPartialUpdate
 } = require('../helpers/partialUpdate');
-
+const { pool } = require('db');
 
 const { SurveyRepository } = require('Repositories/SurveyRepository');
 const { ChoiceRepository } = require('Repositories/ChoiceRepository');
@@ -12,14 +12,14 @@ const { UserRepository } = require('Repositories/UserRepository');
 // const { FenceRepository } = require('Repositories/Fe');
 
 class UnitOfWork {
-  constructor(db) {
-    this.db = db;
+  constructor(context = pool) {
+    this.context = context;
     this.repositories = {
-      surveys: new SurveyRepository(db);
-      questions: new QuestionRepository(db);
-      choices: new ChoiceRepository(db);
-      users: new UserRepository(db);
-      categories: new CategoryRepository(db);
+      surveys: new SurveyRepository(context);
+      questions: new QuestionRepository(context);
+      choices: new ChoiceRepository(context);
+      users: new UserRepository(context);
+      categories: new CategoryRepository(context);
     };
   }
 
@@ -67,7 +67,7 @@ class UnitOfWork {
     (async () => {
       // note: we don't try/catch this because if connecting throws an exception
       // we don't need to dispose of the client (it will be undefined)
-      const client = await this.db.connect();
+      const client = await this.pool.connect();
 
       try {
         await client.query('BEGIN');
