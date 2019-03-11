@@ -1,9 +1,7 @@
 const express = require('express');
 const router = new express.Router();
-const validateInput = require('../middleware/validation');
-const newUserSchema = require('../schema/newUser.json');
-const updateUserSchema = require('../schema/updateUser.json');
-const { ensureAdminUser, ensureCorrectUserOrAdmin } = require('../middleware/auth');
+const { getToken } = require('../middleware/httpRequestParsing');
+const { getAllUsersIfAdmin, getUserIfAdminOrOwner, createUserIfSchemaIsValid, updateUserIfAdminOrOwner, deleteUserIfAdminOrOwner } = require('../Core/Application/users');
 
 /** 
  * users endpoints are restricted
@@ -12,70 +10,73 @@ const { ensureAdminUser, ensureCorrectUserOrAdmin } = require('../middleware/aut
  */
 
 // Get a list of users, admin only
-router.get('/', ensureAdminUser, async function (req, res, next) {
-  const users = await User.getAll();
-  return res.json({ users });
+router.get("/", async function (req, res, next) {
+  const responseObj = await getAllUsersIfAdmin(res.token);
+  return res.json(responseObj);
 });
 
 // Create/Register a new user
-router.post('/', validateInput(newUserSchema), async function (req, res, next) {
+router.post("/", async function (req, res, next) {
   try {
-    await User.create(req.body);
-    const token = await User.authenticate(req.body);
-    return res.json({ token });
+    const responseObj = createUserIfSchemaIsValid(req.body);
+    return res.json(responseObj);
   } catch (error) {
     return next(error);
   }
 });
 
 // Get a user by username
-router.get('/:username', ensureCorrectUserOrAdmin, async function (req, res, next) {
+router.get('/:username', getToken, async function (req, res, next) {
   try {
-    const user = await User.get(req.params.username);
-    return res.json({ user });
+    const responseObj = getUserIfAdminOrOwner({
+      token: req.token,
+      username: req.params.username,
+    });
+    
+    return res.json(responseObj);
   } catch (error) {
     return next(error);
   }
 });
 
-// Get a list of surveys created by this user
-router.get('/:username/surveys', ensureCorrectUserOrAdmin, async function (req, res, next) {
-  const surveys = await User.getSurveys(req.params.username);
-  return res.json({ surveys });
-});
+// // Get a list of surveys created by this user
+// router.get('/:username/surveys', ensureCorrectUserOrAdmin, async function (req, res, next) {
+//   const surveys = await User.getSurveys(req.params.username);
+//   return res.json({ surveys });
+// });
+//
+// // Get a list of surveys voted on by this user, 
+// router.get('/:username/history', ensureCorrectUserOrAdmin, async function (req, res, next) {
+//   const surveys = await User.getHistory(req.params.username);
+//   return res.json({ surveys });
+// });
 
-// Get a list of surveys voted on by this user, 
-router.get('/:username/history', ensureCorrectUserOrAdmin, async function (req, res, next) {
-  const surveys = await User.getHistory(req.params.username);
-  return res.json({ surveys });
-});
-
-//Update a user
-router.patch(
-  '/:username',
-  ensureCorrectUserOrAdmin,
-  validateInput(updateUserSchema),
-  async function (req, res, next) {
-    try {
-      let user = await User.get(req.params.username);
-      user.updateFromValues(req.body);
-      await user.save();
-      return res.json({ user });
-    } catch (error) {
-      return next(error);
-    }
-  }
-);
-
-//Delete a user
-router.delete('/:username', ensureCorrectUserOrAdmin, async function (req, res, next) {
-  try {
-    const user = await User.get(req.params.username);
-    const message = await user.delete();
-    return res.json({ message });
-  } catch (error) {
-    return next(error);
-  }
-});
+// //Update a user
+// router.patch(
+//   '/:username',
+//   ensureCorrectUserOrAdmin,
+//   validateInput(updateUserSchema),
+//   async function (req, res, next) {
+//     try {
+//       let user = await User.get(req.params.username);
+//       user.updateFromValues(req.body);
+//       await user.save();
+//       return res.json({ user });
+//     } catch (error) {
+//       return next(error);
+//     }
+//   }
+// );
+//
+// //Delete a user
+// router.delete('/:username', ensureCorrectUserOrAdmin, async function (req, res, next) {
+//   try {
+//     const user = await User.get(req.params.username);
+//     const message = await user.delete();
+//     return res.json({ message });
+//   } catch (error) {
+//     return next(error);
+//   }
+// });
 
 module.exports = router;
