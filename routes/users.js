@@ -1,7 +1,8 @@
 const express = require('express');
 const router = new express.Router();
 const { getToken } = require('../middleware/httpRequestParsing');
-const { getAllUsersIfAdmin, getUserIfAdminOrOwner, createUserIfSchemaIsValid, updateUserIfAdminOrOwner, deleteUserIfAdminOrOwner } = require('../Core/Application/users');
+const { serializeGetAllUsersInput, serializeGetUserInput, serializeCreateUserInput } = require('../Core/Application/Users/usersUseCaseSerializers');
+const { getAllUsersIfAdmin, getUserIfAdminOrOwner, createUserWithValidSchema, updateUserIfAdminOrOwner, deleteUserIfAdminOrOwner } = require('../Core/Application/Users/usersUseCases');
 const assignStatusCode = require('../helpers/httpStatusCodeAssigner');
 
 /** 
@@ -11,20 +12,9 @@ const assignStatusCode = require('../helpers/httpStatusCodeAssigner');
  */
 
 // Get a list of users, admin only
-router.get("/", async function (req, res, next) {
+router.get("/", getToken, serializeGetAllUsersInput, async function (req, res, next) {
   try {
-    const responseObj = await getAllUsersIfAdmin(req.body.token);
-    return res.json(responseObj);
-  } catch (error) {
-    assignStatusCode(error);
-    return next(error);
-  }
-});
-
-// Create/Register a new user
-router.post("/", async function (req, res, next) {
-  try {
-    const responseObj = await createUserIfSchemaIsValid(req.body);
+    const responseObj = await getAllUsersIfAdmin(req.requestObj);
     return res.json(responseObj);
   } catch (error) {
     assignStatusCode(error);
@@ -33,13 +23,20 @@ router.post("/", async function (req, res, next) {
 });
 
 // Get a user by username
-router.get('/:username', getToken, async function (req, res, next) {
+router.get('/:username', getToken, serializeGetUserInput, async function (req, res, next) {
   try {
-    const responseObj = await getUserIfAdminOrOwner({
-      token: req.token,
-      username: req.params.username,
-    });
-    
+    const responseObj = await getUserIfAdminOrOwner(req.requestObj);
+    return res.json(responseObj);
+  } catch (error) {
+    assignStatusCode(error);
+    return next(error);
+  }
+});
+
+// Create/Register a new user
+router.post("/", serializeCreateUserInput, async function (req, res, next) {
+  try {
+    const responseObj = await createUserWithValidSchema(req.requestObj);
     return res.json(responseObj);
   } catch (error) {
     assignStatusCode(error);
