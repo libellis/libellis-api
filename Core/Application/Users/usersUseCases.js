@@ -3,10 +3,7 @@ const {
 } = require('../../../helpers/partialUpdate');
 const UnitOfWork = require('../../../Persistence/UnitOfWork');
 const User = require('../../Domain/user');
-const { serializeGetAllUsersOutput, serializeGetUserOutput, serializeCreateUserOutput } = require('./usersUseCaseSerializers');
-const { validateSchema } = require('../validation');
-const newUserSchema = require('../../../schema/newUser.json');
-const updateUserSchema = require('../../../schema/updateUser.json');
+const { serializeGetAllUsersOutput, serializeGetUserOutput, serializeCreateUserOutput, serializeUpdateUserOutput, serializeDeleteUserOutput } = require('./usersUseCaseOutputsSerializers');
 const { SECRET } = require('../../../config');
 const jwt = require('jsonwebtoken');
 
@@ -109,9 +106,6 @@ async function userExists(username, unitOfWork) {
 
 async function updateUserIfAdminOrOwner({ token, username, userChangeSet }) {
   if (authorize({ token, username }, 1)) {
-    // Will throw error internally if not valid
-    validateSchema(userChangeSet, updateUserSchema);
-
     const unitOfWork = new UnitOfWork();
 
     let user;
@@ -126,7 +120,6 @@ async function updateUserIfAdminOrOwner({ token, username, userChangeSet }) {
     // update values from userChangeSet if they match up to values
     // in the user domain model instance
     classPartialUpdate(user, userChangeSet);
-
     unitOfWork.users.save(user);
 
     try {
@@ -135,16 +128,7 @@ async function updateUserIfAdminOrOwner({ token, username, userChangeSet }) {
       throw e;
     }
 
-    return {
-      user: {
-        username: user.username,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        photo_url: user.photo_url,
-        is_admin: user.is_admin,
-      }
-    };
+    return serializeUpdateUserOutput(user);
   } else {
     const error = new Error("You cannot modify an account unless you own the account, or are an admin.");
     error.type = "Unauthorized";
@@ -173,10 +157,7 @@ async function deleteUserIfAdminOrOwner({ token, username }) {
       throw e;
     }
 
-    return {
-      message: "User Deleted"
-    }
-
+    return serializeDeleteUserOutput(user);
   } else {
     const error = new Error("You cannot delete an account unless you own the account, or are an admin.")
     error.type = "Unauthorized";

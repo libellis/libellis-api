@@ -1,7 +1,7 @@
 const express = require('express');
 const router = new express.Router();
 const { getToken } = require('../middleware/httpRequestParsing');
-const { serializeGetAllUsersInput, serializeGetUserInput, serializeCreateUserInput } = require('../Core/Application/Users/usersUseCaseSerializers');
+const { serializeGetAllUsersInput, serializeGetUserInput, serializeCreateUserInput, serializeUpdateUserInput, serializeDeleteUserInput } = require('../Core/Application/Users/usersUseCaseInputsSerializers');
 const { getAllUsersIfAdmin, getUserIfAdminOrOwner, createUserWithValidSchema, updateUserIfAdminOrOwner, deleteUserIfAdminOrOwner } = require('../Core/Application/Users/usersUseCases');
 const assignStatusCode = require('../helpers/httpStatusCodeAssigner');
 
@@ -56,32 +56,21 @@ router.post("/", serializeCreateUserInput, async function (req, res, next) {
 //   return res.json({ surveys });
 // });
 
-//Update a user
-router.patch(
-  '/:username',
-  getToken,
-  async function (req, res, next) {
-    try {
-      let responseObj = await updateUserIfAdminOrOwner({
-        token: req.token,
-        username: req.params.username,
-        userChangeSet: req.body,
-      });
-      return res.json(responseObj);
-    } catch (error) {
-      assignStatusCode(error);
-      return next(error);
-    }
-  }
-);
-
-//Delete a user
-router.delete('/:username', getToken, async function (req, res, next) {
+// Update a user
+router.patch('/:username', getToken, serializeUpdateUserInput, async function (req, res, next) {
   try {
-    let responseObj = await deleteUserIfAdminOrOwner({
-      token: req.token, 
-      username: req.params.username,
-    });
+    let responseObj = await updateUserIfAdminOrOwner(req.requestObj);
+    return res.json(responseObj);
+  } catch (error) {
+    assignStatusCode(error);
+    return next(error);
+  }
+});
+
+// Delete a user
+router.delete('/:username', getToken, serializeDeleteUserInput, async function (req, res, next) {
+  try {
+    let responseObj = await deleteUserIfAdminOrOwner(req.requestObj);
     return res.json(responseObj);
   } catch (error) {
     assignStatusCode(error);
