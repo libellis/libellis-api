@@ -100,52 +100,53 @@ describe('GET /users', () => {
 });
 
 
-// //Test create user route
-// describe('POST /users', () => {
-//   it('should correctly create a new user and return it', async function () {
-//     const response = await request(app)
-//       .post('/users')
-//       .send({
-//         username: 'bobcat',
-//         password: 'bob',
-//         first_name: 'bob',
-//         last_name: 'johnson',
-//         email: 'bob@gmail.com'
-//       });
-//     expect(response.statusCode).toBe(200);
-//     expect(response.body).toHaveProperty('token');
-//   });
-//
-//   it('should validate for proper email address format', async function () {
-//     // TEST FOR JSON SCHEMA
-//     const invalidResponse = await request(app)
-//       .post('/users')
-//       .send({
-//         username: 'bobcat',
-//         password: 'bob',
-//         first_name: 'bob',
-//         last_name: 'johnson',
-//         email: 'bob.com'
-//       });
-//
-//     expect(invalidResponse.statusCode).toBe(400);
-//   })
-//
-//   it('should throw an error if we try to create a user that already exists', async function () {
-//     const response = await request(app)
-//       .post('/users')
-//       .send({
-//         username: 'georgetheman',
-//         password: 'georgeisawesome',
-//         first_name: 'george',
-//         last_name: 'johnson',
-//         email: 'george@gmail.com'
-//       });
-//     expect(response.statusCode).toBe(400);
-//     expect(response.body.error).toBe(`Username "georgetheman" already exists`);
-//   })
-// });
-//
+//Test create user route
+describe('POST /users', () => {
+  it('should correctly create a new user and return it', async function () {
+    const response = await request(app)
+      .post('/users')
+      .send({
+        username: 'bobcat',
+        password: 'bob',
+        first_name: 'bob',
+        last_name: 'johnson',
+        email: 'bob@gmail.com'
+      });
+    expect(response.statusCode).toBe(200);
+    expect(response.body.is_admin).toBe(false);
+  });
+
+  it('should validate for proper email address format', async function () {
+    // TEST FOR JSON SCHEMA
+    const invalidResponse = await request(app)
+      .post('/users')
+      .send({
+        username: 'bobcat',
+        password: 'bob',
+        first_name: 'bob',
+        last_name: 'johnson',
+        email: 'bob.com'
+      });
+
+    expect(invalidResponse.statusCode).toBe(422);
+  });
+
+  it('should throw an error if we try to create a user that already exists', async function () {
+    const response = await request(app)
+      .post('/users')
+      .send({
+        username: 'georgetheman',
+        password: 'georgeisawesome',
+        first_name: 'george',
+        last_name: 'johnson',
+        email: 'george@gmail.com'
+      });
+    
+    //expect(response.statusCode).toBe(400);
+    expect(response.body.error).toBe(`Username "georgetheman" already exists`);
+  })
+});
+
 
 //Test get one user route
 describe('GET /users/:username', () => {

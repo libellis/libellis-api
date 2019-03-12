@@ -6,15 +6,17 @@ const { validate } = require('jsonschema');
  *  being passed for validation
  */
 
-function validateInput(req, schema) {
+function validateSchema(req, schema) {
     const result = validate(req, schema);
     if (!result.valid) {
         let error = {};
         error.message = result.errors.map(error => error.stack);
-        error.status = 400;
+        error.type = "InvalidSchema";
         throw error;
     }
     return true;
 }
 
-module.exports = validateInput;
+module.exports = {
+    validateSchema,
+}

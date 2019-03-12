@@ -26,6 +26,19 @@ router.post("/", async function (req, res, next) {
     const responseObj = await createUserIfSchemaIsValid(req.body);
     return res.json(responseObj);
   } catch (error) {
+    // make this a utility function somewhere? setting errors in routes should be handled
+    // nicely and automatically
+    switch (error.type) {
+      case "DuplicateResource":
+        error.status = 400;
+        break;
+      case "InvalidSchema":
+        error.status = 422;
+        break;
+      default:
+        error.status = 500;
+        break;
+    }
     return next(error);
   }
 });

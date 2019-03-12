@@ -3,7 +3,7 @@ const {
 } = require('../../helpers/partialUpdate');
 const UnitOfWork = require('../../Persistence/UnitOfWork');
 const User = require('../Domain/user');
-const {validateInput} = require('./validation');
+const { validateSchema } = require('./validation');
 const newUserSchema = require('../../schema/newUser.json');
 const updateUserSchema = require('../../schema/updateUser.json');
 const { SECRET } = require('../../config');
@@ -105,21 +105,40 @@ async function getUserIfAdminOrOwner({token, username}) {
 
 async function createUserIfSchemaIsValid(userData) {
   // Will throw error internally if not valid
-  validateInput(userData, newUserSchema);
+  validateSchema(userData, newUserSchema);
 
   const unitOfWork = new UnitOfWork();
-  const newUser = new User(userData);
+  
+  
+  if (await userExists(userData.username, unitOfWork)) {
+    const error = new Error(`Username "${userData.username}" already exists`);
+    error.type = "DuplicateResource";
+    throw error;
+  }
 
-  // add password this way so it hits our setter and gets hashed
-  newUser.password = userData.password;
+  const newUser = new User(userData);
   unitOfWork.users.add(newUser);
-  unitOfWork.complete();
+  
+  try {
+    await unitOfWork.complete();
+  } catch (e) {
+    throw e;
+  }
 
   return {
     username: newUser.username,
     email: newUser.email,
-    is_admin: newUser.is_admin,
+    is_admin: newUser.is_admin || false,
   };
+}
+
+async function userExists(username, unitOfWork) {
+  try {
+    await unitOfWork.users.get({ username });
+  } catch (e) {
+    return false; 
+  }
+  return true;
 }
 
 async function updateUserIfAdminOrOwner({token, username}, userChangeSet) {

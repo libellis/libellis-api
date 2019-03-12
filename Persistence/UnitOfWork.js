@@ -58,29 +58,30 @@ class UnitOfWork {
   async complete() {
     // run through all repositories running their aggregate
     // sql commands in a transaction
-    
-    await (async () => {
-      // note: we don't try/catch tconst db = require('../../Persistence/db');his because if connecting throws an exception
-      // we don't need to dispose of the client (it will be undefined)
-      const client = await this.context.connect();
+    try {
+      await (async () => {
+        const client = await this.context.connect();
 
-      try {
-        await client.query('BEGIN');
+        try {
+          await client.query('BEGIN');
 
-        for (const repo of Object.values(this.repositories)) {
-          for (const [query, values] of repo.commands) {
-            client.query(query, values);
+          for (const repo of Object.values(this.repositories)) {
+            for (const [query, values] of repo.commands) {
+              client.query(query, values);
+            }
           }
+
+          await client.query('COMMIT');
+        } catch (e) {
+          await client.query('ROLLBACK');
+          throw e
+        } finally {
+          client.release()
         }
-        
-        await client.query('COMMIT');
-      } catch (e) {
-        await client.query('ROLLBACK');
-        throw e
-      } finally {
-        client.release()
-      }
-    })();
+      })();
+    } catch (e) {
+      throw new Error(); 
+    }
   }
   
   dispose() {
