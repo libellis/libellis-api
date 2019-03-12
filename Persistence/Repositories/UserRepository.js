@@ -74,7 +74,6 @@ class UserRepository {
       'users',
       {
         username: userEntity.username,
-        password: userEntity.password,
         first_name: userEntity.first_name,
         last_name: userEntity.last_name,
         email: userEntity.email,

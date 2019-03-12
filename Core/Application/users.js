@@ -141,28 +141,48 @@ async function userExists(username, unitOfWork) {
   return true;
 }
 
-async function updateUserIfAdminOrOwner({token, username}, userChangeSet) {
+async function updateUserIfAdminOrOwner({token, username, userChangeSet}) {
   if (authorize({token, username}, 1)) {
+    // Will throw error internally if not valid
+    validateSchema(userChangeSet, updateUserSchema);
+    
     const unitOfWork = new UnitOfWork();
-    const user = unitOfWork.users.get({username});
-
+    
+    let user;
+    try {
+      user = await unitOfWork.users.get({username});
+    } catch (e) {
+      const error = new Error("No such user exists.");
+      error.type = "NotFound";
+      throw error;
+    }
+    
     // update values from userChangeSet if they match up to values
     // in the user domain model instance
     classPartialUpdate(user, userChangeSet);
 
     unitOfWork.users.save(user);
-    unitOfWork.complete();
 
-    return JSON.stringify({
-      username: user.username,
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: user.email,
-      photo_url: user.photo_url,
-      is_admin: user.is_admin,
-    });
+    try {
+      await unitOfWork.complete();
+    } catch (e) {
+      throw e;
+    }
+    
+    return {
+      user: {
+        username: user.username,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        photo_url: user.photo_url,
+        is_admin: user.is_admin,
+      }
+    };
   } else {
-    throw new Error("You cannot modify an account unless you own the account, or are an admin.")
+    const error = new Error("You cannot modify an account unless you own the account, or are an admin.");
+    error.type = "Unauthorized";
+    throw error;
   }
 }
 

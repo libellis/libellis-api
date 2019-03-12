@@ -6,6 +6,16 @@
   "title": "The Root Schema",
   "additionalProperties": false,
   "properties": {
+    "token": {
+      "$id": "#/properties/_token",
+      "type": "string",
+      "title": "The Token Schema",
+      "default": "",
+      "examples": [
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImtldmluIiwiaXNfYWRtaW4iOmZhbHNlLCJpYXQiOjE1NDIwODk1NTB9.Ira6KG8GBx3ZS0DC_HJcvqOA2KYyzLN3P-S-lLTBwGE"
+      ],
+      "pattern": "^(.*)$"
+    },
     "first_name": {
       "$id": "#/properties/first_name",
       "type": "string",

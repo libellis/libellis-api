@@ -6,7 +6,7 @@
   "title": "The Root Schema",
   "additionalProperties": false,
   "properties": {
-    "_token": {
+    "token": {
       "$id": "#/properties/_token",
       "type": "string",
       "title": "The Token Schema",

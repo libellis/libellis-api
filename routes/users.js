@@ -70,23 +70,42 @@ router.get('/:username', getToken, async function (req, res, next) {
 //   return res.json({ surveys });
 // });
 
-// //Update a user
-// router.patch(
-//   '/:username',
-//   ensureCorrectUserOrAdmin,
-//   validateInput(updateUserSchema),
-//   async function (req, res, next) {
-//     try {
-//       let user = await User.get(req.params.username);
-//       user.updateFromValues(req.body);
-//       await user.save();
-//       return res.json({ user });
-//     } catch (error) {
-//       return next(error);
-//     }
-//   }
-// );
-//
+//Update a user
+router.patch(
+  '/:username',
+  getToken,
+  async function (req, res, next) {
+    try {
+      let responseObj = await updateUserIfAdminOrOwner({
+        token: req.token,
+        username: req.params.username,
+        userChangeSet: req.body,
+      });
+      return res.json(responseObj);
+    } catch (error) {
+      console.log("GOT HERE TO ERROR: ", error);
+      switch (error.type) {
+        case "DuplicateResource":
+          error.status = 400;
+          break;
+        case "Unauthorized":
+          error.status = 401;
+          break;
+        case "NotFound":
+          error.status = 404;
+          break;
+        case "InvalidSchema":
+          error.status = 422;
+          break;
+        default:
+          error.status = 500;
+          break;
+      }
+      return next(error);
+    }
+  }
+);
+
 // //Delete a user
 // router.delete('/:username', ensureCorrectUserOrAdmin, async function (req, res, next) {
 //   try {

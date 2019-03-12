@@ -256,66 +256,60 @@ describe('GET /users/:username', () => {
 //     expect(response.statusCode).toBe(401);
 //   });
 // });
-//
-// //Test updating a user route
-// describe('PATCH /users/:username', () => {
-//   it('should correctly update a user and return it', async function () {
-//     const response = await request(app)
-//       .patch(`/users/${user3.username}`)
-//       .send({
-//         first_name: 'Josephina'
-//       })
-//       .query({
-//         _token: user3._token
-//       });
-//     expect(response.statusCode).toBe(200);
-//     expect(response.body.user._username).toBe(user3.username);
-//     expect(response.body.user.first_name).toBe('Josephina');
-//
-//     //TEST FOR JSON SCHEMA
-//     const invalidResponse = await request(app)
-//       .patch(`/users/${user3.username}`)
-//       .send({
-//         first_name: 20,
-//         last_name: null,
-//         _token: user3._token
-//       });
-//     expect(invalidResponse.statusCode).toBe(400);
-//   });
-//
-//   it('should fail to patch a username to another users username in db', async function () {
-//     const invalidResponse = await request(app)
-//       .patch(`/users/${user3.username}`)
-//       .send({
-//         username: 'joerocket'
-//       })
-//       .query({
-//         _token: user3._token
-//       });
-//
-//     expect(invalidResponse.statusCode).toBe(400);
-//   });
-//
-//   it('should fail to patch a user that has been deleted', async function () {
-//     const response = await request(app)
-//       .delete(`/users/${user3.username}`)
-//       .send({
-//         _token: user3._token
-//       });
-//     const invalidResponse = await request(app)
-//       .patch(`/users/${user3.username}`)
-//       .send({
-//         first_name: 'dumby'
-//       })
-//       .query({
-//         _token: user3._token
-//       });
-//
-//     expect(invalidResponse.statusCode).toBe(400);
-//     expect(invalidResponse.body.error).toMatch(`Cannot find user by username: georgetheman`);
-//   });
-// });
-//
+
+//Test updating a user route
+describe('PATCH /users/:username', () => {
+  it('should correctly update a user and return it', async function () {
+    const response = await request(app)
+      .patch(`/users/${user3.username}`)
+      .send({
+        first_name: 'Josephina',
+        token: user3.token,
+      })
+    expect(response.statusCode).toBe(200);
+    expect(response.body.user.username).toBe(user3.username);
+    expect(response.body.user.first_name).toBe('Josephina');
+
+    //TEST FOR JSON SCHEMA
+    const invalidResponse = await request(app)
+      .patch(`/users/${user3.username}`)
+      .send({
+        first_name: 20,
+        last_name: null,
+        taco: "extra key",
+        token: user3.token
+      });
+    expect(invalidResponse.statusCode).toBe(422);
+  });
+
+  it('should fail to patch a changeable field for a different user in db', async function () {
+    const invalidResponse = await request(app)
+      .patch(`/users/${user2.username}`)
+      .send({
+        first_name: 'Joe',
+        token: user3.token,
+      });
+
+    expect(invalidResponse.statusCode).toBe(401);
+  });
+
+  it('should fail to patch a user that has been deleted', async function () {
+    const unitOfWork = new UnitOfWork();
+    unitOfWork.users.remove(user3);
+    await unitOfWork.complete();
+    
+    const invalidResponse = await request(app)
+      .patch(`/users/${user3.username}`)
+      .send({
+        first_name: 'dumby',
+        token: user3.token,
+      });
+
+    expect(invalidResponse.statusCode).toBe(404);
+    expect(invalidResponse.body.error).toMatch("No such user exists.");
+  });
+});
+
 //
 // //Test deleting a user route
 // describe('DELETE /users/:username', () => {
