@@ -79,7 +79,7 @@ async function getUserIfAdminOrOwner({token, username}) {
       user = await unitOfWork.users.get({username});
     } catch (e) {
       let error = new Error();
-      error.type = "ResourceNotFound";
+      error.type = "NotFound";
       error.message = `Cannot find user by username: ${username}`;
       throw error;
     }
@@ -189,12 +189,32 @@ async function updateUserIfAdminOrOwner({token, username, userChangeSet}) {
 async function deleteUserIfAdminOrOwner({token, username}) {
   if (authorize({token, username}, 1)) {
     const unitOfWork = new UnitOfWork();
-    const user = unitOfWork.users.get({username});
+    
+    let user;
+    try {
+      user = await unitOfWork.users.get({username});
+    } catch (e) {
+      const error = new Error("No such user exists.");
+      error.type = "NotFound";
+      throw error;
+    }
 
     unitOfWork.users.remove(user);
-    unitOfWork.complete();
+
+    try {
+      await unitOfWork.complete();
+    } catch (e) {
+      throw e;
+    }
+    
+    return {
+      message: "User Deleted"
+    }
+    
   } else {
-    throw new Error("You cannot delete an account unless you own the account, or are an admin.")
+    const error = new Error("You cannot delete an account unless you own the account, or are an admin.")
+    error.type = "Unauthorized";
+    throw error;
   }
 }
 

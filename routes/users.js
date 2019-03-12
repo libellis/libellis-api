@@ -2,6 +2,7 @@ const express = require('express');
 const router = new express.Router();
 const { getToken } = require('../middleware/httpRequestParsing');
 const { getAllUsersIfAdmin, getUserIfAdminOrOwner, createUserIfSchemaIsValid, updateUserIfAdminOrOwner, deleteUserIfAdminOrOwner } = require('../Core/Application/users');
+const assignStatusCode = require('../helpers/httpStatusCodeAssigner');
 
 /** 
  * users endpoints are restricted
@@ -14,9 +15,9 @@ router.get("/", async function (req, res, next) {
   try {
     const responseObj = await getAllUsersIfAdmin(req.body.token);
     return res.json(responseObj);
-  } catch (e) {
-    e.status = e.type === "Unauthorized" ? 401 : 500;
-    return next(e);
+  } catch (error) {
+    assignStatusCode(error);
+    return next(error);
   }
 });
 
@@ -26,19 +27,7 @@ router.post("/", async function (req, res, next) {
     const responseObj = await createUserIfSchemaIsValid(req.body);
     return res.json(responseObj);
   } catch (error) {
-    // make this a utility function somewhere? setting errors in routes should be handled
-    // nicely and automatically
-    switch (error.type) {
-      case "DuplicateResource":
-        error.status = 400;
-        break;
-      case "InvalidSchema":
-        error.status = 422;
-        break;
-      default:
-        error.status = 500;
-        break;
-    }
+    assignStatusCode(error);
     return next(error);
   }
 });
@@ -53,7 +42,7 @@ router.get('/:username', getToken, async function (req, res, next) {
     
     return res.json(responseObj);
   } catch (error) {
-    error.status = error.type === "ResourceNotFound" ? 400 : 401;
+    assignStatusCode(error);
     return next(error);
   }
 });
@@ -83,38 +72,24 @@ router.patch(
       });
       return res.json(responseObj);
     } catch (error) {
-      console.log("GOT HERE TO ERROR: ", error);
-      switch (error.type) {
-        case "DuplicateResource":
-          error.status = 400;
-          break;
-        case "Unauthorized":
-          error.status = 401;
-          break;
-        case "NotFound":
-          error.status = 404;
-          break;
-        case "InvalidSchema":
-          error.status = 422;
-          break;
-        default:
-          error.status = 500;
-          break;
-      }
+      assignStatusCode(error);
       return next(error);
     }
   }
 );
 
-// //Delete a user
-// router.delete('/:username', ensureCorrectUserOrAdmin, async function (req, res, next) {
-//   try {
-//     const user = await User.get(req.params.username);
-//     const message = await user.delete();
-//     return res.json({ message });
-//   } catch (error) {
-//     return next(error);
-//   }
-// });
+//Delete a user
+router.delete('/:username', getToken, async function (req, res, next) {
+  try {
+    let responseObj = await deleteUserIfAdminOrOwner({
+      token: req.token, 
+      username: req.params.username,
+    });
+    return res.json(responseObj);
+  } catch (error) {
+    assignStatusCode(error);
+    return next(error);
+  }
+});
 
 module.exports = router;

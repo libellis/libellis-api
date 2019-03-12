@@ -173,7 +173,7 @@ describe('GET /users/:username', () => {
       .query({
         token: adminUser.token
       });
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(404);
     expect(response.body.error).toEqual("Cannot find user by username: superfakeusertest")
   });
 
@@ -187,14 +187,14 @@ describe('GET /users/:username', () => {
   });
 });
 
-//
+
 // // test get surveys created by user
 // describe('GET /users/:username/surveys', () => {
 //   it('should get an empty array of surveys for existing user with no created surveys', async function () {
 //     const response = await request(app)
 //       .get(`/users/${user3.username}/surveys`)
 //       .query({
-//         _token: user3._token
+//         token: user3.token
 //       });
 //     expect(response.statusCode).toBe(200);
 //     expect(response.body).toEqual({
@@ -310,34 +310,34 @@ describe('PATCH /users/:username', () => {
   });
 });
 
-//
-// //Test deleting a user route
-// describe('DELETE /users/:username', () => {
-//   it('should correctly delete a user', async function () {
-//     const response = await request(app)
-//       .delete(`/users/${user3.username}`)
-//       .send({
-//         _token: user3._token
-//       });
-//     expect(response.statusCode).toBe(200);
-//     expect(response.body.message).toBe('User Deleted');
-//   });
-//
-//   it('should fail to delete a user who tries to delete themselves more than once', async function () {
-//     const response = await request(app)
-//       .delete(`/users/${user3.username}`)
-//       .send({
-//         _token: user3._token
-//       });
-//     const badResponse = await request(app)
-//       .delete(`/users/${user3.username}`)
-//       .send({
-//         _token: user3._token
-//       });
-//     expect(badResponse.statusCode).toBe(400);
-//     expect(badResponse.body.error).toBe('Cannot find user by username: georgetheman');
-//   });
-// });
+
+//Test deleting a user route
+describe('DELETE /users/:username', () => {
+  it('should correctly delete a user', async function () {
+    const response = await request(app)
+      .delete(`/users/${user3.username}`)
+      .send({
+        token: user3.token
+      });
+    expect(response.statusCode).toBe(200);
+    expect(response.body.message).toBe('User Deleted');
+  });
+
+  it('should fail to delete a user who tries to delete themselves more than once', async function () {
+    const response = await request(app)
+      .delete(`/users/${user3.username}`)
+      .send({
+        token: user3.token
+      });
+    const badResponse = await request(app)
+      .delete(`/users/${user3.username}`)
+      .send({
+        token: user3.token
+      });
+    expect(badResponse.statusCode).toBe(404);
+    expect(badResponse.body.error).toBe('No such user exists.');
+  });
+});
 
 //Delete tables after each test
 afterEach(async function () {
