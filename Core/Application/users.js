@@ -64,7 +64,9 @@ async function getAllUsersIfAdmin(token) {
     };
     
   } else {
-    throw new Error("You must be an admin to get a list of all users.");
+    const error = new Error("You must be an admin to get a list of all users.");
+    error.type = "Unauthorized"; 
+    throw error;
   }
 }
 

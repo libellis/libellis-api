@@ -15,8 +15,7 @@ router.get("/", async function (req, res, next) {
     const responseObj = await getAllUsersIfAdmin(req.body.token);
     return res.json(responseObj);
   } catch (e) {
-    e.status = 401;
-    e.message = "Unauthorized.";
+    e.status = e.type === "Unauthorized" ? 401 : 500;
     return next(e);
   }
 });
