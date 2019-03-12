@@ -1,8 +1,7 @@
 process.env.NODE_ENV = 'test';
-const db = require('../../db');
+const db = require('../../Persistence/db');
 const request = require('supertest');
 const app = require('../../app');
-const User = require('../../models/user');
 const {
   createTables,
   insertTestData,
@@ -13,25 +12,16 @@ const {
 // Insert one test user before each test
 beforeEach(async function () {
   await createTables();
-  const response = await request(app)
-  .post('/users')
-  .send({
-    username: 'testuser',
-    password: 'password',
-    first_name: 'test',
-    last_name: 'user',
-    email: 'test@testmail.com'
-  }); 
+  await insertTestData();
 });
-
 
 describe('POST /login', () => {
   it('should login a user', async function () {
     const response = await request(app)
     .post('/login')
     .send({
-      username: 'testuser',
-      password: 'password'
+      username: "joerocket",
+      password: "testpass",
     }); 
   expect(response.status).toBe(200);
   expect(response.body.token).toEqual(expect.any(String))    
@@ -52,7 +42,7 @@ describe('POST /login', () => {
     const response = await request(app)
     .post('/login')
     .send({
-      username: 'testuser',
+      username: 'joerocket',
       password: 'wrongpassword'
     }); 
   expect(response.status).toBe(400);

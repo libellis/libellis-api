@@ -1,5 +1,4 @@
-const { db } = require('db');
-const { UnitOfWork } = require('../../Persistence/Repositories/UnitOfWork');
+const UnitOfWork = require('../../Persistence/UnitOfWork');
 const bcrypt = require('bcryptjs');
 const { BWF, SECRET, DEFAULT_PHOTO } = require('../../config');
 const jwt = require('jsonwebtoken');
@@ -13,11 +12,11 @@ const jwt = require('jsonwebtoken');
  */
 
 // Authenticate user - returns JWT
-async function authenticate({ db }, { username, password }) {
-  const unitOfWork = new UnitOfWork(db);
-  const user = unitOfWork.users.get({ username });
+async function authenticate({ username, password }) {
+  const unitOfWork = new UnitOfWork();
+  const user = await unitOfWork.users.get({ username });
   if (user) {
-    if (bcrypt.compareSync(username.password, user.password)) {
+    if (bcrypt.compareSync(password, user._password)) {
       const token = jwt.sign({ username, is_admin: user.is_admin }, SECRET);
       return token;
     }
@@ -59,4 +58,8 @@ function ensureLoggedIn(req, res, next) {
   catch (err) {
     return next({ status: 401, message: "Unauthorized" });
   }
+}
+
+module.exports = {
+  authenticate,
 }

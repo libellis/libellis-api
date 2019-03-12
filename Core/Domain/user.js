@@ -1,7 +1,8 @@
-const { BWF, SECRET, DEFAULT_PHOTO } = require('../config');
+const { BWF, SECRET, DEFAULT_PHOTO } = require('../../config');
+const bcrypt = require('bcryptjs');
 
 class User /* extends Model */ {
-  constructor({ username, first_name, last_name, email, photo_url, is_admin }) {
+  constructor({ username, password="placeholder", first_name, last_name, email, photo_url, is_admin }) {
     this.username = username;
     this.password = password;
     this.first_name = first_name;
@@ -22,15 +23,19 @@ class User /* extends Model */ {
   get username() {
     return this._username;
   }
-
+  
   set password(val) {
-    const salt = bcrypt.genSaltSync(BWF);
-    const hash = bcrypt.hashSync(password, salt);
-    this._password = hash;
+    this._password = val;
+  }
+  
+  get password() {
+    throw new Error("Cannot directly access plain text password. Did you want hashedPassword?")
   }
 
-  get password() {
-    return this._password;
+  get hashedPassword() {
+    const salt = bcrypt.genSaltSync(BWF);
+    const hash = bcrypt.hashSync(this._password, salt);
+    return hash;
   }
 }
 

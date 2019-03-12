@@ -2,9 +2,10 @@ const {
   sqlForPartialUpdate,
 } = require('../../helpers/partialUpdate');
 
-const { User } = require('../../Core/Domain/user');
+const User = require('../../Core/Domain/user');
+const { DEFAULT_PHOTO } = require("../../config");
 
-class UserRepository /* extends Model */ {
+class UserRepository {
   constructor(db) {
     this.db = db;
     this.commands = [];
@@ -34,41 +35,41 @@ class UserRepository /* extends Model */ {
   async getAll({ search }) {
     let result;
     if (search === undefined || search === '') {
-      let result = await this.db.query(
+      result = await this.db.query(
         `SELECT username, first_name, last_name, email FROM users`
       );
     } else {
-      let result = await this.db.query(
+      result = await this.db.query(
         `SELECT username, first_name, last_name, email FROM users
         WHERE username ILIKE $1`, [`%${search}%`]
       );
     }
 
-    return result.rows.map(user => new User({ ...user, db }));
+    return result.rows.map(user => new User(user));
   }
 
   /** WRITES */
 
   // Create a new user and return an instance
-  async add(userEntity) {
-    this.commands.push(`
+  add(userEntity) {
+    this.commands.push([`
       INSERT INTO users (username, password, first_name, last_name, email, photo_url, is_admin)
       VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING username, first_name, last_name, email, photo_url, is_admin`,
       [
         userEntity.username,
-        userEntity.password,
+        userEntity.hashedPassword,
         userEntity.first_name,
         userEntity.last_name,
         userEntity.email,
         userEntity.photo_url || DEFAULT_PHOTO,
         userEntity.is_admin || false
-      ]
+      ]]
     );
   }
 
   //Update a user instance
-  async save(userEntity) {
+  save(userEntity) {
     const { query, values } = sqlForPartialUpdate(
       'users',
       {
@@ -87,7 +88,7 @@ class UserRepository /* extends Model */ {
   }
 
   //Delete user and return a message
-  async remove(userEntity) {
+  remove(userEntity) {
     this.commands.push([
       `DELETE FROM users WHERE username=$1 RETURNING username`,
       [userEntity.username]

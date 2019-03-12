@@ -2,7 +2,9 @@ const deps = require('../dep_container/IoC');
 const { db } = deps;
 var fs = require('fs');
 
-const User = require('../models/user');
+const UnitOfWork = require('../Persistence/UnitOfWork');
+const User = require('../Core/Domain/user');
+const { authenticate } = require('../Core/Application/auth');
 
 async function createTables() {
   // run create tables SQL from data.sql
@@ -23,33 +25,44 @@ async function insertTestData() {
   // `);
 
 
-  const user1 = await User.create(deps, {
-    username: 'joerocket',
-    password: 'testpass',
-    first_name: 'joe',
-    last_name: 'smith',
-    email: 'joe@gmail.com',
+  let user1 = new User({
+    username: "joerocket",
+    password: "testpass",
+    first_name: "joe",
+    last_name: "smith",
+    email: "joe@gmail.com",
     is_admin: true
+  }); 
+  
+  let user2 = new User({
+    username: "spongebob",
+    password: "gary",
+    first_name: "SpongeBob",
+    last_name: "SquarePants",
+    email: "sponge@gmail.com"
   });
-
-  user1._token = await User.authenticate(deps, {
+  
+  const unitOfWork = new UnitOfWork();
+  
+  unitOfWork.users.add(user1);
+  unitOfWork.users.add(user2);
+  
+  try {
+    await unitOfWork.complete();
+  } catch (e) {
+    console.log("This didn't work.");
+  }
+  
+  user1.token = await authenticate({
     username: user1.username,
     password: 'testpass'
   });
-
-  const user2 = await User.create(deps, {
-    username: 'spongebob',
-    password: 'gary',
-    first_name: 'SpongeBob',
-    last_name: 'SquarePants',
-    email: 'sponge@gmail.com'
-  });
-
-  user2._token = await User.authenticate(deps, {
+  
+  user2.token = await authenticate({
     username: user2.username,
     password: 'gary'
   });
-
+  
   /***********************************************/
   /** Create categories so Surveys can have them */
 

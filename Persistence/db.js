@@ -1,7 +1,7 @@
 /** Database setup for libellis. */
 
 const { Pool } = require("pg");
-const { DB_URI } = require("./config");
+const { DB_URI } = require("../config");
 const url = require('url');
 
 const params = url.parse(DB_URI);

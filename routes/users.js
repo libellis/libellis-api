@@ -11,14 +11,20 @@ const { getAllUsersIfAdmin, getUserIfAdminOrOwner, createUserIfSchemaIsValid, up
 
 // Get a list of users, admin only
 router.get("/", async function (req, res, next) {
-  const responseObj = await getAllUsersIfAdmin(res.token);
-  return res.json(responseObj);
+  try {
+    const responseObj = await getAllUsersIfAdmin(req.body.token);
+    return res.json(responseObj);
+  } catch (e) {
+    e.status = 401;
+    e.message = "Unauthorized.";
+    return next(e);
+  }
 });
 
 // Create/Register a new user
 router.post("/", async function (req, res, next) {
   try {
-    const responseObj = createUserIfSchemaIsValid(req.body);
+    const responseObj = await createUserIfSchemaIsValid(req.body);
     return res.json(responseObj);
   } catch (error) {
     return next(error);
@@ -28,13 +34,14 @@ router.post("/", async function (req, res, next) {
 // Get a user by username
 router.get('/:username', getToken, async function (req, res, next) {
   try {
-    const responseObj = getUserIfAdminOrOwner({
+    const responseObj = await getUserIfAdminOrOwner({
       token: req.token,
       username: req.params.username,
     });
     
     return res.json(responseObj);
   } catch (error) {
+    error.status = error.type === "ResourceNotFound" ? 400 : 401;
     return next(error);
   }
 });
